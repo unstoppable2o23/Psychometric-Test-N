@@ -1,0 +1,326 @@
+     1→<!DOCTYPE html>
+     2→<html lang="en">
+     3→<head>
+     4→<meta charset="UTF-8">
+     5→<meta name="viewport" content="width=device-width, initial-scale=1.0">
+     6→<title>Multiple Intelligence Assessment</title>
+     7→<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Lora:wght@500;600;700&display=swap" rel="stylesheet">
+     8→<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+     9→<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+    10→<style>
+    11→*{margin:0;padding:0;box-sizing:border-box}
+    12→:root{--bg:#FAF5EC;--text:#1E293B;--muted:#64748B;--blue:#2563EB;--sky:#0EA5E9;--green:#10B981;--rose:#E11D48;--soft:#EFF6FF;--border:#E7E0D2;--navy:#0F172A}
+    13→html{scroll-behavior:smooth}
+    14→body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6;overflow-x:hidden}
+    15→.bg-deco{position:fixed;inset:0;z-index:-1;overflow:hidden}
+    16→.bg-deco div{position:absolute;border-radius:50%;filter:blur(110px);opacity:.15}
+    17→.b1{width:620px;height:620px;background:#60A5FA;top:-18%;left:-12%;animation:drift 14s ease-in-out infinite alternate}
+    18→.b2{width:520px;height:520px;background:#34D399;bottom:-18%;right:-10%;animation:drift 18s ease-in-out infinite alternate-reverse}
+    19→.b3{width:420px;height:420px;background:#F5C98A;top:40%;left:55%;opacity:.12;animation:drift 16s ease-in-out infinite alternate}
+    20→@keyframes drift{from{transform:translate(0,0)}to{transform:translate(50px,40px) scale(1.08)}}
+    21→main{max-width:1000px;margin:0 auto;padding:2rem 1rem}
+    22→.screen{display:none}.screen.active{display:block;animation:fadeUp .5s ease}
+    23→@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+    24→.glass{background:rgba(255,255,255,.8);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.75);box-shadow:0 20px 60px rgba(80,60,20,.1)}
+    25→.form-card{border-radius:24px;padding:2.6rem;max-width:720px;margin:2.5rem auto}
+    26→.form-card h1{font-family:'Lora',serif;font-size:2.3rem;color:var(--navy);line-height:1.2}
+    27→.form-card h1 em{font-style:normal;background:linear-gradient(90deg,var(--blue),var(--sky),var(--green));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+    28→.accent-bar{width:78px;height:5px;border-radius:3px;background:linear-gradient(90deg,var(--blue),var(--green));margin:.6rem 0 1rem}
+    29→p.sub{color:var(--muted);margin-bottom:1.2rem}
+    30→.chips{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.4rem}
+    31→.chip{background:var(--soft);color:var(--blue);border:1px solid #BFDBFE;font-size:.73rem;font-weight:600;padding:.3rem .8rem;border-radius:999px}
+    32→.info-box{background:#FDFBF6;border:1px solid var(--border);border-left:4px solid var(--blue);border-radius:10px;padding:1rem 1.2rem;margin-bottom:1rem;font-size:.9rem}
+    33→.info-box h3{font-size:.95rem;color:var(--navy);margin-bottom:.4rem}
+    34→.info-box ul{padding-left:1.1rem;margin:.3rem 0}
+    35→.info-box li{margin-bottom:.25rem}
+    36→.form-group{margin-bottom:1.1rem}
+    37→.form-group label{display:block;margin-bottom:.35rem;color:#334155;font-size:.86rem;font-weight:600}
+    38→.form-group input{width:100%;padding:.85rem 1rem;background:rgba(255,255,255,.9);border:2px solid var(--border);border-radius:12px;color:var(--navy);font-family:'Poppins',sans-serif;font-size:1rem}
+    39→.form-group input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 4px rgba(37,99,235,.13)}
+    40→.btn{display:inline-block;padding:.95rem 2.2rem;background:linear-gradient(90deg,var(--blue),var(--sky));color:#fff;border:none;border-radius:12px;font-family:'Poppins',sans-serif;font-weight:600;cursor:pointer;font-size:1rem;transition:.25s;margin-top:.8rem;box-shadow:0 8px 22px rgba(37,99,235,.35)}
+    41→.btn:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(37,99,235,.45)}
+    42→.quiz-wrap{max-width:780px;margin:0 auto}
+    43→.quiz-top{display:flex;align-items:center;gap:1rem;margin:1rem 0 1.4rem}
+    44→.ring-wrap{position:relative;width:76px;height:76px;flex-shrink:0}
+    45→.ring-wrap svg{width:76px;height:76px;transform:rotate(-90deg)}
+    46→.ring-bg{fill:none;stroke:#E7E0D2;stroke-width:8}
+    47→.ring-fill{fill:none;stroke:url(#ringGrad);stroke-width:8;stroke-linecap:round;stroke-dasharray:326.7;stroke-dashoffset:326.7;transition:stroke-dashoffset .5s ease}
+    48→.ring-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--navy)}
+    49→.quiz-meta{flex:1}
+    50→.quiz-meta .t{font-family:'Lora',serif;font-weight:700;color:var(--navy)}
+    51→.quiz-meta .p{font-size:.85rem;color:var(--muted);font-weight:500}
+    52→.stage-pill{background:var(--soft);color:var(--blue);font-size:.72rem;font-weight:700;padding:.35rem .8rem;border-radius:999px;border:1px solid #BFDBFE;white-space:nowrap}
+    53→.q-card-big{border-radius:24px;padding:2.2rem 2.4rem;animation:qIn .3s ease}
+    54→@keyframes qIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:none}}
+    55→.q-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem}
+    56→.q-sec{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--blue);background:var(--soft);border:1px solid #BFDBFE;padding:.25rem .75rem;border-radius:999px}
+    57→.q-count{font-size:.8rem;font-weight:600;color:var(--muted)}
+    58→.q-big{font-family:'Lora',serif;font-size:1.5rem;font-weight:600;color:var(--navy);line-height:1.4;margin-bottom:1.5rem}
+    59→.opts-list{display:flex;flex-direction:column;gap:.5rem}
+    60→.opt-row{display:flex;align-items:center;gap:.9rem;width:100%;text-align:left;padding:.8rem 1.1rem;background:#FDFBF7;border:2px solid var(--border);border-radius:14px;cursor:pointer;font-family:'Poppins',sans-serif;font-size:.94rem;font-weight:600;color:#475569;transition:.16s}
+    61→.opt-row:hover{border-color:var(--blue);color:var(--blue);background:var(--soft);transform:translateX(6px)}
+    62→.opt-badge{width:30px;height:30px;border-radius:50%;background:#EDE7DA;color:#475569;display:flex;align-items:center;justify-content:center;font-size:.82rem;font-weight:700;flex-shrink:0}
+    63→.opt-row.selected{background:linear-gradient(90deg,var(--blue),var(--sky));color:#fff;border-color:transparent;box-shadow:0 8px 20px rgba(37,99,235,.35)}
+    64→.opt-row.selected .opt-badge{background:rgba(255,255,255,.25);color:#fff}
+    65→.kbd-hint{margin-top:1.1rem;font-size:.76rem;color:#A8A291;text-align:center}
+    66→.quiz-nav{display:flex;justify-content:space-between;margin-top:1.1rem}
+    67→.ghost-btn{background:transparent;border:2px solid var(--border);color:#475569;font-family:'Poppins',sans-serif;font-weight:600;padding:.65rem 1.4rem;border-radius:12px;cursor:pointer;font-size:.9rem}
+    68→.ghost-btn:hover{border-color:var(--blue);color:var(--blue)}
+    69→.done-card{border-radius:24px;padding:3rem 2.5rem;text-align:center}
+    70→.done-emoji{font-size:3rem}
+    71→.done-card h2{font-family:'Lora',serif;font-size:1.9rem;color:var(--navy);margin:.5rem 0}
+    72→.report-card{background:#fff;border-radius:16px;border:1px solid var(--border);box-shadow:0 20px 50px rgba(80,60,20,.12);padding:3rem;margin-bottom:1rem}
+    73→.report-head{border-bottom:3px solid var(--blue);padding-bottom:1.2rem;margin-bottom:1.6rem}
+    74→.report-head .brand{font-family:'Lora',serif;font-weight:700;color:var(--blue);font-size:1.05rem}
+    75→.report-head h1{font-family:'Lora',serif;font-size:2.1rem;color:var(--navy);margin:.4rem 0}
+    76→.report-head .meta{display:flex;gap:1.5rem;flex-wrap:wrap;font-size:.8rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+    77→.report-head .meta b{color:var(--navy);text-transform:none;letter-spacing:0;font-weight:600;margin-left:.3rem}
+    78→.rsec{margin-bottom:2rem}
+    79→.rsec h2{font-family:'Lora',serif;font-size:1.25rem;color:var(--navy);margin:1.4rem 0 .8rem;border-left:4px solid var(--blue);padding-left:.7rem}
+    80→.rsec h3{font-family:'Lora',serif;font-size:1.05rem;color:var(--navy);margin:1.1rem 0 .5rem}
+    81→.rsec p{color:#374151;margin-bottom:.7rem;font-size:.93rem}
+    82→.rsec ul{list-style:none;margin:.6rem 0}
+    83→.rsec ul li{position:relative;padding-left:1.4rem;margin-bottom:.45rem;font-size:.93rem;color:#374151}
+    84→.rsec ul li::before{content:'➤';position:absolute;left:0;color:var(--blue);font-size:.72rem;top:4px}
+    85→.intel-box{margin-bottom:1.6rem;padding:1.3rem;background:#FDFBF6;border:1px solid var(--border);border-left:5px solid var(--blue);border-radius:14px}
+    86→.intel-head{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:.5rem;margin-bottom:.4rem}
+    87→.intel-head .nm{font-family:'Lora',serif;font-size:1.15rem;font-weight:700;color:var(--navy)}
+    88→.intel-head .sc{font-size:.85rem;font-weight:700;color:var(--blue)}
+    89→.intel-box p{font-size:.9rem;color:#374151;margin-bottom:.6rem}
+    90→.intel-box h4{font-size:.78rem;text-transform:uppercase;letter-spacing:.05em;color:var(--blue);margin:.8rem 0 .3rem}
+    91→.grid2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+    92→.badge{display:inline-block;padding:.18rem .55rem;border-radius:999px;font-size:.64rem;font-weight:700;text-transform:uppercase;white-space:nowrap}
+    93→.b-vhigh{background:rgba(16,185,129,.15);color:#047857;border:1px solid #047857}
+    94→.b-high{background:rgba(37,99,235,.1);color:#1D4ED8;border:1px solid #1D4ED8}
+    95→.b-med{background:rgba(14,165,233,.12);color:#0369A1;border:1px solid #0369A1}
+    96→.b-low{background:rgba(245,158,11,.14);color:#B45309;border:1px solid #B45309}
+    97→.b-vlow{background:rgba(225,29,72,.12);color:#BE123C;border:1px solid #BE123C}
+    98→.bar-item{margin-bottom:.75rem}
+    99→.bar-label{display:flex;justify-content:space-between;font-size:.86rem;margin-bottom:.25rem;font-weight:600;color:#334155}
+   100→.bar-track{height:10px;background:#EDE7DA;border-radius:5px;overflow:hidden}
+   101→.bar-fill{height:100%;width:0;border-radius:5px;transition:width 1.1s cubic-bezier(.22,1,.36,1)}
+   102→table.data{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.87rem}
+   103→table.data th,table.data td{border:1px solid #EDE7DA;padding:.6rem .8rem;text-align:left;vertical-align:top}
+   104→table.data th{background:var(--navy);color:#fff;font-weight:600;text-transform:uppercase;letter-spacing:.04em;font-size:.74rem}
+   105→table.data tr:nth-child(even){background:#FAF8F2}
+   106→table.data td.cat{font-weight:600;color:var(--navy)}
+   107→.chart-2col{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;align-items:start}
+   108→.chart-box{background:#FAF8F2;border:1px solid #EDE7DA;border-radius:12px;padding:1rem}
+   109→.radar-box{position:relative;height:300px}
+   110→.barchart-box{position:relative;height:320px}
+   111→.reveal{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease}
+   112→.reveal.vis{opacity:1;transform:none}
+   113→.print-btn{display:block;width:100%;background:linear-gradient(90deg,var(--blue),var(--sky));color:#fff;border:none;padding:1rem;border-radius:12px;font-family:'Poppins',sans-serif;font-weight:600;cursor:pointer;font-size:1rem;margin-bottom:2rem}
+   114→@media (max-width:768px){.form-card{padding:1.6rem}.q-card-big{padding:1.5rem}.q-big{font-size:1.2rem}.report-card{padding:1.4rem}.chart-2col{grid-template-columns:1fr}.grid2{grid-template-columns:1fr}.stage-pill{display:none}}
+   115→
+   116→/* ============ PRINT — A4 PERFECT ============ */
+   117→@page{size:A4;margin:0}
+   118→@media print{
+   119→ html,body{width:210mm;background:#fff!important;line-height:1.45}
+   120→ *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+   121→ .bg-deco,.print-btn,#form-screen,#quiz-screen{display:none!important}
+   122→ main{max-width:none!important;padding:0!important;margin:0!important}
+   123→ .report-card{box-shadow:none!important;border:none!important;border-radius:0!important;padding:12mm!important;margin:0!important;background:#fff!important;overflow:visible!important}
+   124→ table{border-collapse:collapse!important;page-break-inside:auto!important;break-inside:auto!important}
+   125→ table tr,td,th{page-break-inside:avoid!important;break-inside:avoid!important}
+   126→ table thead{display:table-header-group!important}
+   127→ h1,h2,h3,h4,.intel-box,.bar-item,.info-box,.chart-box{page-break-inside:avoid!important;break-inside:avoid!important}
+   128→ h1,h2,h3,h4{page-break-after:avoid!important;break-after:avoid!important}
+   129→ p,li{orphans:3;widows:3}
+   130→ .chart-2col{grid-template-columns:1fr!important}
+   131→ .radar-box{height:240px!important;overflow:hidden!important}
+   132→ .barchart-box{height:260px!important;overflow:hidden!important}
+   133→ canvas{max-width:100%!important;max-height:100%!important}
+   134→ h1,h2,h3,h4,.rsec h2{font-size:1.1rem;margin:1rem 0 .55rem}
+   135→ .rsec p,.rsec ul li{font-size:.85rem;margin-bottom:.4rem}
+   136→ table th,table td{padding:.5rem .6rem!important;font-size:.8rem}
+   137→ .intel-box{padding:1rem;margin-bottom:1.2rem}
+   138→ .reveal{opacity:1!important;transform:none!important}
+   139→ .bar-fill,.pct{transition:none!important}
+   140→ .pgnext{page-break-before:always;break-before:page}
+   141→}
+   142→</style>
+   143→</head>
+   144→<body>
+   145→<svg width="0" height="0" style="position:absolute"><defs><linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#2563EB"/><stop offset="100%" stop-color="#10B981"/></linearGradient></defs></svg>
+   146→<div class="bg-deco"><div class="b1"></div><div class="b2"></div><div class="b3"></div></div>
+   147→<main>
+   148→<section id="form-screen" class="screen active">
+   149→ <div class="form-card glass">
+   150→  <h1>Multiple <em>Intelligence</em> Assessment</h1><div class="accent-bar"></div>
+   151→  <p class="sub">Based on Dr. Howard Gardner's Theory of Multiple Intelligences (1983) — tested under Project SUMIT, found to improve student performance in 78% of cases.</p>
+   152→  <div class="chips"><span class="chip">📝 54 Questions</span><span class="chip">⏱️ 20–25 Minutes</span><span class="chip">🧠 9 Intelligences</span><span class="chip">📊 Radar + Careers</span></div>
+   153→  <div class="info-box"><h3>Assessment Output</h3><ul><li><strong>Detailed Report:</strong> Analysis of all nine intelligence types with your scores.</li><li><strong>Improvement Plan:</strong> Actionable points to improve your strongest intelligences.</li><li><strong>Career Recommendations:</strong> Careers and pathways matched to your strongest intelligences.</li></ul></div>
+   154→  <div class="info-box"><h3>Guidelines for Best Results</h3><ul><li>Relax — there are no right or wrong answers.</li><li>Be honest about your abilities; don't be influenced by what others expect.</li><li>Rate each statement on a scale of 1 (Strongly Disagree) to 7 (Strongly Agree).</li></ul></div>
+   155→  <div class="form-group"><label>Full Name</label><input type="text" id="s-name" placeholder="Enter your full name"></div>
+   156→  <div class="form-group"><label>Email Address</label><input type="email" id="s-email" placeholder="you@example.com"></div>
+   157→  <div class="form-group"><label>Mobile Number</label><input type="tel" id="s-phone" placeholder="e.g. 98765 43210"></div>
+   158→  <button class="btn" onclick="startTest()">Start Assessment →</button>
+   159→ </div>
+   160→</section>
+   161→<section id="quiz-screen" class="screen">
+   162→ <div class="quiz-wrap">
+   163→  <div class="quiz-top">
+   164→   <div class="ring-wrap"><svg viewBox="0 0 120 120"><circle class="ring-bg" cx="60" cy="60" r="52"/><circle class="ring-fill" id="ring-fill" cx="60" cy="60" r="52"/></svg><div class="ring-num" id="ring-num">0%</div></div>
+   165→   <div class="quiz-meta"><div class="t">Multiple Intelligence Test</div><div class="p" id="prog-text">0 / 54 answered</div></div>
+   166→   <div class="stage-pill" id="grade-pill"></div>
+   167→  </div>
+   168→  <div id="quiz-body"></div>
+   169→  <div class="quiz-nav"><button type="button" class="ghost-btn" id="back-btn" onclick="back()">← Back</button><div></div></div>
+   170→ </div>
+   171→</section>
+   172→<section id="report-screen" class="screen">
+   173→ <div class="report-card" id="report-content"></div>
+   174→ <button class="print-btn" onclick="window.print()">Print / Save as PDF (A4)</button>
+   175→</section>
+   176→</main>
+   177→<script>
+   178→const INTEL={
+   179→linguistic:{name:"Linguistic Intelligence",short:"Linguistic",desc:"Linguistic intelligence helps you to understand and use language properly in reading, writing, speaking, including sign language and Braille. It also affects vocabulary and the ability to understand and use humor, create pictures using words, notice language patterns, and recognize relationships between words. Linguistic intelligence is one of the main intelligences linked with succeeding in school.",strengths:["Know how to use vocabulary, sentence structure, grammar and spelling for clear communication","Easily remember word-based information","Good at learning new languages and other symbol systems, such as computer code","Use language creatively for storytelling, writing, using humor and composing poetry","Can tailor communication style depending on topic, audience and purpose"],challenges:["Have difficulty with grammar, vocabulary, reading, writing, new languages and word-based puzzles","Struggle with communication, creativity and memory for general facts","Avoid activities that involve reading, writing and speaking, especially with challenging material","Don't pick up on subtle forms of humor, such as irony, sarcasm and satire","Have trouble remembering things that are read or heard"],famous:["Ta-Nehisi Coates (writer, journalist)","Barack Obama (lawyer, U.S. president)","Amanda Gorman (poet, activist)","Noam Chomsky (linguist, philosopher)"],careers:["Interpreters and Translators","Technical Writers","Lawyers","Political Scientists","Speech-Language Pathologists","Editors","Poets, Lyricists and Creative Writers","English Language and Literature Teachers"],advice:"Underline, highlight, or write down any new or unfamiliar words you come across in your reading. Look up these words as soon as you can. Take elective classes like creative writing, speech and debate, drama, or foreign languages. Read aloud to improve your flow, pronunciation and confidence. Get involved with the school paper or media club."},
+   180→logical:{name:"Logical Intelligence",short:"Logical-Math",desc:"This intelligence includes the ability to reason inductively (make conclusions based on observations) and deductively (make conclusions based on hypotheses). It also involves finding relationships between abstract ideas, recognizing logical sequences and patterns, recognizing problems and solving them. This intelligence is closely linked with being successful in school.",strengths:["Easily recognize number patterns and can make quick, accurate calculations","Understand the relationship between cause and effect","Can identify all the parts in a system and how they interact","Analyze information to determine what is important versus what is not","Able to work with abstract concepts and use symbols to represent concrete ideas"],challenges:["Struggle with abstract mathematical and logical concepts","Poor problem-solving ability — don't know how to develop approaches for reaching the best solution","Dislike activities involving puzzles, strategy, calculations or formulas","Find it hard to categorize and organize things in a logical manner","Not inclined to experiment or form theories to explain things"],famous:["Temple Grandin (inventor, scientist)","Albert Einstein (physicist, humanitarian)","Katalin Karikó (pioneer of mRNA technology)","Neil deGrasse Tyson (astrophysicist)","Katherine Johnson (mathematician, NASA scientist)"],careers:["Statisticians","Actuaries","Operations Research Analysts","Bioengineers and Biomedical Engineers","Environmental Engineers","Mathematicians","Biostatisticians","Physicists"],advice:"Use and create information that can be represented in multiple ways — for example, data placed in a chart or graph. To improve critical thinking, learn about the 'fallacies of logic' (incorrect arguments). Ask others to help you spot flaws in your problem solving. Look for patterns and ways to organize information to make it easier to remember."},
+   181→spatial:{name:"Spatial Intelligence",short:"Spatial",desc:"Spatial intelligence includes the ability to identify objects accurately, change and recreate images, and recognize how shapes and objects relate to each other. While this intelligence is typically applied through visual means, spatial intelligence does not only rely on vision — it can also be used through touch and sometimes even hearing.",strengths:["Able to visualize images — both real and imagined — with great clarity","Notice and remember visual details; tend to evaluate the design, symmetry or beauty of things","Can work with shape, size, position and location to solve problems and design, arrange or build things","Have a good sense of direction and can easily navigate different environments","Can accurately visualize and estimate distances and measurements"],challenges:["Difficulty learning information that is visual or tactile","Poor memory for visual details such as locations and what things look like; may forget faces","Dislike puzzles, mazes, building models and other activities that require fitting pieces together","Easily lose sense of direction and have trouble following maps, charts and diagrams","Struggle to estimate distances and measurements"],famous:["Javier Senosiain (architect)","Michelangelo (artist, engineer)","Kathryn Bigelow (director, producer)","Vera Wang (fashion designer)","Matthew Henson (Arctic explorer, navigator)"],careers:["Architectural and Civil Drafters","Computer Hardware Engineers","Commercial and Industrial Designers","Bioengineers and Biomedical Engineers","Commercial Pilots","Architects, Except Landscape and Naval"],advice:"When taking notes or studying, use mind maps, charts, diagrams or pictures to visualize the topics you are learning about. Imagine different ways of seeing things. Take elective courses like art, marketing and advertising, dance, animation, video production, woodworking or design. Incorporate visual representations into your assignments and projects."},
+   182→kinesthetic:{name:"Kinesthetic Intelligence",short:"Bodily-Kin",desc:"This intelligence provides the mind and body coordination needed to move your body and other objects. It influences small movements, such as using your fingers to play a musical instrument, and large movements, such as running and catching a ball. Kinesthetic intelligence also affects certain mental abilities such as visualizing and remembering complex movements.",strengths:["Have good balance and coordination when moving or being physically active","Good at hands-on activities, such as using tools and objects to build, create and repair","Can analyze complex movements and the steps involved to identify problems and solutions","Use movement to express feelings and ideas — gestures, body language, acting or dance","Have good reflexes — react quickly and instinctively"],challenges:["Avoid activities that require good coordination or complex movements","Not interested in playing competitive sports","Do not use movement or physical precision for self-expression","Lack confidence when using tools and other physical objects","Unaware of own body language and may miss non-verbal cues from others"],famous:["Naomi Osaka (tennis player)","Bruce Lee (martial artist)","Paula Abdul (dancer, choreographer)","Dorothy Dietrich (magician, stunt performer)","Jim Carrey (actor, comedian)"],careers:["Dancers","Athletes and Sports Competitors","Exercise Trainers and Group Fitness Instructors","Machine Tool Setters, Operators, and Tenders","Cutting and Slicing Machine Setters","Fallers"],advice:"Actively use your body and your five senses to 'learn by doing'. Use hands-on activities, such as manipulating objects or conducting experiments, to learn new concepts. Try to remain active when you're concentrating on learning something. Take short breaks to get up and move around or stretch during class time. Complete assignments by acting out skits or building models."},
+   183→musical:{name:"Musical Intelligence",short:"Musical",desc:"This intelligence includes the ability to play an instrument or sing, as well as a number of other skills such as: recognizing tones, patterns, rhythms, beats and sounds; enjoying and analyzing music; understanding musical structures; and creating melodies and rhythms.",strengths:["Enjoy a wide range of different types of music","Use music to influence mood, build motivation and boost productivity","Easily pick up on the beat or chords in music and recognize different instruments by their sounds","Notice and use different tones in speech to impart emotion, emphasis or meaning","Sing well, can play one or more instruments and could easily learn another","Readily recall tunes and lyrics, and can use music, rhythms and patterns to remember things"],challenges:["Enjoy only a few types of music","Music has little effect on mood, motivation and emotions","Difficulty identifying sounds of different musical instruments","Not likely to notice or use tone that imparts meaning in speech","Do not sing well and would have trouble learning to play an instrument","Do not remember melodies and lyrics of songs"],famous:["Jack White (singer, songwriter, producer)","The Weeknd (singer, songwriter, record producer)","Beyoncé Knowles (singer, songwriter and actress)","will.i.am (musician and producer)","Adele Adkins (singer-songwriter)"],careers:["Music Directors and Composers","Musical Instrument Repairers and Tuners","Art, Drama, and Music Teachers","Music Therapists","Musicians and Singers","Sound Engineering Technicians","Choreographers"],advice:"Take any kind of music, singing or dance class. Take speech and debate, poetry or creative writing classes. Pay attention to the rhythm and patterns in speech and writing. When working on assignments or playing sports, try to move and work with a rhythm that suits the activity. Include music in your presentations or projects, selecting music that complements the assignment."},
+   184→interpersonal:{name:"Interpersonal Intelligence",short:"Interpersonal",desc:"This intelligence includes understanding and working with people, building relationships, seeing the world from others' points of view, communicating well verbally and non-verbally, cooperating in a group, having influence, and responding to the mood, personality and goals of others.",strengths:["Relate well to others","Notice and understand people's needs, perspectives, emotions and motivations","Connect and interact with people quickly and easily","Form and maintain lasting relationships","Able to lead, influence and inspire others"],challenges:["Difficulty building and maintaining social relationships","Do not notice or respond appropriately to others' feelings, motivations or behaviors","Not good at collaborative work","Uncomfortable interacting with people whose experiences, views and beliefs differ from own","Don't see the humor in things that others find funny"],famous:["Martin Luther King, Jr. (clergyman, civil rights activist)","Mother Teresa (nun, humanitarian)","Oprah Winfrey (talk-show host, philanthropist)","Mary Ainsworth (developmental psychologist)","Joseph Roberts (motivational speaker, advocate)"],careers:["School Psychologists","Legislators","Educational, Guidance, and Career Counselors","Arbitrators, Mediators, and Conciliators","Psychiatrists","Public Relations Specialists","Patient Representatives","Flight Attendants"],advice:"Learn how to be a good listener. Practice 'active listening' and use every conversation as an opportunity to better understand other people's points of view. Talk to other students, teachers or experts to learn more. Ask your teacher about working in pairs or groups. Get involved in a social cause or volunteer to mentor other students. Take part in role playing, presentations, debates and group activities."},
+   185→intrapersonal:{name:"Intrapersonal Intelligence",short:"Intrapersonal",desc:"Intrapersonal intelligence includes the ability to understand oneself — emotions, fears, motivations, strengths and weaknesses. This intelligence allows you to reflect upon your own thinking and behavior, learn from that reflection, find ways for self-improvement, and build self-confidence.",strengths:["Well aware of personal abilities, challenges, feelings and attitudes","Set realistic goals, able to focus and stay on track","In control of emotions, good at handling high-stress situations","Make decisions thoughtfully and carefully","Ethical and objective, aware of how personal viewpoints can be biased or unfair"],challenges:["Give little thought to personal goals and abilities when making decisions","Unaware of how mood, attitude and tone of voice can affect other people","Allow personal opinions to negatively affect decisions and interactions with others","Set unrealistic goals and make limited progress, often giving up","Don't understand how to recognize and manage own emotions"],famous:["Confucius (philosopher, teacher)","Mamie Phipps Clark (social psychologist)","Mohandas Gandhi (lawyer, ideological leader)","Helen Keller (speaker, author)","Kwame Anthony Appiah (philosopher, cultural theorist)"],careers:["Judges, Magistrate Judges, and Magistrates","Marriage and Family Therapists","Chief Executives","Special Education Teachers","Psychiatrists","Sales Managers","Producers and Directors"],advice:"Learn about and practice good decision making and setting realistic goals. Check your progress regularly. Build awareness of your feelings, attitudes and behavior. Keep a journal or blog and record your thoughts about your experiences. When receiving corrective criticism, remind yourself that feedback is intended to help you improve your skills. Monitor and manage negative emotions."},
+   186→naturalist:{name:"Naturalist Intelligence",short:"Naturalistic",desc:"Naturalist intelligence involves being able to recognize, appreciate and group different things in the environment: plants, animals, people, structures, weather patterns, landscapes and so on. It also allows one to see the connections between different parts of the environment, to easily recognize when environmental changes happen, and to understand what impacts those changes might have. People with a strong naturalist intelligence are typically viewed as being 'in tune' with nature.",strengths:["Sensitive to nature — feel a concern for and connection to living things and the natural environment","Observe similarities and differences in plants, animals and natural formations","Organize and group things according to their traits","Enjoy growing plants, taking care of animals or learning about the natural environment","Aware of subtle changes in the weather, climate and seasons","Have an interest in conservation and recycling"],challenges:["Difficulty identifying or grouping plants, animals and objects in the natural environment","Don't notice similarities between seemingly different objects","Unable to identify the sights and sounds of nature","Feel uncomfortable in a natural environment — may fear wild animals, dislike insects, sand and dirt","Unaware of gradual shifts in the weather","Not concerned about environmental protection, pollution controls or water quality"],famous:["Charles Darwin (geologist, naturalist)","Jane Goodall (biologist, conservationist)","Dara McAnulty (naturalist, writer)","Chico Mendes (human rights activist, environmentalist)","John Francis (environmentalist, author)"],careers:["Animal Breeders","Park Naturalists","Sustainability Specialists","Environmental Science Teachers","Veterinarians","Forest and Conservation Workers","Zoologists and Wildlife Biologists","Range Managers"],advice:"Work on assignments in a natural environment that helps you focus — in your backyard, for example, or at a park or beach. Take part in school field trips to science museums, art galleries and other environments where you can use your senses to identify and classify objects. Join or start an environmental project. In class, look for ways to incorporate nature and the environment into your assignments."},
+   187→existential:{name:"Existential Intelligence",short:"Existential",desc:"Existential intelligence involves the ability to contemplate and understand profound, overarching questions about human existence, the universe, and the meaning of life. It allows individuals to think deeply about moral, philosophical, and spiritual issues, recognizing the connections between seemingly disparate concepts and seeing the 'big picture' beyond immediate, tangible realities.",strengths:["Ability to contemplate deep philosophical questions about life, death, and purpose","Seeing connections between disparate ideas and synthesizing them into a larger worldview","Strong capacity for moral and ethical reasoning","Comfortable with ambiguity and questions that have no clear answers","Ability to step back and see the 'big picture' in complex situations"],challenges:["Difficulty understanding abstract philosophical concepts","Preference for strict, concrete rules rather than ambiguity","Discomfort with questions that lack definitive answers","Tendency to focus solely on immediate, practical details rather than the larger context","Lack of interest in moral, ethical, or spiritual discussions"],famous:["Søren Kierkegaard (philosopher)","Carl Sagan (astronomer, science communicator)","Simone de Beauvoir (existentialist philosopher)","The Dalai Lama (spiritual leader)","Viktor Frankl (psychiatrist, Holocaust survivor)"],careers:["Philosophy and Religion Teachers","Clergy","Sociologists","Art Therapists","Judges","Clinical Psychologists","Social Workers","Authors"],advice:"When learning something new, think about how the topic fits into the greater scheme of things. What role does it play? Why is it important? Look for ways to connect new concepts to what you already know. Ask yourself what other subjects or ideas are similar to this one. Think about multiple points of view and how they fit into a larger theme. Engage in deep discussions with others who enjoy exploring philosophical questions."}};
+   188→const CLUSTER_MAP={linguistic:"Education/Training",logical:"STEM",spatial:"Architecture/Design",kinesthetic:"Sports/Trades",musical:"Arts/Audio",interpersonal:"Human Services",intrapersonal:"Management/Law",naturalist:"Agriculture/Science",existential:"Philosophy/Social Sciences"};
+   189→const SALARY_MAP={linguistic:"$65,000",logical:"$95,000",spatial:"$80,000",kinesthetic:"$50,000",musical:"$55,000",interpersonal:"$70,000",intrapersonal:"$110,000",naturalist:"$75,000",existential:"$85,000"};
+   190→const QUESTIONS=[
+   191→{c:"linguistic",t:"I enjoy reading books, articles, or other written material in my free time."},
+   192→{c:"linguistic",t:"I can express my ideas clearly and effectively when I write or speak."},
+   193→{c:"linguistic",t:"I have a rich vocabulary and enjoy learning new words and their meanings."},
+   194→{c:"linguistic",t:"I find word games, crosswords, or language puzzles engaging."},
+   195→{c:"linguistic",t:"I often think in words and tend to remember information through verbal cues or notes."},
+   196→{c:"linguistic",t:"I can easily articulate my thoughts and persuade others using spoken or written language."},
+   197→{c:"logical",t:"I enjoy solving mathematical problems, logic puzzles, or brain teasers."},
+   198→{c:"logical",t:"I naturally look for patterns, sequences, and logical relationships in information."},
+   199→{c:"logical",t:"I like to organize and classify information into categories or systems."},
+   200→{c:"logical",t:"I approach decisions through careful analysis rather than gut feeling."},
+   201→{c:"logical",t:"I enjoy strategy-based games that require planning and critical reasoning."},
+   202→{c:"logical",t:"I easily grasp cause-and-effect relationships in complex systems."},
+   203→{c:"spatial",t:"I can clearly visualize objects, spaces, or scenes in my mind's eye."},
+   204→{c:"spatial",t:"I have a strong sense of direction and rarely get lost."},
+   205→{c:"spatial",t:"I enjoy drawing, designing, or creating visual art in some form."},
+   206→{c:"spatial",t:"I can easily interpret diagrams, maps, charts, and visual data."},
+   207→{c:"spatial",t:"I notice and appreciate colors, shapes, and visual details that others overlook."},
+   208→{c:"spatial",t:"I can mentally rotate objects and understand how they fit together in space."},
+   209→{c:"kinesthetic",t:"I learn best through physical activity and hands-on experience rather than just reading."},
+   210→{c:"kinesthetic",t:"I have good coordination and control of my body movements."},
+   211→{c:"kinesthetic",t:"I regularly participate in sports, dancing, or other physical activities."},
+   212→{c:"kinesthetic",t:"I use hand gestures and body language naturally when communicating."},
+   213→{c:"kinesthetic",t:"I enjoy taking things apart and reassembling them or building with my hands."},
+   214→{c:"kinesthetic",t:"I have excellent fine motor skills and work well with tools or delicate objects."},
+   215→{c:"musical",t:"I have a good sense of rhythm and can keep time to music accurately."},
+   216→{c:"musical",t:"I genuinely enjoy listening to music across various genres and styles."},
+   217→{c:"musical",t:"I can easily remember melodies, lyrics, or tunes after hearing them once or twice."},
+   218→{c:"musical",t:"I notice background music and environmental sounds that others tend to ignore."},
+   219→{c:"musical",t:"I can sing in tune or play at least one musical instrument."},
+   220→{c:"musical",t:"I am highly sensitive to the pitch, tone, and timbre of sounds."},
+   221→{c:"interpersonal",t:"I can quickly sense and understand other people's moods and emotions."},
+   222→{c:"interpersonal",t:"I enjoy working in groups and collaborating with others on tasks."},
+   223→{c:"interpersonal",t:"People frequently seek my advice or come to me to talk through problems."},
+   224→{c:"interpersonal",t:"I can read body language and social cues that reveal how people truly feel."},
+   225→{c:"interpersonal",t:"I am skilled at mediating conflicts and helping people find common ground."},
+   226→{c:"interpersonal",t:"I can easily adapt my behavior to suit different social situations."},
+   227→{c:"intrapersonal",t:"I am keenly aware of my own strengths and areas for improvement."},
+   228→{c:"intrapersonal",t:"I enjoy spending quiet time alone to reflect on my thoughts and feelings."},
+   229→{c:"intrapersonal",t:"I have a clear understanding of what motivates me and what doesn't."},
+   230→{c:"intrapersonal",t:"I set personal goals and work steadily toward achieving them."},
+   231→{c:"intrapersonal",t:"I honestly examine my mistakes and use them as opportunities to grow."},
+   232→{c:"intrapersonal",t:"I am comfortable with my own company and do not rely on others to keep me entertained."},
+   233→{c:"naturalist",t:"I feel energized and at peace when I spend time outdoors in nature."},
+   234→{c:"naturalist",t:"I can identify various plants, animals, birds, or natural phenomena around me."},
+   235→{c:"naturalist",t:"I am attentive to changes in weather, seasons, and natural cycles."},
+   236→{c:"naturalist",t:"I care deeply about environmental and conservation issues."},
+   237→{c:"naturalist",t:"I prefer natural or outdoor settings over busy urban environments."},
+   238→{c:"naturalist",t:"I easily categorize and classify objects in my surroundings based on their features."},
+   239→{c:"existential",t:"I often find myself thinking about the deeper meaning of life and human existence."},
+   240→{c:"existential",t:"I enjoy discussing philosophical, moral, or ethical questions with others."},
+   241→{c:"existential",t:"I am comfortable with ambiguity and questions that do not have clear, definitive answers."},
+   242→{c:"existential",t:"I can easily see how different concepts from unrelated fields connect on a larger scale."},
+   243→{c:"existential",t:"I frequently ponder the vastness of the universe and our place within it."},
+   244→{c:"existential",t:"I prefer looking at the 'big picture' rather than getting bogged down in details."}
+   245→];
+   246→const SCALE=['Strongly Disagree','Disagree','Slightly Disagree','Neutral','Slightly Agree','Agree','Strongly Agree'];
+   247→let Q=[],A=[],STU={},qi=0,busy=false,radar=null,barchart=null;
+   248→const CIRC=2*Math.PI*52,$=i=>document.getElementById(i);
+   249→function startTest(){
+   250→ const n=$('s-name').value.trim(),e=$('s-email').value.trim(),p=$('s-phone').value.trim();
+   251→ if(!n)return alert('Please enter your Name'); if(!e)return alert('Please enter your Email'); if(!p)return alert('Please enter your Mobile Number');
+   252→ STU={name:n,email:e,phone:p}; Q=QUESTIONS; A=new Array(Q.length).fill(null); qi=0;
+   253→ $('grade-pill').textContent=STU.name;
+   254→ $('form-screen').classList.remove('active'); $('quiz-screen').classList.add('active'); renderQ(); window.scrollTo(0,0);
+   255→}
+   256→function renderQ(){
+   257→ ring(); $('back-btn').style.visibility=qi===0?'hidden':'visible';
+   258→ const b=$('quiz-body');
+   259→ if(qi>=Q.length){ b.innerHTML=`<div class="done-card glass"><div class="done-emoji">🎉</div><h2>All Done, ${STU.name}!</h2><p>You answered all ${Q.length} questions.</p><button class="btn" onclick="finish()">Generate My Report ✨</button></div>`; return; }
+   260→ const q=Q[qi]; let o='';
+   261→ SCALE.forEach((l,i)=>{o+=`<button type="button" class="opt-row${A[qi]===i+1?' selected':''}" onclick="pick(${i})"><span class="opt-badge">${i+1}</span><span>${l}</span></button>`;});
+   262→ b.innerHTML=`<div class="q-card-big glass"><div class="q-meta"><span class="q-sec">Rate Yourself (1–7)</span><span class="q-count">Question ${qi+1} of ${Q.length}</span></div><div class="q-big">${q.t}</div><div class="opts-list">${o}</div><div class="kbd-hint">💡 Press keys <b>1–7</b> to answer faster · ← to go back</div></div>`;
+   263→}
+   264→function pick(i){ if(busy||qi>=Q.length)return; busy=true; A[qi]=i+1;
+   265→ document.querySelectorAll('#quiz-body .opt-row').forEach((r,x)=>r.classList.toggle('selected',x===i));
+   266→ ring(); setTimeout(()=>{busy=false;qi++;renderQ(); if(qi>=Q.length)window.scrollTo({top:0,behavior:'smooth'});},280);
+   267→}
+   268→function back(){ if(busy||qi===0)return; qi--; renderQ(); }
+   269→function ring(){ const d=A.filter(a=>a!==null).length,p=Q.length?d/Q.length:0;
+   270→ $('ring-fill').style.strokeDashoffset=(CIRC*(1-p)).toFixed(1); $('ring-num').textContent=Math.round(p*100)+'%'; $('prog-text').textContent=d+' / '+Q.length+' answered'; }
+   271→document.addEventListener('keydown',e=>{ if(!$('quiz-screen').classList.contains('active'))return;
+   272→ if(e.key>='1'&&e.key<='7'&&qi<Q.length)pick(+e.key-1);
+   273→ else if(e.key==='ArrowLeft'||e.key==='Backspace'){e.preventDefault();back();} });
+   274→function countUp(el){const t=+el.dataset.target,d=1300,t0=performance.now();(function s(x){const p=Math.min((x-t0)/d,1);el.textContent=Math.round(t*(1-Math.pow(1-p,3)))+'%';p<1&&requestAnimationFrame(s)})(t0);}
+   275→function initFx(){
+   276→ requestAnimationFrame(()=>requestAnimationFrame(()=>{document.querySelectorAll('.bar-fill').forEach(b=>b.style.width=b.dataset.w+'%');document.querySelectorAll('.pct').forEach(countUp);}));
+   277→ const io=new IntersectionObserver(es=>es.forEach(x=>{if(x.isIntersecting){x.target.classList.add('vis');io.unobserve(x.target)}}),{threshold:.1});
+   278→ document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+   279→ if(typeof confetti==='function'){const C=['#2563EB','#0EA5E9','#10B981','#F59E0B'];confetti({particleCount:130,spread:75,origin:{y:.6},colors:C});setTimeout(()=>confetti({particleCount:80,spread:100,origin:{x:.2,y:.5},colors:C}),250);setTimeout(()=>confetti({particleCount:80,spread:100,origin:{x:.8,y:.5},colors:C}),450);}
+   280→}
+   281→function lv(s){return s>=80?'Very High':s>=65?'High':s>=50?'Moderate':s>=35?'Low':'Very Low'}
+   282→function lvB(s){return s>=80?'b-vhigh':s>=65?'b-high':s>=50?'b-med':s>=35?'b-low':'b-vlow'}
+   283→window.addEventListener('beforeprint',()=>{[radar,barchart].forEach(c=>{if(c){c.resize();c.update('none');}})});
+   284→function showReport(html){ $('report-content').innerHTML=html; $('quiz-screen').classList.remove('active'); $('report-screen').classList.add('active'); window.scrollTo(0,0); initFx(); }
+   285→function finish(){
+   286→ const sc={}; Object.keys(INTEL).forEach(k=>sc[k]=0);
+   287→ Q.forEach((q,i)=>{ if(A[i]) sc[q.c]+=A[i]; });
+   288→ const pct={}; Object.keys(sc).forEach(k=>pct[k]=Math.round(sc[k]/42*100));
+   289→ const sorted=Object.keys(sc).sort((a,b)=>pct[b]-pct[a]);
+   290→ const date=new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+   291→ const bars=sorted.map(k=>`<div class="bar-item reveal"><div class="bar-label"><span>${INTEL[k].short}</span><span><span class="pct" data-target="${pct[k]}">0%</span> <span class="badge ${lvB(pct[k])}">${lv(pct[k])}</span></span></div><div class="bar-track"><div class="bar-fill" data-w="${pct[k]}" style="background:linear-gradient(90deg,#1D4ED8,#3B82F6)"></div></div></div>`).join('');
+   292→ const boxes=sorted.map(k=>{const d=INTEL[k],p=pct[k];
+   293→  return `<div class="intel-box reveal"><div class="intel-head"><span class="nm">${d.name}</span><span class="sc">${p}% — <span class="badge ${lvB(p)}">${lv(p)}</span></span></div>
+   294→  <p>${d.desc}</p><div class="grid2"><div><h4>💪 Strengths</h4><ul>${d.strengths.map(s=>`<li>${s}</li>`).join('')}</ul></div><div><h4>⚠️ Challenges</h4><ul>${d.challenges.map(s=>`<li>${s}</li>`).join('')}</ul></div></div>
+   295→  <h4>🌟 Famous People with Strong ${d.short} Intelligence</h4><ul>${d.famous.map(s=>`<li>${s}</li>`).join('')}</ul>
+   296→  <h4>💼 Top Careers</h4><ul>${d.careers.slice(0,6).map((s,i)=>`<li><strong>${i+1}.</strong> ${s}</li>`).join('')}</ul></div>`;});
+   297→ const improve=sorted.slice(0,3).map(k=>{const d=INTEL[k];
+   298→  return `<div class="info-box reveal"><h3>${d.name} — Advice for Learning</h3><p>${d.advice}</p></div>`;}).join('');
+   299→ const ei=Math.round((pct.interpersonal+pct.intrapersonal)/2);
+   300→ const eiTraits=["Adaptable: able to deal with new and changing conditions","Empathic: intensely aware of needs and feelings","Composed: think carefully before reacting","Optimistic: have a positive outlook on life","Expressive: can communicate emotions in a healthy way","Resilient: can deal with pressure and stress"];
+   301→ const eiRecs=["Develop a sense of humor and try to make people laugh without putting others down.","Write out your thoughts and create a plan for self-improvement — a list of goals from easy to difficult.","Volunteer to help others, especially interacting directly with those you are helping.","Practice being grateful — once a week, write down what makes you thankful.","Move outside your own perspective. Practice listening more than speaking."];
+   302→ let careerRows=''; let cnt=0;
+   303→ sorted.slice(0,3).forEach(k=>{ INTEL[k].careers.slice(0,4).forEach(c=>{ if(cnt<12){careerRows+=`<tr><td class="cat">${c}</td><td>${CLUSTER_MAP[k]}</td><td>${SALARY_MAP[k]}</td></tr>`;cnt++;} }); });
+   304→ showReport(`<div class="report-head"><div class="brand">Multiple Intelligence Assessment · Report</div><h1>${STU.name}</h1><div class="meta"><span>Date<b>${date}</b></span><span>Phone<b>${STU.phone}</b></span><span>Questions<b>${Q.length} of ${Q.length}</b></span></div></div>
+   305→ <div class="rsec reveal"><h2>Your Intelligence Profile</h2>
+   306→ <div class="chart-2col"><div class="chart-box"><div class="barchart-box"><canvas id="barC"></canvas></div></div><div class="chart-box"><div class="radar-box"><canvas id="radarC"></canvas></div></div></div>
+   307→ <p style="margin-top:.8rem">The bar chart and radar chart above show your scores across all nine intelligences. The larger the area and the longer the bar, the stronger that intelligence is in you.</p></div>
+   308→ <div class="rsec"><h2>Intelligences and You — Detailed Breakdown</h2>${boxes}</div>
+   309→ <div class="rsec reveal"><h2>Improvement Plan: Developing Your Intelligences</h2>
+   310→ <p>The following recommendations are based on your results. Consider each and select the ones you think would work best for you to improve your intelligences.</p>${improve}</div>
+   311→ <div class="rsec reveal"><h2>Emotional Intelligence (EI) and You</h2>
+   312→ <p>Your EI score blends your interpersonal and intrapersonal intelligence scores. Your emotional intelligence is currently at a <strong>${lv(ei).toLowerCase()}</strong> level (<strong>${ei}%</strong>). This affects your ability to judge what others are thinking or feeling, recognize your own moods, and persuade others.</p>
+   313→ <h3>Key EI Traits to Develop</h3><ul>${eiTraits.map(t=>`<li>${t}</li>`).join('')}</ul>
+   314→ <h3>Recommendations</h3><ul>${eiRecs.map(t=>`<li>${t}</li>`).join('')}</ul></div>
+   315→ <div class="rsec reveal"><h2>Recommendations: Career and Pathways</h2>
+   316→ <p>The careers listed below are all linked to your assessment results, with the careers at the top being the best match for your profile.</p>
+   317→ <table class="data"><thead><tr><th>Career Title</th><th>Cluster</th><th>Salary</th></tr></thead><tbody>${careerRows}</tbody></table></div>`);
+   318→ if(typeof Chart!=='undefined'){
+   319→  const labels=sorted.map(k=>INTEL[k].short), vals=sorted.map(k=>pct[k]);
+   320→  const rc=$('radarC'); if(rc) radar=new Chart(rc,{type:'radar',data:{labels,datasets:[{data:vals,fill:true,backgroundColor:'rgba(37,99,235,.25)',borderColor:'#1D4ED8',borderWidth:2.5,pointBackgroundColor:'#1D4ED8',pointRadius:4}]},options:{responsive:true,maintainAspectRatio:false,scales:{r:{min:0,max:100,ticks:{stepSize:20,backdropColor:'transparent',color:'#475569',font:{size:10}},grid:{color:'#C9D3E0'},angleLines:{color:'#C9D3E0'},pointLabels:{color:'#0F172A',font:{family:'Poppins',weight:'600',size:10}}}},plugins:{legend:{display:false}}}}});
+   321→  const bc=$('barC'); if(bc) barchart=new Chart(bc,{type:'bar',data:{labels,datasets:[{data:vals,backgroundColor:'#2563EB',borderRadius:6}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,scales:{x:{max:100,grid:{color:'#EDE7DA'},ticks:{color:'#64748B',font:{size:10}}},y:{grid:{display:false},ticks:{color:'#0F172A',font:{family:'Poppins',weight:'600',size:10}}}},plugins:{legend:{display:false}}}}});
+   322→ }
+   323→}
+   324→</script>
+   325→</body>
+   326→</html>

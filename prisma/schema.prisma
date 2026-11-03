@@ -1,0 +1,299 @@
+// ============================================================================
+// Psychometric Testing Platform — Prisma Schema
+// ----------------------------------------------------------------------------
+// NOTE ON DATABASE: The architecture specification proposed PostgreSQL. This
+// standalone deployment uses SQLite (the configured Prisma provider in this
+// environment) so the application is independently functional without a
+// separate database server. The schema is provider-agnostic: switching to
+// PostgreSQL later only requires changing the `datasource` provider + url and
+// running `prisma migrate`. All enum-like fields use String (SQLite has no
+// native enum) and all "list" fields are stored as JSON strings — both map
+// cleanly to PostgreSQL types when migrated.
+// ============================================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// USERS & AUTH
+// ---------------------------------------------------------------------------
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  phone        String?
+  name         String
+  role         String   // STUDENT | SUPER_ADMIN | COUNSELLOR
+  passwordHash String?
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  sessions               Session[]
+  studentAssignments     Assignment[]      @relation("StudentAssignments")
+  assignedByMe           Assignment[]      @relation("AssignedBy")
+  attempts               Attempt[]
+  reportsAsStudent       Report[]          @relation("ReportStudent")
+  counsellorStudents     CounsellorStudent[]  @relation("CounsellorSide")
+  studentUnderCounsellor CounsellorStudent[]  @relation("StudentSide")
+  counsellorReports      CounsellorReportAccess[]
+  auditLogs              AuditLog[]
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+  @@index([userId])
+}
+
+// ---------------------------------------------------------------------------
+// ASSESSMENTS & QUESTIONS
+// ---------------------------------------------------------------------------
+model Assessment {
+  id               String   @id @default(cuid())
+  slug             String   @unique
+  title            String
+  shortTitle       String?
+  description      String
+  purpose          String
+  targetPopulation String?
+  instructions     String
+  estimatedMinutes Int
+  category         String   // STREAM | CAREER | PERSONALITY | LEARNING | INTELLIGENCE | BRANCH | MULTI
+  totalQuestions   Int
+  isActive         Boolean  @default(true)
+  createdAt        DateTime @default(now())
+
+  questions  Question[]
+  assignments Assignment[]
+  attempts   Attempt[]
+  reports    Report[]
+  manuals    InterpretationManual[]
+}
+
+model Question {
+  id           String   @id @default(cuid())
+  assessmentId String
+  orderIndex   Int
+  sectionId    String?
+  sectionName  String?
+  text         String
+  questionType String   // YES_NO | YES_NO_MAYBE | LIKERT5 | LIKERT7 | MCQ | FORCED_CHOICE
+  options      String   // JSON array of option labels
+  dimension    String?  // primary dimension / category code
+  scoring      String   // JSON: per-option scoring map (answer -> {dim: pts})
+  isReverse    Boolean  @default(false)
+  correctAnswer String? // for MCQ aptitude items
+
+  assessment Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  answers    Answer[]
+
+  @@index([assessmentId])
+}
+
+// ---------------------------------------------------------------------------
+// ASSIGNMENTS & UNIQUE SECURE LINKS
+// ---------------------------------------------------------------------------
+model Assignment {
+  id           String   @id @default(cuid())
+  studentId    String
+  assessmentId String
+  assignedById String
+  status       String   // ASSIGNED | IN_PROGRESS | COMPLETED
+  createdAt    DateTime @default(now())
+  startedAt    DateTime?
+  completedAt  DateTime?
+
+  student    User       @relation("StudentAssignments", fields: [studentId], references: [id])
+  assessment Assessment @relation(fields: [assessmentId], references: [id])
+  assignedBy User       @relation("AssignedBy", fields: [assignedById], references: [id])
+  tokens     AccessToken[]
+  attempts   Attempt[]
+
+  @@index([studentId])
+  @@index([assessmentId])
+}
+
+model AccessToken {
+  id           String   @id @default(cuid())
+  assignmentId String
+  token        String   @unique
+  expiresAt    DateTime
+  revokedAt    DateTime?
+  usedAt       DateTime?
+  createdAt    DateTime @default(now())
+
+  assignment Assignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+  @@index([assignmentId])
+}
+
+// ---------------------------------------------------------------------------
+// ATTEMPTS & ANSWERS
+// ---------------------------------------------------------------------------
+model Attempt {
+  id                 String   @id @default(cuid())
+  assignmentId       String
+  studentId          String
+  assessmentId       String
+  status             String   // IN_PROGRESS | COMPLETED | ABANDONED
+  startedAt          DateTime @default(now())
+  completedAt        DateTime?
+  currentQuestionIndex Int     @default(0)
+
+  assignment  Assignment   @relation(fields: [assignmentId], references: [id])
+  student     User         @relation(fields: [studentId], references: [id])
+  assessment  Assessment   @relation(fields: [assessmentId], references: [id])
+  answers     Answer[]
+  scoreResult ScoreResult?
+  report      Report?
+
+  @@index([studentId])
+  @@index([assignmentId])
+}
+
+model Answer {
+  id             String   @id @default(cuid())
+  attemptId      String
+  questionId     String
+  questionOrder  Int
+  selectedOption String   // chosen option label / value
+  answeredAt     DateTime @default(now())
+
+  attempt  Attempt  @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  question Question @relation(fields: [questionId], references: [id])
+
+  @@unique([attemptId, questionId])
+  @@index([attemptId])
+}
+
+// ---------------------------------------------------------------------------
+// SCORING & REPORTS
+// ---------------------------------------------------------------------------
+model ScoreResult {
+  id             String   @id @default(cuid())
+  attemptId      String   @unique
+  dimensions     String   // JSON: { dim: { score, max, pct, level, label } }
+  totalScore     Int?
+  recommendation String?  // top recommendation text
+  topDimensions  String?  // JSON array of top dimension codes
+  generatedAt    DateTime @default(now())
+
+  attempt Attempt @relation(fields: [attemptId], references: [id])
+}
+
+model Report {
+  id              String   @id @default(cuid())
+  attemptId       String   @unique
+  studentId       String
+  assessmentId    String
+  accessLevel     String   // ADMIN_COUNSELLOR | STUDENT
+  paymentRequired Boolean  @default(true)
+  paymentStatus   String   // NOT_REQUIRED | PENDING | PAID
+  generatedAt     DateTime @default(now())
+
+  student    User     @relation("ReportStudent", fields: [studentId], references: [id])
+  assessment Assessment @relation(fields: [assessmentId], references: [id])
+  attempt    Attempt  @relation(fields: [attemptId], references: [id])
+  counsellorAccess CounsellorReportAccess[]
+  payments   PaymentTransaction[]
+
+  @@index([studentId])
+}
+
+// ---------------------------------------------------------------------------
+// COUNSELLOR ACCESS
+// ---------------------------------------------------------------------------
+model CounsellorStudent {
+  id           String   @id @default(cuid())
+  counsellorId String
+  studentId    String
+  assignedById String
+  createdAt    DateTime @default(now())
+
+  counsellor User @relation("CounsellorSide", fields: [counsellorId], references: [id])
+  student    User @relation("StudentSide", fields: [studentId], references: [id])
+
+  @@index([counsellorId])
+  @@index([studentId])
+}
+
+model CounsellorReportAccess {
+  id           String   @id @default(cuid())
+  counsellorId String
+  reportId     String
+  grantedById  String
+  createdAt    DateTime @default(now())
+
+  counsellor User   @relation(fields: [counsellorId], references: [id])
+  report    Report  @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+  @@index([counsellorId])
+}
+
+// ---------------------------------------------------------------------------
+// INTERPRETATION MANUALS (counsellor-only)
+// ---------------------------------------------------------------------------
+model InterpretationManual {
+  id           String   @id @default(cuid())
+  assessmentId String
+  title        String
+  content      String   // JSON: structured sections for counsellors
+  createdAt    DateTime @default(now())
+
+  assessment Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+
+  @@index([assessmentId])
+}
+
+// ---------------------------------------------------------------------------
+// PAYMENTS (future-ready)
+// ---------------------------------------------------------------------------
+model PaymentTransaction {
+  id           String   @id @default(cuid())
+  reportId     String
+  studentId    String
+  amount       Float
+  currency     String   @default("INR")
+  gateway      String?  // e.g. RAZORPAY, STRIPE
+  gatewayRef   String?  // order id / payment id from gateway
+  status       String   // INITIATED | PENDING | SUCCESS | FAILED
+  paidAt       DateTime?
+  createdAt    DateTime @default(now())
+
+  report Report @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+  @@index([reportId])
+}
+
+// ---------------------------------------------------------------------------
+// AUDIT LOG
+// ---------------------------------------------------------------------------
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorId    String?
+  actorRole  String?
+  action     String
+  targetType String?
+  targetId   String?
+  metadata   String?  // JSON
+  ip         String?
+  createdAt  DateTime @default(now())
+
+  actor User? @relation(fields: [actorId], references: [id])
+
+  @@index([actorId])
+  @@index([action])
+}

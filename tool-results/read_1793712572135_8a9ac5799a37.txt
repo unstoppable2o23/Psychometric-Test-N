@@ -1,0 +1,856 @@
+     1→<!DOCTYPE html>
+     2→<html lang="en">
+     3→<head>
+     4→    <meta charset="UTF-8">
+     5→    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     6→    <title>Discover Stream Selector Test & Psychometric Assessment</title>
+     7→    <!-- Tailwind CSS CDN -->
+     8→    <script src="https://cdn.tailwindcss.com"></script>
+     9→    <!-- Chart.js CDN -->
+    10→    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    11→    <style>
+    12→        @media print {
+    13→            .no-print { display: none !important; }
+    14→            body { background: white !important; padding: 0 !important; color: black !important; }
+    15→            .report-page { page-break-after: always; padding: 20px 0; border: none !important; box-shadow: none !important; }
+    16→            .report-card { border: none !important; box-shadow: none !important; }
+    17→        }
+    18→        .progress-bar-transition { transition: width 0.4s ease-in-out; }
+    19→        .bg-maroon { background-color: #800000; }
+    20→        .text-maroon { color: #800000; }
+    21→        .border-maroon { border-color: #800000; }
+    22→    </style>
+    23→</head>
+    24→<body class="bg-slate-100 text-slate-800 font-sans min-h-screen">
+    25→
+    26→    <!-- APP HEADER -->
+    27→    <header class="bg-blue-900 text-white py-3 px-6 shadow-md no-print sticky top-0 z-50">
+    28→        <div class="max-w-6xl mx-auto flex justify-between items-center">
+    29→            <div class="flex items-center space-x-3">
+    30→                <div class="bg-amber-400 text-blue-950 font-black p-2 rounded-lg text-lg flex items-center justify-center w-9 h-9 shadow">
+    31→                    🎓
+    32→                </div>
+    33→                <div>
+    34→                    <h1 class="text-lg font-bold tracking-wide leading-none">Discover Stream Selector Test</h1>
+    35→                    <span class="text-[11px] text-blue-200">76-Question Diagnostic Assessment</span>
+    36→                </div>
+    37→            </div>
+    38→            <span class="text-xs bg-blue-800 text-blue-100 px-3 py-1 rounded-full font-medium">Class 10 Assessment</span>
+    39→        </div>
+    40→    </header>
+    41→
+    42→    <main class="max-w-5xl mx-auto p-4 sm:p-6">
+    43→
+    44→        <!-- STEP 1: USER REGISTRATION SCREEN -->
+    45→        <section id="registration-screen" class="bg-white rounded-xl shadow-md p-6 sm:p-8 max-w-xl mx-auto my-10 border border-slate-200">
+    46→            <div class="text-center mb-6">
+    47→                <div class="inline-block p-3 bg-blue-50 text-blue-700 rounded-full mb-2">
+    48→                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+    49→                </div>
+    50→                <h2 class="text-2xl font-bold text-slate-900">Candidate Information</h2>
+    51→                <p class="text-slate-500 text-sm mt-1">Please enter your details to begin the Stream Assessment.</p>
+    52→            </div>
+    53→            
+    54→            <form id="user-form" class="space-y-4">
+    55→                <div>
+    56→                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Full Name *</label>
+    57→                    <input type="text" id="user-name" required placeholder="e.g. Maurya Doshi" class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:outline-none">
+    58→                </div>
+    59→                <div>
+    60→                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Phone Number *</label>
+    61→                    <input type="tel" id="user-phone" required placeholder="e.g. 9819629066" class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:outline-none">
+    62→                </div>
+    63→                <div>
+    64→                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Email Address *</label>
+    65→                    <input type="email" id="user-email" required placeholder="e.g. mausamdoshi@gmail.com" class="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:outline-none">
+    66→                </div>
+    67→                <button type="submit" class="w-full bg-blue-800 hover:bg-blue-900 text-white font-bold py-3 rounded-lg shadow-md transition duration-200 mt-2">
+    68→                    Start Stream Selector Test →
+    69→                </button>
+    70→            </form>
+    71→        </section>
+    72→
+    73→        <!-- STEP 2: MULTI-QUESTION SECTIONAL TEST SCREEN -->
+    74→        <section id="test-screen" class="hidden space-y-6 no-print">
+    75→            
+    76→            <!-- TOP STEPPER NAVIGATION HEADER -->
+    77→            <div class="bg-blue-900 text-white rounded-xl shadow-sm p-4 overflow-x-auto">
+    78→                <div id="section-stepper" class="flex items-center justify-between min-w-[700px] text-center text-xs font-semibold">
+    79→                    <!-- Dynamic Section Nodes -->
+    80→                </div>
+    81→            </div>
+    82→
+    83→            <!-- SECTION PROGRESS BAR -->
+    84→            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+    85→                <div class="flex items-center space-x-3">
+    86→                    <div class="bg-blue-100 p-2 rounded-lg text-blue-800">
+    87→                        🧠
+    88→                    </div>
+    89→                    <div>
+    90→                        <span id="active-section-label" class="text-xs font-bold text-blue-700 uppercase">SECTION 1</span>
+    91→                        <h2 id="active-section-title" class="text-base font-bold text-slate-900 leading-tight">Self Identification</h2>
+    92→                    </div>
+    93→                </div>
+    94→                <div class="w-full sm:w-64">
+    95→                    <div class="flex justify-between text-xs font-bold text-slate-600 mb-1">
+    96→                        <span>Overall Progress</span>
+    97→                        <span id="section-progress-text">0% Completed</span>
+    98→                    </div>
+    99→                    <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
+   100→                        <div id="section-progress-bar" class="bg-emerald-500 h-full w-0 progress-bar-transition"></div>
+   101→                    </div>
+   102→                </div>
+   103→            </div>
+   104→
+   105→            <!-- SECTION MILESTONE BANNER -->
+   106→            <div id="milestone-banner" class="bg-gradient-to-r from-blue-50 to-amber-50 p-5 rounded-xl border border-blue-200 shadow-sm">
+   107→                <h3 id="milestone-title" class="text-lg font-bold text-blue-950 mb-1">Milestone Headline</h3>
+   108→                <p id="milestone-desc" class="text-slate-600 text-sm leading-relaxed">Milestone instructions go here...</p>
+   109→            </div>
+   110→
+   111→            <!-- MULTI-QUESTION CONTAINER -->
+   112→            <div id="section-questions-container" class="space-y-4">
+   113→                <!-- Questions rendered dynamically -->
+   114→            </div>
+   115→
+   116→            <!-- SECTION ACTION CONTROLS -->
+   117→            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex justify-between items-center">
+   118→                <button id="prev-sec-btn" onclick="prevSection()" class="px-5 py-2.5 rounded-lg border border-slate-300 text-slate-700 font-bold hover:bg-slate-50 disabled:opacity-40" disabled>
+   119→                    ← Previous Section
+   120→                </button>
+   121→                <div id="validation-msg" class="text-xs font-semibold text-rose-600 hidden">
+   122→                    ⚠️ Please answer all questions in this section to proceed.
+   123→                </div>
+   124→                <button id="next-sec-btn" onclick="nextSection()" class="px-6 py-2.5 rounded-lg bg-blue-800 hover:bg-blue-900 text-white font-bold transition shadow">
+   125→                    Save & Next Section →
+   126→                </button>
+   127→            </div>
+   128→        </section>
+   129→
+   130→        <!-- STEP 3: PSYCHOMETRIC STREAM SELECTOR REPORT -->
+   131→        <section id="report-screen" class="hidden space-y-10">
+   132→            
+   133→            <!-- TOP REPORT CONTROLS (NO PRINT) -->
+   134→            <div class="flex justify-between items-center bg-white p-4 sm:p-6 rounded-xl border border-slate-200 shadow-sm no-print">
+   135→                <div>
+   136→                    <h2 class="text-xl font-bold text-slate-900">Assessment Complete!</h2>
+   137→                    <p class="text-sm text-slate-500">Your personalized Stream Suggestor Report is ready below.</p>
+   138→                </div>
+   139→                <button onclick="window.print()" class="bg-blue-800 hover:bg-blue-900 text-white font-bold px-5 py-2.5 rounded-lg shadow flex items-center gap-2 transition">
+   140→                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+   141→                    Print / Download PDF
+   142→                </button>
+   143→            </div>
+   144→
+   145→            <!-- PAGE 1: PREFERENCE ORDER & INTRO -->
+   146→            <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 sm:p-10 report-page relative">
+   147→                <div class="flex justify-between items-start border-b border-slate-200 pb-6 mb-6">
+   148→                    <div class="flex items-center space-x-3">
+   149→                        <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white text-2xl font-bold">
+   150→                            📐
+   151→                        </div>
+   152→                        <div>
+   153→                            <h2 class="text-2xl font-bold text-blue-900 leading-none">Stream Suggestor Report</h2>
+   154→                            <span class="text-xs text-slate-500 mt-1 block">Psychometric Career Assessment</span>
+   155→                        </div>
+   156→                    </div>
+   157→                </div>
+   158→
+   159→                <!-- CANDIDATE METADATA -->
+   160→                <div class="bg-slate-50 rounded-lg p-4 border border-slate-200 mb-6 text-sm grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+   161→                    <div>
+   162→                        <span class="text-slate-500 text-xs block">Name:</span>
+   163→                        <strong id="rpt-name" class="text-slate-900 font-bold text-base">-</strong>
+   164→                    </div>
+   165→                    <div>
+   166→                        <span class="text-slate-500 text-xs block">Phone No:</span>
+   167→                        <strong id="rpt-phone" class="text-slate-900 font-semibold">-</strong>
+   168→                    </div>
+   169→                    <div>
+   170→                        <span class="text-slate-500 text-xs block">Email ID:</span>
+   171→                        <strong id="rpt-email" class="text-slate-900 font-semibold truncate block">-</strong>
+   172→                    </div>
+   173→                    <div>
+   174→                        <span class="text-slate-500 text-xs block">Date:</span>
+   175→                        <strong id="rpt-date" class="text-slate-900 font-semibold">-</strong>
+   176→                    </div>
+   177→                </div>
+   178→
+   179→                <div class="text-slate-700 text-sm space-y-4 leading-relaxed mb-8">
+   180→                    <p>
+   181→                        The most critical decision you'll make early in your career is selecting the field of study you want to pursue. In this report, your preferred streams following the 10th grade are ranked from 1 to 4, with 1 indicating your most favored choice. Regardless of the stream you ultimately choose, it's essential to dedicate your best efforts, as this commitment is likely to pave the way for your success.
+   182→                    </p>
+   183→                    <p>
+   184→                        This report aims to assist you in identifying your inclinations toward a specific academic stream and determining the best course of study based on your aptitude, abilities, and interests after completing 10th grade. The test has been carefully crafted by a team of psychologists, academic counselors, and experienced psychiatrists to guide you in making this crucial early decision.
+   185→                    </p>
+   186→                    <div class="p-3 bg-amber-50 border-l-4 border-amber-500 text-amber-900 text-xs rounded-r">
+   187→                        <strong>Disclaimer:</strong> This report should be viewed as an indicator or a tool to facilitate decision-making and should be thoroughly discussed and analyzed with a certified career counselor. It serves as an ongoing conversation about your stream choices.
+   188→                    </div>
+   189→                </div>
+   190→
+   191→                <div class="mt-8">
+   192→                    <h3 id="ranking-header-title" class="text-lg font-bold text-slate-900 mb-4">Candidate's Stream Preference Order</h3>
+   193→                    <div id="preference-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+   194→                        <!-- Dynamic Preference Cards -->
+   195→                    </div>
+   196→                </div>
+   197→
+   198→                <div class="mt-16 pt-4 border-t border-slate-200 flex justify-between text-xs text-slate-400">
+   199→                    <span>Psychometric Career Assessment</span>
+   200→                    <span>Page-1</span>
+   201→                </div>
+   202→            </div>
+   203→
+   204→            <!-- PAGE 2: APTITUDE VS INTEREST GRAPH -->
+   205→            <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 sm:p-10 report-page">
+   206→                <div class="flex justify-between items-start border-b border-slate-200 pb-4 mb-6">
+   207→                    <h2 class="text-xl font-bold text-blue-900">Stream Suggestor Report</h2>
+   208→                    <span class="text-xs text-slate-400">Aptitude vs. Interest Analysis</span>
+   209→                </div>
+   210→
+   211→                <div class="relative w-full h-80 mb-8">
+   212→                    <canvas id="comparisonChart"></canvas>
+   213→                </div>
+   214→
+   215→                <div class="bg-slate-50 border border-slate-200 rounded-xl p-6 text-xs sm:text-sm text-slate-700 space-y-3">
+   216→                    <h4 class="font-bold text-slate-900 text-base uppercase tracking-wider border-b border-slate-200 pb-2">
+   217→                        LET'S UNDERSTAND THE STREAM SELECTOR GRAPH:
+   218→                    </h4>
+   219→                    <ul class="space-y-2 list-disc list-inside leading-relaxed">
+   220→                        <li>The graph above illustrates an individual's potential, which is assessed in terms of their interest and aptitude. Knowing one's potential can significantly aid in making informed decisions about academic subjects.</li>
+   221→                        <li>A person's <strong>aptitude</strong> isn't merely a measure of knowledge or understanding but rather their inherent capacity, talent, or ability to excel in a particular task. A high aptitude in a certain field indicates a natural proficiency in that area.</li>
+   222→                        <li><strong>Interest</strong>, on the other hand, reflects a state of curiosity and inclination, closely intertwined with one's emotions. When we possess a genuine interest in a specific endeavor or process, our strong emotional attachment enhances the likelihood of success, as we are willing to invest our maximum effort.</li>
+   223→                        <li>Focusing solely on aptitude without considering interest implies that the individual can perform the task but may not sustain it over an extended period. Conversely, emphasizing interest alone may not guarantee the possession of the necessary skills and abilities to excel in the desired task.</li>
+   224→                    </ul>
+   225→                </div>
+   226→
+   227→                <div class="mt-16 pt-4 border-t border-slate-200 flex justify-between text-xs text-slate-400">
+   228→                    <span>Psychometric Career Assessment</span>
+   229→                    <span>Page-2</span>
+   230→                </div>
+   231→            </div>
+   232→
+   233→            <!-- PAGES 3-6: DETAILED STREAM PAGES -->
+   234→            <div id="stream-detail-pages" class="space-y-10">
+   235→                <!-- Dynamically rendered per stream -->
+   236→            </div>
+   237→
+   238→        </section>
+   239→
+   240→    </main>
+   241→
+   242→    <!-- JS ENGINE -->
+   243→    <script>
+   244→        // --- ALL 76 QUESTIONS IN EASY CLASS-10 ENGLISH ---
+   245→        const TEST_SECTIONS = [
+   246→            {
+   247→                id: "sec1",
+   248→                name: "SELF IDENTIFICATION",
+   249→                milestoneTitle: "Your journey in the Stream Selector Test has begun.",
+   250→                milestoneDesc: "Read each question carefully and pick the option that best describes you.",
+   251→                questions: [
+   252→                    { id: 1, text: "Do you enjoy doing community service or helping out as a volunteer?", options: ["Yes", "No", "Not sure"], domain: "humanities", type: "interest" },
+   253→                    { id: 2, text: "Are you good at listening to others and making friends with all kinds of people?", options: ["Yes", "No", "Not sure"], domain: "humanities", type: "interest" },
+   254→                    { id: 3, text: "Is working with large amounts of numbers and data easy for you?", options: ["Yes", "No", "Not sure"], domain: "commerce", type: "aptitude" },
+   255→                    { id: 4, text: "Do you feel confident managing money or budgets for other people?", options: ["Yes", "No", "Not sure"], domain: "commerce", type: "aptitude" },
+   256→                    { id: 5, text: "Do you enjoy reading technical guides and solving technical or mechanical problems?", options: ["Yes", "No", "Not sure"], domain: "sci_math", type: "aptitude" },
+   257→                    { id: 6, text: "Do you enjoy working in a science laboratory and performing experiments?", options: ["Yes", "No", "Not sure"], domain: "sci_bio", type: "interest" },
+   258→                    { id: 7, text: "Are you interested in studying how plants, animals, and living things grow?", options: ["Yes", "No", "Not sure"], domain: "sci_bio", type: "interest" },
+   259→                    { id: 8, text: "Do you think working in a hospital or medical clinic is a bad career choice?", options: ["Yes", "No", "Not sure"], domain: "sci_bio", type: "interest_reverse" },
+   260→                    { id: 9, text: "Can you analyze financial reports and explain them easily to others?", options: ["Yes", "No", "Not sure"], domain: "commerce", type: "aptitude" },
+   261→                    { id: 10, text: "Does learning about new technologies and gadgets excite you?", options: ["Yes", "No", "Not sure"], domain: "sci_math", type: "interest" },
+   262→                    { id: 11, text: "Do you enjoy spending time reading about world history, evolution, and human culture?", options: ["Yes", "No", "Not sure"], domain: "humanities", type: "interest" },
+   263→                    { id: 12, text: "Do you find learning physics formulas and chemistry theories boring?", options: ["Yes", "No", "Not sure"], domain: "sci_math", type: "interest_reverse" },
+   264→                    { id: 13, text: "Do you enjoy reading business news, stock updates, or economic reports?", options: ["Yes", "No", "Not sure"], domain: "commerce", type: "interest" },
+   265→                    { id: 14, text: "Are you interested in how government laws, rules, and policies are created?", options: ["Yes", "No", "Not sure"], domain: "humanities", type: "interest" }
+   266→                ]
+   267→            },
+   268→            {
+   269→                id: "sec2",
+   270→                name: "WORK SITUATIONS",
+   271→                milestoneTitle: "Great work! You have completed the first milestone.",
+   272→                milestoneDesc: "Imagine yourself working in a future job. Choose 'Yes' if you would enjoy doing this work to earn your living.",
+   273→                questions: [
+   274→                    { id: 15, text: "Would you like a job where you: Discuss better ways to govern and run a country?", options: ["Yes", "No", "Not sure"], domain: "humanities", type: "interest" },
+   275→                    { id: 16, text: "Would you like a job where you: Guide and counsel students about their studies and careers?", options: ["Yes", "No", "Not sure"], domain: "humanities", type: "interest" },
+   276→                    { id: 17, text: "Would you like a job where you: Write theater plays or teach dance and performing arts?", options: ["Yes", "No", "Not sure"], domain: "humanities", type: "interest" },
+   277→                    { id: 18, text: "Would you like a job where you: Write and handle official business communications and letters?", options: ["Yes", "No", "Not sure"], domain: "commerce", type: "interest" },
+   278→                    { id: 19, text: "Would you like a job where you: Decide which company stocks and shares to invest money in?", options: ["Yes", "No", "Not sure"], domain: "commerce", type: "interest" },
+   279→                    { id: 20, text: "Would you like a job where you: Write computer programs, logic, and software code?", options: ["Yes", "No", "Not sure"], domain: "sci_math", type: "interest" },
+   280→                    { id: 21, text: "Would you like a job where you: Design electronic communication devices and smartphones?", options: ["Yes", "No", "Not sure"], domain: "sci_math", type: "interest" },
+   281→                    { id: 22, text: "Would you like a job where you: Provide medical care and treatments to patients or animals?", options: ["Yes", "No", "Not sure"], domain: "sci_bio", type: "interest" },
+   282→                    { id: 23, text: "Would you like a job where you: Protect wild animals and forests from illegal hunters?", options: ["Yes", "No", "Not sure"], domain: "sci_bio", type: "interest" },
+   283→                    { id: 24, text: "Would you like a job where you: Give injections, prescribe medicine, or clean teeth at a clinic?", options: ["Yes", "No", "Not sure"], domain: "sci_bio", type: "interest" },
+   284→                    { id: 25, text: "Would you like a job where you: Take care of newborn babies in a hospital care unit?", options: ["Yes", "No", "Not sure"], domain: "sci_bio", type: "interest" },
+   285→                    { id: 26, text: "Would you like a job where you: Test different soils and fertilizers to grow better crops?", options: ["Yes", "No", "Not sure"], domain: "sci_bio", type: "interest" },
+   286→                    { id: 27, text: "Would you like a job where you: Grow biological cell tissues in a lab and write research papers?", options: ["Yes", "No", "Not sure"], domain: "sci_bio", type: "interest" },
+   287→                    { id: 28, text: "Would you like a job where you: Distribute vaccines and health treatments in government health centers?", options: ["Yes", "No", "Not sure"], domain: "sci_bio", type: "interest" },
+   288→                    { id: 29, text: "Would you like a job where you: Organize public health awareness camps to fight diseases?", options: ["Yes", "No", "Not sure"], domain: "humanities", type: "interest" },
+   289→                    { id: 30, text: "Would you like a job where you: Lead a team to complete business projects for corporate clients?", options: ["Yes", "No", "Not sure"], domain: "commerce", type: "interest" },
+   290→                    { id: 31, text: "Would you like a job where you: Work on space rockets, satellites, and space research missions?", options: ["Yes", "No", "Not sure"], domain: "sci_math", type: "interest" },
+   291→                    { id: 32, text: "Would you like a job where you: Use advanced math models and formulas to design new gadgets?", options: ["Yes", "No", "Not sure"], domain: "sci_math", type: "interest" },
+   292→                    { id: 33, text: "Would you like a job where you: Perform lab experiments to prove scientific laws and theories?", options: ["Yes", "No", "Not sure"], domain: "sci_math", type: "interest" },
+   293→                    { id: 34, text: "Would you like a job where you: Check electrical meters and instruments to measure power current?", options: ["Yes", "No", "Not sure"], domain: "sci_math", type: "interest" },
+   294→                    { id: 35, text: "Would you like a job where you: Attend strategic business planning meetings with company executives?", options: ["Yes", "No", "Not sure"], domain: "commerce", type: "interest" },
+   295→                    { id: 36, text: "Would you like a job where you: Manage corporate tax planning and company financial records?", options: ["Yes", "No", "Not sure"], domain: "commerce", type: "interest" }
+   296→                ]
+   297→            },
+   298→            {
+   299→                id: "sec3",
+   300→                name: "CODE MATCHING & LOGIC",
+   301→                milestoneTitle: "Milestone 2 Completed!",
+   302→                milestoneDesc: "Test your attention to detail and logical deduction skills. Read carefully and pick the correct option.",
+   303→                questions: [
+   304→                    { id: 37, text: "Which pair of codes below are EXACTLY IDENTICAL to each other?", options: ["A7X9 & A7X9", "A7X9 & A7Y9", "A7X9 & A7X8", "A7X9 & A8X9"], domain: "sci_math", type: "aptitude" },
+   305→                    { id: 38, text: "Find the pair where both text codes match perfectly:", options: ["K92P & K92P", "K92P & K92Q", "K92P & K91P", "K92P & L92P"], domain: "sci_math", type: "aptitude" },
+   306→                    { id: 39, text: "Which option contains two codes that are 100% identical?", options: ["#R48T & #R48T", "#R48T & #R48S", "#R48T & #S48T", "#R48T & #R49T"], domain: "sci_math", type: "aptitude" },
+   307→                    { id: 40, text: "Logical Deduction: If all marketers are creative, and some creative people are artists, which statement MUST be true?", options: ["Some creative people are marketers", "All marketers are artists", "All artists are marketers", "No marketers are creative"], domain: "commerce", type: "aptitude" },
+   308→                    { id: 41, text: "Three friends (Alok, Bhavan, Chandan) bought a Book, a Pen, and a Notebook. Alok did NOT buy the pen. Bhavan bought the notebook. Chandan did NOT buy the pen. What item did Alok buy?", options: ["Book", "Pen", "Notebook", "None of the above"], domain: "sci_math", type: "aptitude" },
+   309→                    { id: 42, text: "A boy has $15 to buy a snack. He chooses a chocolate bar instead of a packet of chips. What is his opportunity cost (what is he giving up)?", options: ["The packet of chips", "His money", "His appetite", "His time"], domain: "commerce", type: "aptitude" },
+   310→                    { id: 43, text: "What is the primary purpose of creating a business plan?", options: ["To outline business goals and strategies to achieve them", "To decide daily employee duties", "To set daily sales prices", "To manage social media accounts"], domain: "commerce", type: "aptitude" },
+   311→                    { id: 44, text: "Which two code strings are EXACTLY IDENTICAL?", options: ["8802-BA & 8802-BA", "8802-BA & 8802-PA", "8802-BA & 8803-BA", "8802-BA & 8802-BB"], domain: "sci_math", type: "aptitude" },
+   312→                    { id: 45, text: "Find the matching pair of codes from the options below:", options: ["TX-909-Z & TX-909-Z", "TX-909-Z & TX-909-S", "TX-909-Z & TY-909-Z", "TX-909-Z & TX-910-Z"], domain: "sci_math", type: "aptitude" },
+   313→                    { id: 46, text: "Identify the pair where both codes are 100% identical:", options: ["#5512-QX & #5512-QX", "#5512-QX & #5512-PX", "#5512-QX & #5513-QX", "#5512-QX & #5512-QY"], domain: "sci_math", type: "aptitude" }
+   314→                ]
+   315→            },
+   316→            {
+   317→                id: "sec4",
+   318→                name: "DATA & PRACTICAL ANALYSIS",
+   319→                milestoneTitle: "Get up and Shine!",
+   320→                milestoneDesc: "Take a deep breath and solve these practical, numerical, and scientific problem-solving questions.",
+   321→                questions: [
+   322→                    { id: 47, text: "A publishing house printed a book with total costs of $50,000. Costs breakdown: Advertising = 40%, Author Earnings = 20%, Printing = 30%, Transport = 10%. How much money was spent on Advertising and Author Earnings respectively?", options: ["$20,000 & $10,000", "$15,000 & $10,000", "$10,000 & $20,000", "$25,000 & $5,000"], domain: "commerce", type: "aptitude" },
+   323→                    { id: 48, text: "A college refund policy states: '1st year students get 100% refund; 2nd year get 50%; 3rd year get 0%'. Records show:\n2008: 1st yr got 100%\n2009: 2nd yr got 100%\n2010: 3rd yr got 0%\n2012: 2nd yr got 100%\nWhich TWO years broke the refund policy rules?", options: ["2009 & 2012", "2008 & 2010", "2009 & 2011", "None of these"], domain: "commerce", type: "aptitude" },
+   324→                    { id: 49, text: "What is the name of the galaxy that contains our Solar System?", options: ["Milky Way", "Andromeda", "Triangulum", "Whirlpool"], domain: "sci_bio", type: "aptitude" },
+   325→                    { id: 50, text: "Which of the following is an example of a chemical change?", options: ["Burning wood", "Melting ice", "Tearing paper", "Dissolving sugar in water"], domain: "sci_bio", type: "aptitude" },
+   326→                    { id: 51, text: "Ajay wants to exchange a single $500 note into $10 notes at the bank. How many $10 notes will he receive?", options: ["50", "10", "500", "20"], domain: "commerce", type: "aptitude" },
+   327→                    { id: 52, text: "Mechanical Reasoning: Two gears X and Y touch each other directly. Gear X is larger than Gear Y. If Gear X turns CLOCKWISE, how does Gear Y turn?", options: ["Counter-clockwise faster", "Clockwise faster", "Counter-clockwise slower", "Clockwise slower"], domain: "sci_math", type: "aptitude" },
+   328→                    { id: 53, text: "What is 1/9 converted into a percentage?", options: ["11.11%", "0.09%", "1.11%", "0.9%"], domain: "sci_math", type: "aptitude" },
+   329→                    { id: 54, text: "Physics Logic: On a standard seesaw lever, if side Y moves down at a speed of 10 cm/s, how does the opposite side X move upwards?", options: ["At the same speed (10 cm/s)", "Faster", "Slower", "It does not move"], domain: "sci_math", type: "aptitude" },
+   330→                    { id: 55, text: "Circuit Logic: In a simple series electric circuit containing 3 open switches and 1 bulb, how many switches MUST be closed for the light bulb to turn on?", options: ["All three switches", "Only one switch", "Only two switches", "None"], domain: "sci_math", type: "aptitude" },
+   331→                    { id: 56, text: "On Day 1, a shopkeeper sold 1 kg of rice for $40. On Day 2, he sold 1 kg of rice for $60. If he made a profit of $10 on both days, what was his buying cost (cost price) on Day 1 and Day 2 respectively?", options: ["$30 and $50", "$30 and $25", "$35 and $30", "$30 and $30"], domain: "commerce", type: "aptitude" }
+   332→                ]
+   333→            },
+   334→            {
+   335→                id: "sec5",
+   336→                name: "READING & VERBAL CONCEPTS",
+   337→                milestoneTitle: "Great Going!",
+   338→                milestoneDesc: "Read the passages below carefully and answer the questions that follow.",
+   339→                passage1: "Asia is the Earth's largest continent, stretching from the Bering Sea in the east to Europe in the west. Following the end of colonial rule, Asian economies grew rapidly—first in Japan, Singapore, South Korea, and Taiwan, and later in China and India. Over two-thirds of the human population lives in Asia, which was also the birthplace of early civilizations. Asia has rich diversity in culture, languages, climates, and government systems.",
+   340→                passage2: "Electromagnetic radiation is energy traveling through space in waves. Sunlight, X-rays, microwave energy, and heat from fires are all examples. Objects appear in different colors to our eyes because they absorb certain light wavelengths and reflect others back to us.",
+   341→                questions: [
+   342→                    { id: 57, text: "Human civilization first originated on the continent of Asia.", options: ["TRUE", "FALSE", "Cannot tell"], domain: "humanities", type: "aptitude", passageId: 1 },
+   343→                    { id: 58, text: "The passage proves that colonial rule had a negative impact on Asia.", options: ["TRUE", "FALSE", "Cannot tell"], domain: "humanities", type: "aptitude", passageId: 1 },
+   344→                    { id: 59, text: "Siberia is the coldest place in the entire world.", options: ["TRUE", "FALSE", "Cannot tell"], domain: "humanities", type: "aptitude", passageId: 1 },
+   345→                    { id: 60, text: "Singapore was among the first Asian countries to experience economic growth after colonial rule.", options: ["TRUE", "FALSE", "Cannot tell"], domain: "humanities", type: "aptitude", passageId: 1 },
+   346→                    { id: 61, text: "Asia exhibits the greatest cultural and climate diversity in the world.", options: ["TRUE", "FALSE", "Cannot tell"], domain: "humanities", type: "aptitude", passageId: 1 },
+   347→                    { id: 62, text: "Light is called electromagnetic radiation because it carries energy through space in wave forms.", options: ["TRUE", "FALSE", "Both"], domain: "sci_math", type: "aptitude", passageId: 2 },
+   348→                    { id: 63, text: "The color we see an object to be depends on which light wavelengths it absorbs or reflects.", options: ["TRUE", "FALSE", "Both"], domain: "sci_math", type: "aptitude", passageId: 2 },
+   349→                    { id: 64, text: "Radio waves, X-rays, microwaves, and visible light are all examples of...", options: ["Electromagnetic radiation", "Sound waves", "Physical particles"], domain: "sci_math", type: "aptitude", passageId: 2 },
+   350→                    { id: 65, text: "An object appears blue because it absorbs blue light and reflects all other colors.", options: ["TRUE", "FALSE", "Both"], domain: "sci_math", type: "aptitude", passageId: 2 },
+   351→                    { id: 66, text: "A white object reflects more light than a dark object.", options: ["TRUE", "FALSE", "Both"], domain: "sci_math", type: "aptitude", passageId: 2 },
+   352→                    { id: 67, text: "Which of the following words is a preposition?", options: ["In", "Location", "No", "Position"], domain: "humanities", type: "aptitude" },
+   353→                    { id: 68, text: "Choose the word with the correct spelling:", options: ["Permissible", "Permisible", "Permissable", "Permisable"], domain: "humanities", type: "aptitude" },
+   354→                    { id: 69, text: "Complete the relationship: Cat is to Fur as Fish is to...", options: ["Scales", "Feathers", "Tail", "Fins"], domain: "sci_bio", type: "aptitude" },
+   355→                    { id: 70, text: "Complete the relationship: Dawn is to Noon as Dusk is to...", options: ["Night", "Afternoon", "Midnight", "Dark"], domain: "humanities", type: "aptitude" },
+   356→                    { id: 71, text: "Complete the relationship: Cat is to Paw as Horse is to...", options: ["Hoof", "Fur", "Hair", "Shoe"], domain: "sci_bio", type: "aptitude" }
+   357→                ]
+   358→            },
+   359→            {
+   360→                id: "sec6",
+   361→                name: "PATTERNS & SEQUENCES",
+   362→                milestoneTitle: "Final Step!",
+   363→                milestoneDesc: "Very well done! Complete these last pattern and visual logic questions to view your complete report.",
+   364→                questions: [
+   365→                    { id: 72, text: "Shape Sequence: Square (4 sides) → Pentagon (5 sides) → Hexagon (6 sides) → ?. What shape comes next in the pattern?", options: ["Heptagon (7 sides)", "Triangle (3 sides)", "Octagon (8 sides)", "Nonagon (9 sides)"], domain: "sci_math", type: "aptitude" },
+   366→                    { id: 73, text: "Pattern Logic: 1 Circle → 2 Triangles → 3 Squares → ?. What is the next logical group in this pattern?", options: ["4 Pentagons", "3 Circles", "5 Hexagons", "2 Squares"], domain: "sci_math", type: "aptitude" },
+   367→                    { id: 74, text: "Direction Rotation: A pointer faces NORTH on Step 1, turns clockwise to EAST on Step 2, and SOUTH on Step 3. Which direction will it face on Step 4?", options: ["WEST", "NORTH", "NORTHEAST", "SOUTHWEST"], domain: "sci_math", type: "aptitude" },
+   368→                    { id: 75, text: "Letter Sequence: A, D, G, J, ? (Notice skipping 2 letters each time: A..D..G..J..?). What is the next letter?", options: ["M", "K", "L", "N"], domain: "sci_math", type: "aptitude" },
+   369→                    { id: 76, text: "Grid Pattern: Row 1 has 1 dot (1²), Row 2 has 4 dots (2²), Row 3 has 9 dots (3²). How many dots will Row 4 have (4²)?", options: ["16 dots", "12 dots", "10 dots", "20 dots"], domain: "sci_math", type: "aptitude" }
+   370→                ]
+   371→            }
+   372→        ];
+   373→
+   374→        // STREAM KNOWLEDGE DATABASE
+   375→        const STREAM_DATABASE = {
+   376→            sci_math: {
+   377→                id: "sci_math",
+   378→                title: "Science (Maths)",
+   379→                subtitle: "Physics, Chemistry & Mathematics (PCM)",
+   380→                description: "This field entails a methodical examination and exploration, employing a range of techniques like observation and experimentation. The key subjects covered in this discipline encompass physics, chemistry, and mathematics.",
+   381→                advantages: [
+   382→                    "A strong grasp of the subject provides the potential to innovate and create new technologies.",
+   383→                    "Enhances comprehension of the occurrence of natural processes and phenomena through hypothesis formulation and experimental investigations."
+   384→                ],
+   385→                coursesTitle: "Top Graduate Level Courses after 12th for PCM Students",
+   386→                courses: [
+   387→                    { name: "Engineering (B.Tech)", duration: "4 yrs" },
+   388→                    { name: "B.Sc Science / Tech", duration: "3 yrs" },
+   389→                    { name: "Architecture (B.Arch)", duration: "5 yrs" },
+   390→                    { name: "Management (BBA/BBM)", duration: "3 yrs" },
+   391→                    { name: "Computer App (BCA)", duration: "3 yrs" },
+   392→                    { name: "Law (LLB)", duration: "5 yrs" },
+   393→                    { name: "National Defense (NDA)", duration: "3 yrs" },
+   394→                    { name: "Creative Careers (B.Des)", duration: "3-4 yrs" }
+   395→                ]
+   396→            },
+   397→            commerce: {
+   398→                id: "commerce",
+   399→                title: "Commerce",
+   400→                subtitle: "Economics, Accountancy & Business Studies",
+   401→                description: "Commerce, as a field of study, entails the examination of business operations and trade. The core subjects within this discipline encompass economics, accountancy, and business studies. Typically, research is not the predominant pursuit within this academic path.",
+   402→                advantages: [
+   403→                    "It fosters a comprehensive understanding of how business activities have a direct and indirect impact on society and the economy.",
+   404→                    "It imparts the skills of recording, categorizing, and interpreting financial records and monetary transactions, essential for effective financial management."
+   405→                ],
+   406→                coursesTitle: "Top Graduate Level Courses after 12th for Commerce Students",
+   407→                courses: [
+   408→                    { name: "B.Com / Accounts", duration: "3 yrs" },
+   409→                    { name: "Chartered Accountancy (CA)", duration: "4 yrs" },
+   410→                    { name: "Company Secretary (CS)", duration: "3 yrs" },
+   411→                    { name: "Cost Accountant (CMA)", duration: "3 yrs" },
+   412→                    { name: "Management (BBA/BBM/BMS)", duration: "3 yrs" },
+   413→                    { name: "Law (LLB)", duration: "5 yrs" },
+   414→                    { name: "Economics / Statistics", duration: "3 yrs" },
+   415→                    { name: "Hotel & Tourism Mgmt", duration: "3 yrs" }
+   416→                ]
+   417→            },
+   418→            sci_bio: {
+   419→                id: "sci_bio",
+   420→                title: "Science (Bio)",
+   421→                subtitle: "Physics, Chemistry & Biology (PCB)",
+   422→                description: "Biology is the scientific discipline focused on the examination of life and living organisms, encompassing their anatomy, physiology, development, and evolutionary processes. It elucidates the mechanisms underlying the survival of living entities.",
+   423→                advantages: [
+   424→                    "Providing insights and knowledge that can be applied to enhance healthcare systems and preventive strategies for diseases and health-related challenges.",
+   425→                    "Offering a vast realm for scientific research, actively encouraged by both government and private sectors, with significant opportunities for advancements."
+   426→                ],
+   427→                coursesTitle: "Top Graduate Level Courses after 12th for PCB Students",
+   428→                courses: [
+   429→                    { name: "Medicine (MBBS)", duration: "5.5 yrs" },
+   430→                    { name: "Dental (BDS)", duration: "5 yrs" },
+   431→                    { name: "B.Sc Biology / Biotech", duration: "3 yrs" },
+   432→                    { name: "Veterinary Science", duration: "5.5 yrs" },
+   433→                    { name: "Ayurveda (BAMS) / Homeo", duration: "5.5 yrs" },
+   434→                    { name: "Pharmacy (B.Pharm)", duration: "4 yrs" },
+   435→                    { name: "Nursing (B.Sc)", duration: "4 yrs" },
+   436→                    { name: "Agriculture & Forestry", duration: "4 yrs" }
+   437→                ]
+   438→            },
+   439→            humanities: {
+   440→                id: "humanities",
+   441→                title: "Humanities",
+   442→                subtitle: "Arts, History, Psychology & Social Sciences",
+   443→                description: "Humanities, often referred to as the Arts, can be defined as the exploration of the 'Human Condition.' It enables a deeper understanding of human society, ideologies, beliefs, and how they manifest through artistic expressions, architecture, and religions.",
+   444→                advantages: [
+   445→                    "Enhancing analytical and expressive abilities.",
+   446→                    "Cultivating independence in one's work.",
+   447→                    "Providing ample research opportunities in fields like sociology and psychology."
+   448→                ],
+   449→                coursesTitle: "Top Graduate Level Courses after 12th for Arts Students",
+   450→                courses: [
+   451→                    { name: "Bachelor of Arts (BA)", duration: "3 yrs" },
+   452→                    { name: "Law (LLB)", duration: "5 yrs" },
+   453→                    { name: "Management (BBA/BBM)", duration: "3 yrs" },
+   454→                    { name: "Journalism & Media", duration: "3 yrs" },
+   455→                    { name: "Fine Arts & Design (B.Des)", duration: "4 yrs" },
+   456→                    { name: "Psychology & Sociology", duration: "3 yrs" },
+   457→                    { name: "Hospitality & Tourism", duration: "3 yrs" },
+   458→                    { name: "Teaching (B.Ed)", duration: "3-4 yrs" }
+   459→                ]
+   460→            }
+   461→        };
+   462→
+   463→        // GLOBAL APP STATE
+   464→        let currentUser = {};
+   465→        let currentSectionIdx = 0;
+   466→        let userAnswers = {};
+   467→
+   468→        // DOM ELEMENTS
+   469→        const regScreen = document.getElementById('registration-screen');
+   470→        const testScreen = document.getElementById('test-screen');
+   471→        const reportScreen = document.getElementById('report-screen');
+   472→
+   473→        // USER FORM SUBMISSION
+   474→        document.getElementById('user-form').addEventListener('submit', function(e) {
+   475→            e.preventDefault();
+   476→            currentUser = {
+   477→                name: document.getElementById('user-name').value.trim(),
+   478→                phone: document.getElementById('user-phone').value.trim(),
+   479→                email: document.getElementById('user-email').value.trim(),
+   480→                date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+   481→            };
+   482→
+   483→            regScreen.classList.add('hidden');
+   484→            testScreen.classList.remove('hidden');
+   485→            renderStepper();
+   486→            renderCurrentSection();
+   487→        });
+   488→
+   489→        // RENDER TOP STEPPER HEADER
+   490→        function renderStepper() {
+   491→            const container = document.getElementById('section-stepper');
+   492→            container.innerHTML = '';
+   493→
+   494→            TEST_SECTIONS.forEach((sec, idx) => {
+   495→                const isCurrent = idx === currentSectionIdx;
+   496→                const isCompleted = idx < currentSectionIdx;
+   497→
+   498→                const stepItem = document.createElement('div');
+   499→                stepItem.className = "flex items-center space-x-2 px-2 py-1";
+   500→                stepItem.innerHTML = `
+   501→                    <div class="w-6 h-6 rounded-full flex items-center justify-center font-bold text-[11px] ${
+   502→                        isCurrent ? 'bg-amber-400 text-blue-950 ring-2 ring-amber-300' : (isCompleted ? 'bg-emerald-500 text-white' : 'bg-blue-800 text-blue-300')
+   503→                    }">
+   504→                        ${isCompleted ? '✓' : idx + 1}
+   505→                    </div>
+   506→                    <span class="${isCurrent ? 'text-amber-300 font-bold' : (isCompleted ? 'text-white' : 'text-blue-300')}">
+   507→                        ${sec.name}
+   508→                    </span>
+   509→                    ${idx < TEST_SECTIONS.length - 1 ? '<span class="text-blue-700">→</span>' : ''}
+   510→                `;
+   511→                container.appendChild(stepItem);
+   512→            });
+   513→        }
+   514→
+   515→        // RENDER ALL QUESTIONS FOR CURRENT SECTION
+   516→        function renderCurrentSection() {
+   517→            const sec = TEST_SECTIONS[currentSectionIdx];
+   518→
+   519→            document.getElementById('active-section-label').textContent = `SECTION ${currentSectionIdx + 1}: ${sec.name}`;
+   520→            document.getElementById('active-section-title').textContent = sec.name;
+   521→            document.getElementById('milestone-title').textContent = sec.milestoneTitle;
+   522→            document.getElementById('milestone-desc').textContent = sec.milestoneDesc;
+   523→
+   524→            let totalQuestionsCount = 0;
+   525→            let answeredQuestionsCount = Object.keys(userAnswers).length;
+   526→            TEST_SECTIONS.forEach(s => totalQuestionsCount += s.questions.length);
+   527→
+   528→            const progress = Math.round((answeredQuestionsCount / totalQuestionsCount) * 100);
+   529→            document.getElementById('section-progress-bar').style.width = `${progress}%`;
+   530→            document.getElementById('section-progress-text').textContent = `${progress}% Completed`;
+   531→
+   532→            const container = document.getElementById('section-questions-container');
+   533→            container.innerHTML = '';
+   534→
+   535→            let startQIndex = 1;
+   536→            for (let i = 0; i < currentSectionIdx; i++) {
+   537→                startQIndex += TEST_SECTIONS[i].questions.length;
+   538→            }
+   539→
+   540→            let lastPassageId = null;
+   541→
+   542→            sec.questions.forEach((q, idx) => {
+   543→                const globalQNum = startQIndex + idx;
+   544→
+   545→                if (q.passageId && q.passageId !== lastPassageId) {
+   546→                    lastPassageId = q.passageId;
+   547→                    const passageText = (q.passageId === 1) ? sec.passage1 : sec.passage2;
+   548→                    const passageCard = document.createElement('div');
+   549→                    passageCard.className = "bg-amber-50 p-5 rounded-xl border border-amber-200 text-xs sm:text-sm text-slate-800 leading-relaxed shadow-sm my-4";
+   550→                    passageCard.innerHTML = `
+   551→                        <strong class="block text-amber-900 font-bold text-sm mb-2 uppercase tracking-wide">📖 Reading Passage ${q.passageId}:</strong>
+   552→                        <p>${passageText}</p>
+   553→                    `;
+   554→                    container.appendChild(passageCard);
+   555→                }
+   556→
+   557→                const card = document.createElement('div');
+   558→                card.className = "bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-start gap-4 transition hover:border-slate-300";
+   559→
+   560→                const selectedVal = userAnswers[q.id];
+   561→
+   562→                card.innerHTML = `
+   563→                    <div class="text-2xl font-black text-blue-900 font-mono select-none w-8 text-right flex-shrink-0">
+   564→                        ${globalQNum}
+   565→                    </div>
+   566→                    <div class="w-full">
+   567→                        <p class="font-bold text-slate-800 text-base mb-3 leading-snug whitespace-pre-line">
+   568→                            ${q.text}
+   569→                        </p>
+   570→                        <div class="space-y-2">
+   571→                            ${q.options.map((opt, oIdx) => `
+   572→                                <label class="flex items-center space-x-3 text-sm font-medium text-slate-700 cursor-pointer hover:text-blue-900 bg-slate-50 hover:bg-blue-50/50 px-3.5 py-2.5 rounded-lg border border-slate-200 transition">
+   573→                                    <input type="radio" name="question_${q.id}" value="${oIdx}" ${selectedVal === oIdx ? 'checked' : ''} onchange="selectRadio(${q.id},${oIdx})" class="w-4 h-4 text-blue-700 focus:ring-blue-600">
+   574→                                    <span>${opt}</span>
+   575→                                </label>
+   576→                            `).join('')}
+   577→                        </div>
+   578→                    </div>
+   579→                `;
+   580→                container.appendChild(card);
+   581→            });
+   582→
+   583→            document.getElementById('prev-sec-btn').disabled = (currentSectionIdx === 0);
+   584→            document.getElementById('validation-msg').classList.add('hidden');
+   585→
+   586→            if (currentSectionIdx === TEST_SECTIONS.length - 1) {
+   587→                document.getElementById('next-sec-btn').textContent = "Submit & View Report ✓";
+   588→                document.getElementById('next-sec-btn').className = "px-6 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold transition shadow";
+   589→            } else {
+   590→                document.getElementById('next-sec-btn').textContent = "Save & Next Section →";
+   591→                document.getElementById('next-sec-btn').className = "px-6 py-2.5 rounded-lg bg-blue-800 hover:bg-blue-900 text-white font-bold transition shadow";
+   592→            }
+   593→
+   594→            window.scrollTo({ top: 0, behavior: 'smooth' });
+   595→        }
+   596→
+   597→        // SAVE RADIO SELECTION
+   598→        function selectRadio(qId, optionIdx) {
+   599→            userAnswers[qId] = optionIdx;
+   600→            document.getElementById('validation-msg').classList.add('hidden');
+   601→
+   602→            let totalQuestionsCount = 0;
+   603→            let answeredQuestionsCount = Object.keys(userAnswers).length;
+   604→            TEST_SECTIONS.forEach(s => totalQuestionsCount += s.questions.length);
+   605→
+   606→            const progress = Math.round((answeredQuestionsCount / totalQuestionsCount) * 100);
+   607→            document.getElementById('section-progress-bar').style.width = `${progress}%`;
+   608→            document.getElementById('section-progress-text').textContent = `${progress}% Completed`;
+   609→        }
+   610→
+   611→        // PREVIOUS SECTION
+   612→        function prevSection() {
+   613→            if (currentSectionIdx > 0) {
+   614→                currentSectionIdx--;
+   615→                renderStepper();
+   616→                renderCurrentSection();
+   617→            }
+   618→        }
+   619→
+   620→        // NEXT SECTION (WITH VALIDATION)
+   621→        function nextSection() {
+   622→            const currentSec = TEST_SECTIONS[currentSectionIdx];
+   623→            const allAnswered = currentSec.questions.every(q => userAnswers[q.id] !== undefined);
+   624→
+   625→            if (!allAnswered) {
+   626→                document.getElementById('validation-msg').classList.remove('hidden');
+   627→                return;
+   628→            }
+   629→
+   630→            if (currentSectionIdx < TEST_SECTIONS.length - 1) {
+   631→                currentSectionIdx++;
+   632→                renderStepper();
+   633→                renderCurrentSection();
+   634→            } else {
+   635→                generateReport();
+   636→            }
+   637→        }
+   638→
+   639→        // --- REPORT GENERATION ENGINE ---
+   640→        function generateReport() {
+   641→            testScreen.classList.add('hidden');
+   642→            reportScreen.classList.remove('hidden');
+   643→
+   644→            document.getElementById('rpt-name').textContent = currentUser.name;
+   645→            document.getElementById('rpt-phone').textContent = currentUser.phone;
+   646→            document.getElementById('rpt-email').textContent = currentUser.email;
+   647→            document.getElementById('rpt-date').textContent = currentUser.date;
+   648→            document.getElementById('ranking-header-title').textContent = `${currentUser.name.split(' ')[0]}'s Stream Preference Order`;
+   649→
+   650→            const scores = {
+   651→                sci_math: { apt: 0, aptCount: 0, int: 0, intCount: 0 },
+   652→                commerce: { apt: 0, aptCount: 0, int: 0, intCount: 0 },
+   653→                sci_bio: { apt: 0, aptCount: 0, int: 0, intCount: 0 },
+   654→                humanities: { apt: 0, aptCount: 0, int: 0, intCount: 0 }
+   655→            };
+   656→
+   657→            TEST_SECTIONS.forEach(sec => {
+   658→                sec.questions.forEach(q => {
+   659→                    const ans = userAnswers[q.id];
+   660→                    let val = 50;
+   661→
+   662→                    if (q.options.length === 3) {
+   663→                        val = (ans === 0) ? 100 : ((ans === 2) ? 50 : 10);
+   664→                        if (q.type === 'interest_reverse') val = 110 - val;
+   665→                    } else {
+   666→                        val = (ans === 0 || ans === 1) ? 90 : 30;
+   667→                    }
+   668→
+   669→                    const targetType = q.type.includes('interest') ? 'int' : 'apt';
+   670→                    scores[q.domain][targetType] += val;
+   671→                    scores[q.domain][targetType + 'Count']++;
+   672→                });
+   673→            });
+   674→
+   675→            const results = Object.keys(STREAM_DATABASE).map(key => {
+   676→                const aptAvg = scores[key].aptCount ? Math.round(scores[key].apt / scores[key].aptCount) : 65;
+   677→                const intAvg = scores[key].intCount ? Math.round(scores[key].int / scores[key].intCount) : 65;
+   678→                const composite = Math.round((aptAvg * 0.5) + (intAvg * 0.5));
+   679→
+   680→                return {
+   681→                    id: key,
+   682→                    data: STREAM_DATABASE[key],
+   683→                    aptitude: Math.min(Math.max(aptAvg, 20), 98),
+   684→                    interest: Math.min(Math.max(intAvg, 20), 98),
+   685→                    composite: composite
+   686→                };
+   687→            });
+   688→
+   689→            results.sort((a, b) => b.composite - a.composite);
+   690→
+   691→            const prefGrid = document.getElementById('preference-grid');
+   692→            prefGrid.innerHTML = '';
+   693→            results.forEach((item, index) => {
+   694→                const isRank1 = index === 0;
+   695→                const card = document.createElement('div');
+   696→                card.className = `p-4 rounded-xl border flex flex-col justify-between text-center relative ${
+   697→                    isRank1 ? 'border-amber-400 bg-amber-50/50 ring-2 ring-amber-300' : 'border-slate-200 bg-white'
+   698→                }`;
+   699→
+   700→                card.innerHTML = `
+   701→                    <div>
+   702→                        <div class="w-8 h-8 rounded-full font-bold text-sm flex items-center justify-center mx-auto mb-2 ${
+   703→                            isRank1 ? 'bg-amber-500 text-white' : 'bg-slate-200 text-slate-700'
+   704→                        }">
+   705→                            ${index + 1}
+   706→                        </div>
+   707→                        <h4 class="font-bold text-slate-900 text-base leading-tight mb-1">${item.data.title}</h4>
+   708→                        ${isRank1 ? '<span class="inline-block bg-emerald-600 text-white text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded mt-1">Recommended Choice</span>' : ''}
+   709→                    </div>
+   710→                `;
+   711→                prefGrid.appendChild(card);
+   712→            });
+   713→
+   714→            renderComparisonChart(results);
+   715→
+   716→            const detailContainer = document.getElementById('stream-detail-pages');
+   717→            detailContainer.innerHTML = '';
+   718→
+   719→            results.forEach((item, index) => {
+   720→                const pageNum = index + 3;
+   721→                const page = document.createElement('div');
+   722→                page.className = "bg-white rounded-xl border border-slate-200 shadow-sm p-6 sm:p-10 report-page";
+   723→
+   724→                let adviceText = "";
+   725→                if (item.aptitude >= 70 && item.interest >= 70) {
+   726→                    adviceText = "Engage in a substantial amount of practical and application problem-solving to excel in this stream. You'll find it natural to invest extra effort into related subjects due to your strong interest profile.";
+   727→                } else if (item.interest > item.aptitude) {
+   728→                    adviceText = "A strong interest profile provides ample room for enhancing your moderate aptitude for analysis and observation. With targeted practice and dedication, you can achieve remarkable success.";
+   729→                } else {
+   730→                    adviceText = "Your profile shows strong underlying capability. To sustain long-term engagement, build upon your strengths and explore practical projects in this domain.";
+   731→                }
+   732→
+   733→                page.innerHTML = `
+   734→                    <div class="flex justify-between items-center border-b border-slate-200 pb-4 mb-6">
+   735→                        <div class="flex items-center space-x-3">
+   736→                            <span class="w-8 h-8 rounded-full bg-blue-900 text-white font-bold flex items-center justify-center text-sm">
+   737→                                ${index + 1}
+   738→                            </span>
+   739→                            <h2 class="text-2xl font-bold text-blue-900">${item.data.title}</h2>
+   740→                        </div>
+   741→                        <span class="text-xs text-slate-400">Stream Suggestor Report</span>
+   742→                    </div>
+   743→
+   744→                    <div class="text-xs sm:text-sm text-slate-700 space-y-3 mb-6">
+   745→                        <p class="leading-relaxed">${item.data.description}</p>
+   746→                        <div>
+   747→                            <strong class="block text-slate-900 mb-1">Advantages of pursuing ${item.data.title} education include:</strong>
+   748→                            <ul class="list-disc list-inside space-y-1 text-slate-600">
+   749→                                ${item.data.advantages.map(adv => `<li>${adv}</li>`).join('')}
+   750→                            </ul>
+   751→                        </div>
+   752→                    </div>
+   753→
+   754→                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center bg-slate-50 p-5 rounded-xl border border-slate-200 mb-8">
+   755→                        <div class="space-y-4">
+   756→                            <div>
+   757→                                <div class="flex justify-between text-xs font-bold mb-1">
+   758→                                    <span class="text-maroon">Aptitude Score</span>
+   759→                                    <span class="text-maroon">${item.aptitude}%</span>
+   760→                                </div>
+   761→                                <div class="w-full bg-slate-200 h-3 rounded-full overflow-hidden">
+   762→                                    <div class="bg-maroon h-full" style="width: ${item.aptitude}%"></div>
+   763→                                </div>
+   764→                            </div>
+   765→                            <div>
+   766→                                <div class="flex justify-between text-xs font-bold mb-1">
+   767→                                    <span class="text-amber-600">Interest Score</span>
+   768→                                    <span class="text-amber-600">${item.interest}%</span>
+   769→                                </div>
+   770→                                <div class="w-full bg-slate-200 h-3 rounded-full overflow-hidden">
+   771→                                    <div class="bg-amber-500 h-full" style="width: ${item.interest}%"></div>
+   772→                                </div>
+   773→                            </div>
+   774→                        </div>
+   775→                        <div class="text-xs text-slate-600 leading-relaxed border-t md:border-t-0 md:border-l border-slate-200 pt-3 md:pt-0 md:pl-5">
+   776→                            ${adviceText}
+   777→                        </div>
+   778→                    </div>
+   779→
+   780→                    <div>
+   781→                        <h4 class="text-sm font-bold text-center text-white bg-blue-800 py-2 rounded-t-lg">
+   782→                            ${item.data.coursesTitle}
+   783→                        </h4>
+   784→                        <div class="bg-slate-50 border border-slate-200 p-4 rounded-b-lg grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 text-xs">
+   785→                            ${item.data.courses.map(c => `
+   786→                                <div class="bg-white p-2.5 rounded border border-slate-200 shadow-sm flex flex-col justify-between">
+   787→                                    <span class="font-bold text-slate-800">${c.name}</span>
+   788→                                    <span class="text-[10px] text-blue-700 font-semibold mt-1">${c.duration}</span>
+   789→                                </div>
+   790→                            `).join('')}
+   791→                        </div>
+   792→                    </div>
+   793→
+   794→                    <div class="mt-12 pt-4 border-t border-slate-200 flex justify-between text-xs text-slate-400">
+   795→                        <span>Psychometric Career Assessment</span>
+   796→                        <span>Page-${pageNum}</span>
+   797→                    </div>
+   798→                `;
+   799→                detailContainer.appendChild(page);
+   800→            });
+   801→        }
+   802→
+   803→        let chartInstance = null;
+   804→        function renderComparisonChart(results) {
+   805→            const ctx = document.getElementById('comparisonChart').getContext('2d');
+   806→            if (chartInstance) chartInstance.destroy();
+   807→
+   808→            const labels = results.map(r => r.data.title);
+   809→            const aptitudeScores = results.map(r => r.aptitude);
+   810→            const interestScores = results.map(r => r.interest);
+   811→
+   812→            chartInstance = new Chart(ctx, {
+   813→                type: 'bar',
+   814→                data: {
+   815→                    labels: labels,
+   816→                    datasets: [
+   817→                        {
+   818→                            label: 'Aptitude',
+   819→                            data: aptitudeScores,
+   820→                            backgroundColor: '#800000',
+   821→                            borderWidth: 0,
+   822→                            barPercentage: 0.6,
+   823→                            categoryPercentage: 0.5
+   824→                        },
+   825→                        {
+   826→                            label: 'Interest',
+   827→                            data: interestScores,
+   828→                            backgroundColor: '#f59e0b',
+   829→                            borderWidth: 0,
+   830→                            barPercentage: 0.6,
+   831→                            categoryPercentage: 0.5
+   832→                        }
+   833→                    ]
+   834→                },
+   835→                options: {
+   836→                    responsive: true,
+   837→                    maintainAspectRatio: false,
+   838→                    scales: {
+   839→                        y: {
+   840→                            beginAtZero: true,
+   841→                            max: 100,
+   842→                            ticks: { stepSize: 10 }
+   843→                        }
+   844→                    },
+   845→                    plugins: {
+   846→                        legend: {
+   847→                            position: 'top',
+   848→                            labels: { font: { weight: 'bold' } }
+   849→                        }
+   850→                    }
+   851→                }
+   852→            });
+   853→        }
+   854→    </script>
+   855→</body>
+   856→</html>

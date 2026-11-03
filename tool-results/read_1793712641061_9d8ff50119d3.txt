@@ -1,0 +1,302 @@
+   200→    <div class="chips">
+   201→      <span class="chip">📝 60 Questions</span><span class="chip">⏱️ ~15 Minutes</span>
+   202→      <span class="chip">🎓 Grade-Specific</span><span class="chip">📊 Detailed Report</span>
+   203→    </div>
+   204→    <div class="form-group"><label>Student Name</label><input type="text" id="s-name" placeholder="e.g. Aarav Sharma"></div>
+   205→    <div class="form-group"><label>Email Address</label><input type="email" id="s-email" placeholder="you@example.com"></div>
+   206→    <div class="form-group"><label>Mobile Number</label><input type="tel" id="s-phone" placeholder="e.g. 98765 43210"></div>
+   207→    <div class="form-group"><label>Current Grade/Class</label>
+   208→      <select id="s-class">
+   209→        <option value="">Select Grade</option>
+   210→        <option value="Class 8 - 10">Class 8 - 10</option>
+   211→        <option value="Class 11 - 12">Class 11 - 12</option>
+   212→        <option value="Undergraduate">Undergraduate</option>
+   213→        <option value="Postgraduate">Postgraduate</option>
+   214→      </select>
+   215→    </div>
+   216→    <button class="btn" onclick="startTest()">Start Assessment →</button>
+   217→  </div>
+   218→</section>
+   219→
+   220→<!-- QUIZ -->
+   221→<section id="quiz-screen" class="screen">
+   222→  <div class="quiz-wrap">
+   223→    <div class="quiz-top">
+   224→      <div class="ring-wrap">
+   225→        <svg viewBox="0 0 120 120"><circle class="ring-bg" cx="60" cy="60" r="52"/><circle class="ring-fill" id="ring-fill" cx="60" cy="60" r="52"/></svg>
+   226→        <div class="ring-num" id="ring-num">0%</div>
+   227→      </div>
+   228→      <div class="quiz-meta">
+   229→        <div class="t">Multi-Dimensional Test</div>
+   230→        <div class="p" id="prog-text">0 / 60 answered</div>
+   231→      </div>
+   232→      <div class="stage-pill" id="grade-pill"></div>
+   233→    </div>
+   234→    <div id="quiz-body"></div>
+   235→    <div class="quiz-nav">
+   236→      <button class="ghost-btn" id="back-btn" onclick="goBack()">← Back</button>
+   237→      <div></div>
+   238→    </div>
+   239→  </div>
+   240→</section>
+   241→
+   242→<!-- REPORT -->
+   243→<section id="report-screen" class="screen">
+   244→  <div class="report-container" id="report-content"></div>
+   245→  <div style="max-width:1000px"><button class="print-btn" onclick="window.print()">Print / Save as PDF Document</button></div>
+   246→</section>
+   247→</main>
+   248→
+   249→<script>
+   250→const sectionOptions = {
+   251→  "Natural Abilities": ['Not at all', 'Barely', 'Somewhat', 'Fairly well', 'Extremely easily'],
+   252→  "Interests": ['I hate it', 'I dislike it', "I don't mind it", 'I like it', 'I absolutely love it'],
+   253→  "Personality": ['Not me at all', 'Rarely me', 'Sometimes me', 'Often me', 'Exactly me'],
+   254→  "Career Motivators": ['Not important', 'Slightly important', 'Moderately important', 'Very important', 'My top priority'],
+   255→  "Learning Styles": ['Never works', 'Rarely works', 'Sometimes works', 'Often works', 'Always works best']
+   256→};
+   257→
+   258→const questionBank = {
+   259→"Class 8 - 10": [
+   260→{ sec: "Natural Abilities", t: "Calculate percentages or discounts in my head while shopping.", c: "Logical/Mathematical" },
+   261→{ sec: "Natural Abilities", t: "Visualize how a 3D origami model will look before folding it.", c: "Spatial/Visual" },
+   262→{ sec: "Natural Abilities", t: "Memorize history dates and definitions for a school test.", c: "Verbal/Linguistic" },
+   263→{ sec: "Natural Abilities", t: "Fix a broken toy or bicycle chain using basic tools.", c: "Mechanical/Kinesthetic" },
+   264→{ sec: "Natural Abilities", t: "Find the next number in a math puzzle or sequence.", c: "Logical/Mathematical" },
+   265→{ sec: "Natural Abilities", t: "Write a creative story or essay using advanced vocabulary.", c: "Verbal/Linguistic" },
+   266→{ sec: "Natural Abilities", t: "Read a school map or blueprint of a building easily.", c: "Spatial/Visual" },
+   267→{ sec: "Natural Abilities", t: "Assemble a Lego set or IKEA furniture without instructions.", c: "Mechanical/Kinesthetic" },
+   268→{ sec: "Natural Abilities", t: "Accurately estimate the height of a tree or building.", c: "Spatial/Visual" },
+   269→{ sec: "Natural Abilities", t: "Structure a logical argument to win a school debate.", c: "Logical/Mathematical" },
+   270→{ sec: "Natural Abilities", t: "Explain a science chapter to a classmate who didn't understand it.", c: "Verbal/Linguistic" },
+   271→{ sec: "Natural Abilities", t: "Learn a new sport or dance move faster than my friends.", c: "Mechanical/Kinesthetic" },
+   272→{ sec: "Interests", t: "Doing science experiments in the school lab.", c: "Investigative" },
+   273→{ sec: "Interests", t: "Drawing, painting, or playing a musical instrument.", c: "Artistic" },
+   274→{ sec: "Interests", t: "Acting as a class monitor or student council leader.", c: "Enterprising" },
+   275→{ sec: "Interests", t: "Helping friends with their homework or volunteering.", c: "Social" },
+   276→{ sec: "Interests", t: "Organizing my notes, folders, and study desk perfectly.", c: "Conventional" },
+   277→{ sec: "Interests", t: "Playing outdoor sports, gardening, or building models.", c: "Realistic" },
+   278→{ sec: "Interests", t: "Watching documentaries about space, biology, or nature.", c: "Investigative" },
+   279→{ sec: "Interests", t: "Participating in school drama, elocution, or art competitions.", c: "Artistic" },
+   280→{ sec: "Interests", t: "Selling tickets for school events or organizing fairs.", c: "Enterprising" },
+   281→{ sec: "Interests", t: "Making spreadsheets for my pocket money or collection.", c: "Conventional" },
+   282→{ sec: "Interests", t: "Working on a farm or doing mechanical DIY projects.", c: "Realistic" },
+   283→{ sec: "Interests", t: "Helping teachers manage the classroom or events.", c: "Social" },
+   284→{ sec: "Personality", t: "I am the life of the party and energize the room when I enter.", c: "Extroversion" },
+   285→{ sec: "Personality", t: "I retreat to my room to recharge after a long social event.", c: "Introversion" },
+   286→{ sec: "Personality", t: "I base my decisions on logic and facts, ignoring emotions.", c: "Thinking" },
+   287→{ sec: "Personality", t: "I prioritize group harmony over cold, hard logic.", c: "Feeling" },
+   288→{ sec: "Personality", t: "I make detailed to-do lists for my homework and strictly follow them.", c: "Judging" },
+   289→{ sec: "Personality", t: "I like to keep my schedule flexible and spontaneous.", c: "Perceiving" },
+   290→{ sec: "Personality", t: "I actively seek to be the center of attention in new groups.", c: "Extroversion" },
+   291→{ sec: "Personality", t: "I think deeply before I speak, preferring to listen to others.", c: "Introversion" },
+   292→{ sec: "Personality", t: "I get highly uncomfortable if school rules are broken.", c: "Judging" },
+   293→{ sec: "Personality", t: "I easily adapt when my parents change plans at the last minute.", c: "Perceiving" },
+   294→{ sec: "Personality", t: "I try to ensure no one's feelings are hurt during conflicts.", c: "Feeling" },
+   295→{ sec: "Personality", t: "I debate based on facts, even if it upsets someone emotionally.", c: "Thinking" },
+   296→{ sec: "Career Motivators", t: "Earning a high salary in my future career is...", c: "Status & Wealth" },
+   297→{ sec: "Career Motivators", t: "Making a positive social impact through my work is...", c: "Altruism & Impact" },
+   298→{ sec: "Career Motivators", t: "Having a stable, safe job like a government employee is...", c: "Security & Stability" },
+   299→{ sec: "Career Motivators", t: "Having the freedom to create and innovate is...", c: "Autonomy & Creativity" },
+   300→{ sec: "Career Motivators", t: "Becoming a boss or manager with authority is...", c: "Status & Wealth" },
+   301→{ sec: "Career Motivators", t: "Directly helping people in my job is...", c: "Altruism & Impact" },
+   302→{ sec: "Career Motivators", t: "Having a routine 9-to-5 job over a risky startup is...", c: "Security & Stability" },
+   303→{ sec: "Career Motivators", t: "Being my own boss rather than working for someone else is...", c: "Autonomy & Creativity" },
+   304→{ sec: "Career Motivators", t: "Having a career that constantly challenges me to learn is...", c: "Autonomy & Creativity" },
+   305→{ sec: "Career Motivators", t: "Winning awards and public recognition is...", c: "Status & Wealth" },
+   306→{ sec: "Career Motivators", t: "Seeing a direct positive change in someone's life is...", c: "Altruism & Impact" },
+   307→{ sec: "Career Motivators", t: "Having a job that is safe from economic recessions is...", c: "Security & Stability" },
+   308→{ sec: "Learning Styles", t: "Grasping concepts when the teacher lectures verbally in class.", c: "Auditory" },
+   309→{ sec: "Learning Styles", t: "Using infographics and charts to understand science topics.", c: "Visual" },
+   310→{ sec: "Learning Styles", t: "Physically performing a lab experiment myself to understand it.", c: "Kinesthetic" },
+   311→{ sec: "Learning Styles", t: "Reading the textbook and writing my own summaries.", c: "Reading/Writing" },
+   312→{ sec: "Learning Styles", t: "Recalling a podcast's content better than a written article.", c: "Auditory" },
+   313→{ sec: "Learning Styles", t: "Color-coding my notes with highlighters to retain information.", c: "Visual" },
+   314→{ sec: "Learning Styles", t: "Sitting still during long theoretical lectures without fidgeting.", c: "Kinesthetic" },
+   315→{ sec: "Learning Styles", t: "Taking written exams over giving oral presentations.", c: "Reading/Writing" },
+   316→{ sec: "Learning Styles", t: "Reading my notes out loud to memorize them effectively.", c: "Auditory" },
+   317→{ sec: "Learning Styles", t: "Following complex written instruction manuals easily.", c: "Reading/Writing" },
+   318→{ sec: "Learning Styles", t: "Drawing diagrams in the margins of my notebook while studying.", c: "Visual" },
+   319→{ sec: "Learning Styles", t: "Taking things apart and putting them back together to understand them.", c: "Kinesthetic" }
+   320→],
+   321→"Class 11 - 12": [
+   322→{ sec: "Natural Abilities", t: "Solve complex calculus, algebra, or physics numericals.", c: "Logical/Mathematical" },
+   323→{ sec: "Natural Abilities", t: "Visualize organic chemistry structures or 3D geometry shapes.", c: "Spatial/Visual" },
+   324→{ sec: "Natural Abilities", t: "Write long, structured answers for humanities or English exams.", c: "Verbal/Linguistic" },
+   325→{ sec: "Natural Abilities", t: "Understand the mechanics of engines or electronic circuits.", c: "Mechanical/Kinesthetic" },
+   326→{ sec: "Natural Abilities", t: "Analyze complex data sets or economic trends.", c: "Logical/Mathematical" },
+   327→{ sec: "Natural Abilities", t: "Memorize lengthy historical timelines or legal case studies.", c: "Verbal/Linguistic" },
+   328→{ sec: "Natural Abilities", t: "Read complex engineering or architectural blueprints.", c: "Spatial/Visual" },
+   329→{ sec: "Natural Abilities", t: "Conduct precise biological dissections or lab titrations.", c: "Mechanical/Kinesthetic" },
+   330→{ sec: "Natural Abilities", t: "Grasp advanced abstract mathematical theorems.", c: "Logical/Mathematical" },
+   331→{ sec: "Natural Abilities", t: "Debate complex socio-political topics fluently.", c: "Verbal/Linguistic" },
+   332→{ sec: "Natural Abilities", t: "Build working physics or robotics models.", c: "Mechanical/Kinesthetic" },
+   333→{ sec: "Natural Abilities", t: "Visualize how a complex molecule looks from different angles.", c: "Spatial/Visual" },
+   334→{ sec: "Interests", t: "Participating in advanced science fairs or coding hackathons.", c: "Investigative" },
+   335→{ sec: "Interests", t: "Creating digital art, animation, or writing a blog.", c: "Artistic" },
+   336→{ sec: "Interests", t: "Leading the student council or organizing school festivals.", c: "Enterprising" },
+   337→{ sec: "Interests", t: "Volunteering at local NGOs or tutoring juniors.", c: "Social" },
+   338→{ sec: "Interests", t: "Balancing accounts or managing club budgets.", c: "Conventional" },
+   339→{ sec: "Interests", t: "Building tech projects, drones, or repairing electronics.", c: "Realistic" },
+   340→{ sec: "Interests", t: "Researching deep scientific or psychological topics online.", c: "Investigative" },
+   341→{ sec: "Interests", t: "Designing school magazines, posters, or sets for plays.", c: "Artistic" },
+   342→{ sec: "Interests", t: "Pitching startup ideas or participating in MUNs.", c: "Enterprising" },
+   343→{ sec: "Interests", t: "Organizing structured files, data, and schedules for events.", c: "Conventional" },
+   344→{ sec: "Interests", t: "Working on agricultural projects or outdoor environmental drives.", c: "Realistic" },
+   345→{ sec: "Interests", t: "Counseling peers or organizing community help drives.", c: "Social" },
+   346→{ sec: "Personality", t: "I am highly sociable and energize my study group.", c: "Extroversion" },
+   347→{ sec: "Personality", t: "I prefer studying alone in a quiet library over group study.", c: "Introversion" },
+   348→{ sec: "Personality", t: "I choose my subjects/career path purely based on ROI and logic.", c: "Thinking" },
+   349→{ sec: "Personality", t: "I choose my subjects/career path based on passion and impact.", c: "Feeling" },
+   350→{ sec: "Personality", t: "I stick to a rigid competitive exam prep schedule.", c: "Judging" },
+   351→{ sec: "Personality", t: "I adapt my study routine based on my mood and upcoming tests.", c: "Perceiving" },
+   352→{ sec: "Personality", t: "I actively network with seniors and teachers.", c: "Extroversion" },
+   353→{ sec: "Personality", t: "I deeply analyze my test mistakes before moving forward.", c: "Introversion" },
+   354→{ sec: "Personality", t: "I get stressed if my study timetable is disrupted.", c: "Judging" },
+   355→{ sec: "Personality", t: "I handle sudden syllabus changes or surprise tests easily.", c: "Perceiving" },
+   356→{ sec: "Personality", t: "I try to maintain harmony in my friend circle during fights.", c: "Feeling" },
+   357→{ sec: "Personality", t: "I prioritize truth and logic over emotions in arguments.", c: "Thinking" },
+   358→{ sec: "Career Motivators", t: "Getting a high-salary corporate or tech job is...", c: "Status & Wealth" },
+   359→{ sec: "Career Motivators", t: "Choosing a career that lets me serve society (e.g., Doctor/Teacher) is...", c: "Altruism & Impact" },
+   360→{ sec: "Career Motivators", t: "Getting a secure government job (UPSC/Bank/SSC) is...", c: "Security & Stability" },
+   361→{ sec: "Career Motivators", t: "Becoming an entrepreneur or freelancer is...", c: "Autonomy & Creativity" },
+   362→{ sec: "Career Motivators", t: "Holding a managerial position with authority is...", c: "Status & Wealth" },
+   363→{ sec: "Career Motivators", t: "Working for an NGO or social impact startup is...", c: "Altruism & Impact" },
+   364→{ sec: "Career Motivators", t: "Having a stable 9-to-5 job over the uncertainty of a startup is...", c: "Security & Stability" },
+   365→{ sec: "Career Motivators", t: "Having creative freedom in my profession is...", c: "Autonomy & Creativity" },
+   366→{ sec: "Career Motivators", t: "Constantly learning and tackling new challenges in college is...", c: "Autonomy & Creativity" },
+   367→{ sec: "Career Motivators", t: "Getting into a top-tier IIT/IIM for public recognition is...", c: "Status & Wealth" },
+   368→{ sec: "Career Motivators", t: "Mentally stimulating work that helps others grow is...", c: "Altruism & Impact" },
+   369→{ sec: "Career Motivators", t: "Having a career immune to AI and market crashes is...", c: "Security & Stability" },
+   370→{ sec: "Learning Styles", t: "Grasping concepts when the coaching teacher lectures verbally.", c: "Auditory" },
+   371→{ sec: "Learning Styles", t: "Using YouTube animations and infographics for complex topics.", c: "Visual" },
+   372→{ sec: "Learning Styles", t: "Performing lab experiments to understand theory.", c: "Kinesthetic" },
+   373→{ sec: "Learning Styles", t: "Reading NCERT/RD Sharma and making written notes.", c: "Reading/Writing" },
+   374→{ sec: "Learning Styles", t: "Listening to educational podcasts or recorded lectures.", c: "Auditory" },
+   375→{ sec: "Learning Styles", t: "Making mind maps and color-coded formulas.", c: "Visual" },
+   376→{ sec: "Learning Styles", t: "Pacing around the room while reciting formulas.", c: "Kinesthetic" },
+   377→{ sec: "Learning Styles", t: "Solving mock test papers by writing them out.", c: "Reading/Writing" },
+   378→{ sec: "Learning Styles", t: "Discussing difficult problems aloud with peers.", c: "Auditory" },
+   379→{ sec: "Learning Styles", t: "Reading reference books like HC Verma or Morrison Boyd.", c: "Reading/Writing" },
+   380→{ sec: "Learning Styles", t: "Drawing flowcharts for biological processes.", c: "Visual" },
+   381→{ sec: "Learning Styles", t: "Using physical models for chemistry or geography.", c: "Kinesthetic" }
+   382→],
+   383→"Undergraduate": [
+   384→{ sec: "Natural Abilities", t: "Analyze large data sets using statistics or programming.", c: "Logical/Mathematical" },
+   385→{ sec: "Natural Abilities", t: "Design UI/UX layouts or architectural 3D models.", c: "Spatial/Visual" },
+   386→{ sec: "Natural Abilities", t: "Write lengthy research papers or thesis documents.", c: "Verbal/Linguistic" },
+   387→{ sec: "Natural Abilities", t: "Build physical prototypes or work with hardware tools.", c: "Mechanical/Kinesthetic" },
+   388→{ sec: "Natural Abilities", t: "Debug complex code or logical algorithms.", c: "Logical/Mathematical" },
+   389→{ sec: "Natural Abilities", t: "Deliver persuasive presentations or pitch ideas.", c: "Verbal/Linguistic" },
+   390→{ sec: "Natural Abilities", t: "Visualize structural integrity or design blueprints.", c: "Spatial/Visual" },
+   391→{ sec: "Natural Abilities", t: "Conduct precise lab operations or medical procedures.", c: "Mechanical/Kinesthetic" },
+   392→{ sec: "Natural Abilities", t: "Build financial models or economic forecasts.", c: "Logical/Mathematical" },
+   393→{ sec: "Natural Abilities", t: "Debate legal cases or complex philosophical theories.", c: "Verbal/Linguistic" },
+   394→{ sec: "Natural Abilities", t: "Operate complex machinery or technical equipment.", c: "Mechanical/Kinesthetic" },
+   395→{ sec: "Natural Abilities", t: "Translate complex concepts into simple visual presentations.", c: "Spatial/Visual" },
+   396→{ sec: "Interests", t: "Doing academic research or working in an R&D lab.", c: "Investigative" },
+   397→{ sec: "Interests", t: "Working on graphic design, film, or creative writing projects.", c: "Artistic" },
+   398→{ sec: "Interests", t: "Leading college clubs, E-cells, or managing events.", c: "Enterprising" },
+   399→{ sec: "Interests", t: "Volunteering for NSS, social work, or counseling.", c: "Social" },
+   400→{ sec: "Interests", t: "Managing college accounts, logistics, or operations.", c: "Conventional" },
+   401→{ sec: "Interests", t: "Working on engineering prototypes, robotics, or field projects.", c: "Realistic" },
+   402→{ sec: "Interests", t: "Analyzing market trends or psychological case studies.", c: "Investigative" },
+   403→{ sec: "Interests", t: "Directing college plays or designing fest merchandise.", c: "Artistic" },
+   404→{ sec: "Interests", t: "Participating in case study competitions or MUNs.", c: "Enterprising" },
+   405→{ sec: "Interests", t: "Organizing academic databases or club inventories.", c: "Conventional" },
+   406→{ sec: "Interests", t: "Interning at a manufacturing plant or outdoor survey site.", c: "Realistic" },
+   407→{ sec: "Interests", t: "Organizing campus drives or teaching underprivileged kids.", c: "Social" },
+   408→{ sec: "Personality", t: "I am the go-to person for networking and socializing in college.", c: "Extroversion" },
+   409→{ sec: "Personality", t: "I prefer deep, solitary work in the library over group projects.", c: "Introversion" },
+   410→{ sec: "Personality", t: "I choose electives based on career ROI and employability.", c: "Thinking" },
+   411→{ sec: "Personality", t: "I choose electives based on passion and professor's teaching style.", c: "Feeling" },
+   412→{ sec: "Personality", t: "I maintain a strict study and assignment schedule.", c: "Judging" },
+   413→{ sec: "Personality", t: "I thrive on the adrenaline of last-minute submissions.", c: "Perceiving" },
+   414→{ sec: "Personality", t: "I actively network with alumni and industry professionals.", c: "Extroversion" },
+   415→{ sec: "Personality", t: "I deeply reflect on my career choices before acting.", c: "Introversion" },
+   416→{ sec: "Personality", t: "I get stressed if project deadlines are moved or rubrics change.", c: "Judging" },
+   417→{ sec: "Personality", t: "I adapt easily to sudden syllabus or schedule changes.", c: "Perceiving" },
+   418→{ sec: "Personality", t: "I ensure team harmony during stressful group assignments.", c: "Feeling" },
+   419→{ sec: "Personality", t: "I take charge of group projects to ensure logical execution.", c: "Thinking" },
+   420→{ sec: "Career Motivators", t: "Landing a high-paying MNC or FAANG job is...", c: "Status & Wealth" },
+   421→{ sec: "Career Motivators", t: "Working for a social impact startup or NGO is...", c: "Altruism & Impact" },
+   422→{ sec: "Career Motivators", t: "Getting a secure government or banking job is...", c: "Security & Stability" },
+   423→{ sec: "Career Motivators", t: "Building my own startup or freelancing is...", c: "Autonomy & Creativity" },
+   424→{ sec: "Career Motivators", t: "Climbing the corporate ladder to C-suite is...", c: "Status & Wealth" },
+   425→{ sec: "Career Motivators", t: "Working in healthcare or education sectors is...", c: "Altruism & Impact" },
+   426→{ sec: "Career Motivators", t: "Having work-life balance and job security is...", c: "Security & Stability" },
+   427→{ sec: "Career Motivators", t: "Having creative freedom over my projects is...", c: "Autonomy & Creativity" },
+   428→{ sec: "Career Motivators", t: "Getting into a top global university for Masters is...", c: "Status & Wealth" },
+   429→{ sec: "Career Motivators", t: "Mentoring juniors and leading community projects is...", c: "Altruism & Impact" },
+   430→{ sec: "Career Motivators", t: "Having a career that is safe from AI automation is...", c: "Security & Stability" },
+   431→{ sec: "Career Motivators", t: "Working remotely and setting my own hours is...", c: "Autonomy & Creativity" },
+   432→{ sec: "Learning Styles", t: "Attending professor's lectures and audio recordings.", c: "Auditory" },
+   433→{ sec: "Learning Styles", t: "Watching YouTube tutorials and visual diagrams.", c: "Visual" },
+   434→{ sec: "Learning Styles", t: "Doing internships and hands-on lab work.", c: "Kinesthetic" },
+   435→{ sec: "Learning Styles", t: "Reading research papers and writing thesis drafts.", c: "Reading/Writing" },
+   436→{ sec: "Learning Styles", t: "Discussing case studies in group audio calls.", c: "Auditory" },
+   437→{ sec: "Learning Styles", t: "Creating Canva presentations and infographics.", c: "Visual" },
+   438→{ sec: "Learning Styles", t: "Taking walks while listening to audiobooks.", c: "Kinesthetic" },
+   439→{ sec: "Learning Styles", t: "Writing detailed structured notes from slides.", c: "Reading/Writing" },
+   440→{ sec: "Learning Styles", t: "Explaining complex topics to peers aloud.", c: "Auditory" },
+   441→{ sec: "Learning Styles", t: "Reading standard textbooks and reference materials.", c: "Reading/Writing" },
+   442→{ sec: "Learning Styles", t: "Drawing flowcharts for business or coding logic.", c: "Visual" },
+   443→{ sec: "Learning Styles", t: "Building physical models or role-playing scenarios.", c: "Kinesthetic" }
+   444→],
+   445→"Postgraduate": [
+   446→{ sec: "Natural Abilities", t: "Analyze industry trends and strategic business models.", c: "Logical/Mathematical" },
+   447→{ sec: "Natural Abilities", t: "Design advanced architectural or engineering systems.", c: "Spatial/Visual" },
+   448→{ sec: "Natural Abilities", t: "Draft complex legal documents or corporate communications.", c: "Verbal/Linguistic" },
+   449→{ sec: "Natural Abilities", t: "Operate advanced medical or industrial machinery.", c: "Mechanical/Kinesthetic" },
+   450→{ sec: "Natural Abilities", t: "Build predictive algorithms or financial forecasts.", c: "Logical/Mathematical" },
+   451→{ sec: "Natural Abilities", t: "Publish research papers or author industry articles.", c: "Verbal/Linguistic" },
+   452→{ sec: "Natural Abilities", t: "Visualize data architecture or network topologies.", c: "Spatial/Visual" },
+   453→{ sec: "Natural Abilities", t: "Perform complex surgeries or lead technical operations.", c: "Mechanical/Kinesthetic" },
+   454→{ sec: "Natural Abilities", t: "Optimize supply chain or operational logistics mathematically.", c: "Logical/Mathematical" },
+   455→{ sec: "Natural Abilities", t: "Negotiate high-stakes deals or mediate conflicts.", c: "Verbal/Linguistic" },
+   456→{ sec: "Natural Abilities", t: "Prototype physical products in a workshop.", c: "Mechanical/Kinesthetic" },
+   457→{ sec: "Natural Abilities", t: "Design intuitive user experiences or brand identities.", c: "Spatial/Visual" },
+   458→{ sec: "Interests", t: "Conducting advanced R&D or publishing academic papers.", c: "Investigative" },
+   459→{ sec: "Interests", t: "Leading creative direction or brand strategy.", c: "Artistic" },
+   460→{ sec: "Interests", t: "Pitching to venture capitalists or leading M&A.", c: "Enterprising" },
+   461→{ sec: "Interests", t: "Mentoring junior team members or coaching executives.", c: "Social" },
+   462→{ sec: "Interests", t: "Auditing financial reports or ensuring legal compliance.", c: "Conventional" },
+   463→{ sec: "Interests", t: "Overseeing manufacturing floors or large-scale field operations.", c: "Realistic" },
+   464→{ sec: "Interests", t: "Analyzing complex data to find market gaps.", c: "Investigative" },
+   465→{ sec: "Interests", t: "Designing innovative product features or marketing campaigns.", c: "Artistic" },
+   466→{ sec: "Interests", t: "Scaling a business unit or launching a new division.", c: "Enterprising" },
+   467→{ sec: "Interests", t: "Managing corporate governance and structured policies.", c: "Conventional" },
+   468→{ sec: "Interests", t: "Working on industrial IoT or smart city projects.", c: "Realistic" },
+   469→{ sec: "Interests", t: "Building CSR initiatives or community health programs.", c: "Social" },
+   470→{ sec: "Personality", t: "I am the networking hub of my professional circle.", c: "Extroversion" },
+   471→{ sec: "Personality", t: "I prefer deep, solitary strategic work over meetings.", c: "Introversion" },
+   472→{ sec: "Personality", t: "I make hiring/firing and business decisions purely on data.", c: "Thinking" },
+   473→{ sec: "Personality", t: "I prioritize company culture and employee morale over pure profit.", c: "Feeling" },
+   474→{ sec: "Personality", t: "I enforce strict timelines and operational processes.", c: "Judging" },
+   475→{ sec: "Personality", t: "I thrive in dynamic startups with shifting priorities.", c: "Perceiving" },
+   476→{ sec: "Personality", t: "I actively seek public speaking and industry panel opportunities.", c: "Extroversion" },
+   477→{ sec: "Personality", t: "I meticulously analyze data before presenting to the board.", c: "Introversion" },
+   478→{ sec: "Personality", t: "I get highly uncomfortable if corporate governance rules are bypassed.", c: "Judging" },
+   479→{ sec: "Personality", t: "I easily pivot strategies during market disruptions.", c: "Perceiving" },
+   480→{ sec: "Personality", t: "I ensure team harmony during stressful product launches.", c: "Feeling" },
+   481→{ sec: "Personality", t: "I prioritize rational business logic over emotional responses.", c: "Thinking" },
+   482→{ sec: "Career Motivators", t: "Achieving a C-suite role (CEO/CFO/CTO) is...", c: "Status & Wealth" },
+   483→{ sec: "Career Motivators", t: "Disrupting industries for social good is...", c: "Altruism & Impact" },
+   484→{ sec: "Career Motivators", t: "Achieving tenure or a permanent senior partnership is...", c: "Security & Stability" },
+   485→{ sec: "Career Motivators", t: "Being an independent consultant or thought leader is...", c: "Autonomy & Creativity" },
+   486→{ sec: "Career Motivators", t: "Building a massive personal net worth is...", c: "Status & Wealth" },
+   487→{ sec: "Career Motivators", t: "Creating systemic change in healthcare/education is...", c: "Altruism & Impact" },
+   488→{ sec: "Career Motivators", t: "Having a stable, long-term corporate job is...", c: "Security & Stability" },
+   489→{ sec: "Career Motivators", t: "Having the freedom to pursue multiple consulting ventures is...", c: "Autonomy & Creativity" },
+   490→{ sec: "Career Motivators", t: "Being recognized as an industry expert is...", c: "Status & Wealth" },
+   491→{ sec: "Career Motivators", t: "Mentoring the next generation of leaders is...", c: "Altruism & Impact" },
+   492→{ sec: "Career Motivators", t: "Job security during economic downturns is...", c: "Security & Stability" },
+   493→{ sec: "Career Motivators", t: "Innovating without bureaucratic red tape is...", c: "Autonomy & Creativity" },
+   494→{ sec: "Learning Styles", t: "Listening to industry podcasts and expert interviews.", c: "Auditory" },
+   495→{ sec: "Learning Styles", t: "Analyzing visual data dashboards and infographics.", c: "Visual" },
+   496→{ sec: "Learning Styles", t: "Running pilot projects and field tests.", c: "Kinesthetic" },
+   497→{ sec: "Learning Styles", t: "Reading industry whitepapers and journals.", c: "Reading/Writing" },
+   498→{ sec: "Learning Styles", t: "Engaging in group debates and mastermind sessions.", c: "Auditory" },
+   499→{ sec: "Learning Styles", t: "Creating visual mind maps of complex business strategies.", c: "Visual" },
+
+[showing lines 200-499 of 809; use offset=500 with limit to continue reading]

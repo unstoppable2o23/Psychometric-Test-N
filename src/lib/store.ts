@@ -1,0 +1,58 @@
+'use client'
+import { create } from 'zustand'
+import { api, AuthUser, Role } from '@/lib/api-client'
+
+export type View =
+  | 'landing' | 'login' | 'register'
+  | 'student-dashboard' | 'test-runner' | 'report-view'
+  | 'admin-dashboard' | 'counsellor-dashboard'
+
+interface AppState {
+  user: AuthUser | null
+  loading: boolean
+  view: View
+  testToken: string | null
+  reportId: string | null
+  // actions
+  init: () => Promise<void>
+  setView: (v: View) => void
+  setUser: (u: AuthUser | null) => void
+  startTest: (token: string) => void
+  viewReport: (id: string) => void
+  logout: () => Promise<void>
+}
+
+export const useApp = create<AppState>((set, get) => ({
+  user: null,
+  loading: true,
+  view: 'landing',
+  testToken: null,
+  reportId: null,
+  init: async () => {
+    try {
+      const { user } = await api.me()
+      if (user) {
+        set({ user, loading: false, view: defaultViewFor(user.role) })
+      } else {
+        set({ user: null, loading: false, view: 'landing' })
+      }
+    } catch {
+      set({ loading: false, view: 'landing' })
+    }
+  },
+  setView: (v) => set({ view: v }),
+  setUser: (u) => set({ user: u, view: u ? defaultViewFor(u.role) : 'landing' }),
+  startTest: (token) => set({ testToken: token, view: 'test-runner' }),
+  viewReport: (id) => set({ reportId: id, view: 'report-view' }),
+  logout: async () => {
+    try { await api.logout() } catch {}
+    set({ user: null, view: 'landing', testToken: null, reportId: null })
+  },
+}))
+
+function defaultViewFor(role: Role): View {
+  if (role === 'STUDENT') return 'student-dashboard'
+  if (role === 'SUPER_ADMIN') return 'admin-dashboard'
+  if (role === 'COUNSELLOR') return 'counsellor-dashboard'
+  return 'landing'
+}

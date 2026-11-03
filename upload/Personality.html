@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Key to Success - Student Personality Assessment</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Lora:wght@500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#FAF5EC;--text:#1E293B;--muted:#64748B;--blue:#2563EB;--sky:#0EA5E9;--green:#10B981;--rose:#E11D48;--soft:#EFF6FF;--border:#E7E0D2;--navy:#0F172A}
+html{scroll-behavior:smooth}
+body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6;overflow-x:hidden}
+.bg-deco{position:fixed;inset:0;z-index:-1;overflow:hidden}
+.bg-deco div{position:absolute;border-radius:50%;filter:blur(110px);opacity:.15}
+.b1{width:620px;height:620px;background:#60A5FA;top:-18%;left:-12%;animation:drift 14s ease-in-out infinite alternate}
+.b2{width:520px;height:520px;background:#34D399;bottom:-18%;right:-10%;animation:drift 18s ease-in-out infinite alternate-reverse}
+.b3{width:420px;height:420px;background:#F5C98A;top:40%;left:55%;opacity:.12;animation:drift 16s ease-in-out infinite alternate}
+@keyframes drift{from{transform:translate(0,0)}to{transform:translate(50px,40px) scale(1.08)}}
+main{max-width:1000px;margin:0 auto;padding:2rem 1rem}
+.screen{display:none}.screen.active{display:block;animation:fadeUp .5s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.glass{background:rgba(255,255,255,.8);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.75);box-shadow:0 20px 60px rgba(80,60,20,.1)}
+.form-card{border-radius:24px;padding:2.6rem;max-width:700px;margin:2.5rem auto}
+.form-card h1{font-family:'Lora',serif;font-size:2.3rem;color:var(--navy);line-height:1.2}
+.form-card h1 em{font-style:normal;background:linear-gradient(90deg,var(--blue),var(--sky),var(--green));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.accent-bar{width:78px;height:5px;border-radius:3px;background:linear-gradient(90deg,var(--blue),var(--green));margin:.6rem 0 1rem}
+p.sub{color:var(--muted);margin-bottom:1.2rem}
+.chips{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.4rem}
+.chip{background:var(--soft);color:var(--blue);border:1px solid #BFDBFE;font-size:.73rem;font-weight:600;padding:.3rem .8rem;border-radius:999px}
+.info-box{background:#FDFBF6;border:1px solid var(--border);border-left:4px solid var(--blue);border-radius:10px;padding:1rem 1.2rem;margin-bottom:1rem;font-size:.9rem}
+.info-box h3{font-size:.95rem;color:var(--navy);margin-bottom:.4rem}
+.info-box ul{padding-left:1.1rem}
+.form-group{margin-bottom:1.1rem}
+.form-group label{display:block;margin-bottom:.35rem;color:#334155;font-size:.86rem;font-weight:600}
+.form-group input{width:100%;padding:.85rem 1rem;background:rgba(255,255,255,.9);border:2px solid var(--border);border-radius:12px;color:var(--navy);font-family:'Poppins',sans-serif;font-size:1rem}
+.form-group input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 4px rgba(37,99,235,.13)}
+.btn{display:inline-block;padding:.95rem 2.2rem;background:linear-gradient(90deg,var(--blue),var(--sky));color:#fff;border:none;border-radius:12px;font-family:'Poppins',sans-serif;font-weight:600;cursor:pointer;font-size:1rem;transition:.25s;margin-top:.8rem;box-shadow:0 8px 22px rgba(37,99,235,.35)}
+.btn:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(37,99,235,.45)}
+.quiz-wrap{max-width:780px;margin:0 auto}
+.quiz-top{display:flex;align-items:center;gap:1rem;margin:1rem 0 1.4rem}
+.ring-wrap{position:relative;width:76px;height:76px;flex-shrink:0}
+.ring-wrap svg{width:76px;height:76px;transform:rotate(-90deg)}
+.ring-bg{fill:none;stroke:#E7E0D2;stroke-width:8}
+.ring-fill{fill:none;stroke:url(#ringGrad);stroke-width:8;stroke-linecap:round;stroke-dasharray:326.7;stroke-dashoffset:326.7;transition:stroke-dashoffset .5s ease}
+.ring-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--navy)}
+.quiz-meta{flex:1}
+.quiz-meta .t{font-family:'Lora',serif;font-weight:700;color:var(--navy)}
+.quiz-meta .p{font-size:.85rem;color:var(--muted);font-weight:500}
+.stage-pill{background:var(--soft);color:var(--blue);font-size:.72rem;font-weight:700;padding:.35rem .8rem;border-radius:999px;border:1px solid #BFDBFE;white-space:nowrap}
+.q-card-big{border-radius:24px;padding:2.2rem 2.4rem;animation:qIn .3s ease}
+@keyframes qIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:none}}
+.q-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem}
+.q-sec{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--blue);background:var(--soft);border:1px solid #BFDBFE;padding:.25rem .75rem;border-radius:999px}
+.q-count{font-size:.8rem;font-weight:600;color:var(--muted)}
+.q-big{font-family:'Lora',serif;font-size:1.5rem;font-weight:600;color:var(--navy);line-height:1.4;margin-bottom:1.5rem}
+.opts-list{display:flex;flex-direction:column;gap:.65rem}
+.opt-row{display:flex;align-items:center;gap:.9rem;width:100%;text-align:left;padding:.95rem 1.1rem;background:#FDFBF7;border:2px solid var(--border);border-radius:14px;cursor:pointer;font-family:'Poppins',sans-serif;font-size:.98rem;font-weight:600;color:#475569;transition:.16s}
+.opt-row:hover{border-color:var(--blue);color:var(--blue);background:var(--soft);transform:translateX(6px)}
+.opt-badge{width:32px;height:32px;border-radius:50%;background:#EDE7DA;color:#475569;display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:700;flex-shrink:0}
+.opt-row.selected{background:linear-gradient(90deg,var(--blue),var(--sky));color:#fff;border-color:transparent;box-shadow:0 8px 20px rgba(37,99,235,.35)}
+.opt-row.selected .opt-badge{background:rgba(255,255,255,.25);color:#fff}
+.kbd-hint{margin-top:1.1rem;font-size:.76rem;color:#A8A291;text-align:center}
+.quiz-nav{display:flex;justify-content:space-between;margin-top:1.1rem}
+.ghost-btn{background:transparent;border:2px solid var(--border);color:#475569;font-family:'Poppins',sans-serif;font-weight:600;padding:.65rem 1.4rem;border-radius:12px;cursor:pointer;font-size:.9rem}
+.ghost-btn:hover{border-color:var(--blue);color:var(--blue)}
+.done-card{border-radius:24px;padding:3rem 2.5rem;text-align:center}
+.done-emoji{font-size:3rem}
+.done-card h2{font-family:'Lora',serif;font-size:1.9rem;color:var(--navy);margin:.5rem 0}
+.report-card{background:#fff;border-radius:16px;border:1px solid var(--border);box-shadow:0 20px 50px rgba(80,60,20,.12);padding:3rem;margin-bottom:1rem}
+.report-head{border-bottom:3px solid var(--blue);padding-bottom:1.2rem;margin-bottom:1.6rem}
+.report-head .brand{font-family:'Lora',serif;font-weight:700;color:var(--blue);font-size:1.05rem}
+.report-head h1{font-family:'Lora',serif;font-size:2.1rem;color:var(--navy);margin:.4rem 0}
+.report-head .meta{display:flex;gap:1.5rem;flex-wrap:wrap;font-size:.8rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.report-head .meta b{color:var(--navy);text-transform:none;letter-spacing:0;font-weight:600;margin-left:.3rem}
+.rsec{margin-bottom:2rem}
+.rsec h2{font-family:'Lora',serif;font-size:1.25rem;color:var(--navy);margin:1.4rem 0 .8rem;border-left:4px solid var(--blue);padding-left:.7rem}
+.rsec p{color:#374151;margin-bottom:.7rem;font-size:.93rem}
+.rsec ul{list-style:none;margin:.6rem 0}
+.rsec ul li{position:relative;padding-left:1.4rem;margin-bottom:.45rem;font-size:.93rem;color:#374151}
+.rsec ul li::before{content:'➤';position:absolute;left:0;color:var(--blue);font-size:.72rem;top:4px}
+.dual{margin-bottom:.8rem}
+.bar-label{display:flex;justify-content:space-between;font-size:.88rem;margin-bottom:.25rem;font-weight:600;color:#334155}
+.bar-track{height:10px;background:#EDE7DA;border-radius:5px;overflow:hidden}
+.bar-fill{height:100%;width:0;border-radius:5px;transition:width 1.1s cubic-bezier(.22,1,.36,1)}
+.f1{background:linear-gradient(90deg,#1D4ED8,#3B82F6)}
+.dual .bar-label span:first-child{color:var(--blue)}.dual .bar-label span:last-child{color:var(--rose)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.type-hero{text-align:center;margin:1.4rem 0}
+.type-hero .code{font-family:'Lora',serif;font-size:3rem;font-weight:700;color:var(--blue);letter-spacing:.05em}
+.type-hero .nick{font-size:1rem;color:var(--muted);font-weight:600}
+table.data{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.88rem}
+table.data th,table.data td{border:1px solid #EDE7DA;padding:.6rem .8rem;text-align:left;vertical-align:top}
+table.data th{background:var(--navy);color:#fff;font-weight:600;text-transform:uppercase;letter-spacing:.04em;font-size:.75rem}
+table.data tr:nth-child(even){background:#FAF8F2}
+table.data td.cat{font-weight:600;color:var(--navy)}
+.stars{color:#F59E0B;letter-spacing:2px}
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease}
+.reveal.vis{opacity:1;transform:none}
+.print-btn{display:block;width:100%;background:linear-gradient(90deg,var(--blue),var(--sky));color:#fff;border:none;padding:1rem;border-radius:12px;font-family:'Poppins',sans-serif;font-weight:600;cursor:pointer;font-size:1rem;margin-bottom:2rem}
+@media (max-width:768px){.form-card{padding:1.6rem}.q-card-big{padding:1.5rem}.q-big{font-size:1.2rem}.report-card{padding:1.4rem}.grid2{grid-template-columns:1fr}.stage-pill{display:none}}
+
+/* ============ PRINT — A4 PERFECT ============ */
+@page{size:A4;margin:0}
+@media print{
+ html,body{width:210mm;background:#fff!important;line-height:1.45}
+ *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+ .bg-deco,.print-btn,#form-screen,#quiz-screen{display:none!important}
+ main{max-width:none!important;padding:0!important;margin:0!important}
+ .report-card{box-shadow:none!important;border:none!important;border-radius:0!important;padding:12mm!important;margin:0!important;background:#fff!important;overflow:visible!important}
+ table{border-collapse:collapse!important;page-break-inside:auto!important;break-inside:auto!important}
+ table tr,td,th{page-break-inside:avoid!important;break-inside:avoid!important}
+ table thead{display:table-header-group!important}
+ h1,h2,h3,h4,.bar-item,.info-box,.dual,.type-hero{page-break-inside:avoid!important;break-inside:avoid!important}
+ h1,h2,h3,h4{page-break-after:avoid!important;break-after:avoid!important}
+ p,li{orphans:3;widows:3}
+ h1,h2,h3,.rsec h2{font-size:1.1rem;margin:1rem 0 .55rem}
+ .rsec p,.rsec ul li{font-size:.85rem;margin-bottom:.4rem}
+ table th,table td{padding:.5rem .6rem!important;font-size:.8rem}
+ .reveal{opacity:1!important;transform:none!important}
+ .bar-fill{transition:none!important}
+ .pgnext{page-break-before:always;break-before:page}
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute"><defs><linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#2563EB"/><stop offset="100%" stop-color="#10B981"/></linearGradient></defs></svg>
+<div class="bg-deco"><div class="b1"></div><div class="b2"></div><div class="b3"></div></div>
+<main>
+<section id="form-screen" class="screen active">
+ <div class="form-card glass">
+  <h1>Key to <em>Success</em></h1><div class="accent-bar"></div>
+  <p class="sub">A personality type assessment — the innate way people naturally see the world and make decisions.</p>
+  <div class="chips"><span class="chip">📝 36 Questions</span><span class="chip">⏱️ 20–30 Minutes</span><span class="chip">🔢 A / B Choice</span><span class="chip">📊 Instant Report</span></div>
+  <div class="info-box"><h3>About Assessment</h3><p>This assessment is based on personality type – a set of basic drives and motivations that remain constant throughout a person's life. The model of personality type is non-judgmental.</p></div>
+  <div class="info-box"><h3>Assessment Output</h3><ul><li><strong>Detailed Report:</strong> Four-letter personality code with strengths, challenges and recommendations.</li><li><strong>Recommended Careers:</strong> Careers you are likely to succeed in based on your type.</li><li><strong>Strengths & Challenges:</strong> Each type has its own inherent strengths and potential challenges.</li></ul></div>
+  <div class="info-box"><h3>Instructions</h3><ul><li>Complete in 20–30 minutes. There are no right or wrong answers.</li><li>Each question asks you to choose between two options based on the given situation.</li></ul></div>
+  <div class="form-group"><label>Full Name</label><input type="text" id="s-name" placeholder="Enter your full name"></div>
+  <div class="form-group"><label>Email Address</label><input type="email" id="s-email" placeholder="you@example.com"></div>
+  <div class="form-group"><label>Mobile Number</label><input type="tel" id="s-phone" placeholder="e.g. 98765 43210"></div>
+  <button class="btn" onclick="startTest()">Start Assessment →</button>
+ </div>
+</section>
+<section id="quiz-screen" class="screen">
+ <div class="quiz-wrap">
+  <div class="quiz-top">
+   <div class="ring-wrap"><svg viewBox="0 0 120 120"><circle class="ring-bg" cx="60" cy="60" r="52"/><circle class="ring-fill" id="ring-fill" cx="60" cy="60" r="52"/></svg><div class="ring-num" id="ring-num">0%</div></div>
+   <div class="quiz-meta"><div class="t">Key to Success Assessment</div><div class="p" id="prog-text">0 / 36 answered</div></div>
+   <div class="stage-pill" id="grade-pill"></div>
+  </div>
+  <div id="quiz-body"></div>
+  <div class="quiz-nav"><button type="button" class="ghost-btn" id="back-btn" onclick="back()">← Back</button><div></div></div>
+ </div>
+</section>
+<section id="report-screen" class="screen">
+ <div class="report-card" id="report-content"></div>
+ <button class="print-btn" onclick="window.print()">Print / Save as PDF (A4)</button>
+</section>
+</main>
+<script>
+const QUESTIONS=[
+{s:"Energy & Focus (E vs I)",t:"At a networking event, do you naturally:",a:"Meet and talk to as many new people as possible.",av:"E",b:"Have deep, quiet conversations with just a few people.",bv:"I"},
+{s:"Energy & Focus (E vs I)",t:"After a long, exhausting week of work, do you prefer to:",a:"Go out with friends to a lively restaurant or event to decompress.",av:"E",b:"Stay home, read a book, or watch a movie to recharge alone.",bv:"I"},
+{s:"Energy & Focus (E vs I)",t:"When working on a team project, do you prefer to:",a:"Talk through ideas out loud with the group.",av:"E",b:"Have time to think and process your thoughts before sharing them.",bv:"I"},
+{s:"Energy & Focus (E vs I)",t:"When learning a new skill, do you:",a:"Learn best by doing, discussing, and jumping right in.",av:"E",b:"Learn best by reading, studying the theory, and observing first.",bv:"I"},
+{s:"Energy & Focus (E vs I)",t:"If you need to make an important decision quickly, do you:",a:"Talk it out with others to weigh different perspectives.",av:"E",b:"Step away from the noise to process your thoughts internally.",bv:"I"},
+{s:"Energy & Focus (E vs I)",t:"When meeting someone for the first time, are you:",a:"Outgoing, expressive, and easy to get to know.",av:"E",b:"Reserved, observing, and slow to open up until you trust them.",bv:"I"},
+{s:"Energy & Focus (E vs I)",t:"In a crisis or high-pressure situation, do you:",a:"Take immediate action and rally others to keep moving.",av:"E",b:"Step back quietly, assess the root cause, and formulate a careful plan.",bv:"I"},
+{s:"Energy & Focus (E vs I)",t:"When communicating with your team, do you:",a:"Prefer face-to-face meetings or phone calls.",av:"E",b:"Prefer emails, memos, or text-based communication.",bv:"I"},
+{s:"Energy & Focus (E vs I)",t:"When you have an idea, do you:",a:"Want to share it immediately and get immediate feedback.",av:"E",b:"Want to refine it internally before presenting it to anyone else.",bv:"I"},
+{s:"Information & Perception (S vs N)",t:"When reading a report or document, do you prefer:",a:"Clear, step-by-step instructions and practical data.",av:"S",b:"An overarching vision or conceptual framework.",bv:"N"},
+{s:"Information & Perception (S vs N)",t:"When looking at a new project, do you focus on:",a:"The immediate facts, resources, and current reality.",av:"S",b:"The future possibilities, long-term potential, and what could be.",bv:"N"},
+{s:"Information & Perception (S vs N)",t:"When solving a complex problem, do you rely on:",a:"Past experience, proven methods, and standard procedures.",av:"S",b:"Novel ideas, brainstorming, and finding unseen connections.",bv:"N"},
+{s:"Information & Perception (S vs N)",t:"If you are giving a presentation, do you tend to:",a:"Speak in a literal, sequential, and straightforward manner.",av:"S",b:"Speak in a metaphorical, conceptual, and exploratory manner.",bv:"N"},
+{s:"Information & Perception (S vs N)",t:"When assembling a piece of furniture, do you:",a:"Follow the step-by-step manual exactly as written.",av:"S",b:"Look at the final picture, figure out the general idea, and improvise.",bv:"N"},
+{s:"Information & Perception (S vs N)",t:"In your daily work, you are most bored by:",a:"Vague theories and concepts that lack practical application.",av:"S",b:"Tedious, routine tasks that require repeating the exact same steps.",bv:"N"},
+{s:"Information & Perception (S vs N)",t:"When you meet someone new, you are more likely to remember:",a:"Their specific name, title, and physical details.",av:"S",b:"The general impression, the vibe, and how they made you feel.",bv:"N"},
+{s:"Information & Perception (S vs N)",t:"When describing an event to a friend, do you:",a:"Describe the exact sequence of events as they happened.",av:"S",b:"Describe the meaning behind the event and how it connects to other things.",bv:"N"},
+{s:"Information & Perception (S vs N)",t:"You are most likely to trust:",a:"What you can directly observe, measure, and verify.",av:"S",b:"Your gut feeling, intuition, and internal logic.",bv:"N"},
+{s:"Decisions & Judging (T vs F)",t:"When a colleague comes to you upset, do you:",a:"Offer logical solutions to fix the problem.",av:"T",b:"Offer emotional support and validate their feelings.",bv:"F"},
+{s:"Decisions & Judging (T vs F)",t:"When making a difficult business decision, you prioritize:",a:"Objective criteria, fairness, and logical consistency.",av:"T",b:"The impact the decision will have on the people involved.",bv:"F"},
+{s:"Decisions & Judging (T vs F)",t:"In a debate or discussion, do you:",a:"Argue the facts and logic, even if it means disagreeing with someone.",av:"T",b:"Seek harmony and try to find a compromise that makes everyone happy.",bv:"F"},
+{s:"Decisions & Judging (T vs F)",t:"When you have to give feedback to a subordinate, do you:",a:"Be direct and blunt, because truth is more important than comfort.",av:"T",b:"Be tactful and encouraging, because morale is more important than critique.",bv:"F"},
+{s:"Decisions & Judging (T vs F)",t:"You feel most valued in the workplace when:",a:"People recognize your competence, logic, and fairness.",av:"T",b:"People recognize your empathy, warmth, and the support you give others.",bv:"F"},
+{s:"Decisions & Judging (T vs F)",t:"If you have to fire an employee, you:",a:"Base the decision entirely on performance metrics and bottom line.",av:"T",b:"Consider their personal life, family situation, and give them a soft landing.",bv:"F"},
+{s:"Decisions & Judging (T vs F)",t:"When watching the news, you are more drawn to:",a:"Economic trends, geopolitical strategies, and policy facts.",av:"T",b:"Human interest stories and profiles of overcoming adversity.",bv:"F"},
+{s:"Decisions & Judging (T vs F)",t:"When evaluating a potential new hire, you weigh:",a:"Their resume, hard skills, and objective test scores.",av:"T",b:"Your personal impression of their character and how they fit the team culture.",bv:"F"},
+{s:"Decisions & Judging (T vs F)",t:"People often describe you as:",a:"Analytical, objective, and fair-minded.",av:"T",b:"Compassionate, warm, and empathetic.",bv:"F"},
+{s:"Lifestyle & Action (J vs P)",t:"When planning a vacation, do you:",a:"Create a detailed itinerary, book tickets in advance, and know exactly what you are doing each day.",av:"J",b:"Keep things open-ended, booking a flight but deciding what to do when you arrive.",bv:"P"},
+{s:"Lifestyle & Action (J vs P)",t:"In your daily workspace, is your desk:",a:"Neat, organized, and structured.",av:"J",b:"Chaotic, messy, but you know exactly where everything is.",bv:"P"},
+{s:"Lifestyle & Action (J vs P)",t:"When facing a major deadline, do you:",a:"Start early, break the project into milestones, and finish ahead of time.",av:"J",b:"Feel a burst of energy at the last minute and pull an all-nighter to finish.",bv:"P"},
+{s:"Lifestyle & Action (J vs P)",t:"When making a grocery list, do you:",a:"Stick strictly to the list and organize it by aisle.",av:"J",b:"Use it as a rough guide, wandering the aisles and buying what looks good.",bv:"P"},
+{s:"Lifestyle & Action (J vs P)",t:"If your boss suddenly changes the project parameters at the last minute, do you:",a:"Feel stressed and annoyed that the plan has been disrupted.",av:"J",b:"Feel excited by the change of pace and the new challenge.",bv:"P"},
+{s:"Lifestyle & Action (J vs P)",t:"When working on a long-term goal, do you:",a:"Create schedules, track progress, and cross off tasks.",av:"J",b:"Work in bursts of inspiration, jumping between different parts of the project.",bv:"P"},
+{s:"Lifestyle & Action (J vs P)",t:"When given a menu at a restaurant, do you:",a:"Decide quickly and stick to your choice.",av:"J",b:"Keep your options open, ask the waiter what they recommend, and decide at the last second.",bv:"P"},
+{s:"Lifestyle & Action (J vs P)",t:"In your personal life, you strongly prefer:",a:"Structure, predictability, and knowing what to expect.",av:"J",b:"Flexibility, variety, and the freedom to change your mind.",bv:"P"},
+{s:"Lifestyle & Action (J vs P)",t:"You feel most accomplished at the end of the day when:",a:"You have crossed every item off your to-do list.",av:"J",b:"You had the freedom to explore a spontaneous new idea.",bv:"P"}
+];
+const typeData={
+INTJ:{nick:"The Architect",profile:"Imaginative and strategic thinkers, with a plan for everything. You are highly analytical and value logic, competence, and innovation. You are independent and determined, often focusing intensely on your own internal vision of how things could be improved. While you may seem reserved, your mind is constantly exploring complex theories and future possibilities.",strengths:["Strategic and visionary","Logical and objective","Independent and determined","Highly analytical","Decisive"],challenges:["Can be overly critical","May struggle with emotional nuances","Dislike routine or highly structured environments","Can be dismissive of input that lacks logic"],recs:["Learn to appreciate emotional perspectives in decision-making.","Break down grand visions into actionable, daily steps.","Practice patience with those who process information differently.","Delegate routine tasks to avoid burnout."],careers:[["Software Engineer","Technology","$110,000"],["Financial Analyst","Business","$85,000"],["Scientific Researcher","Science","$90,000"],["Architect","Design","$80,000"]]},
+INTP:{nick:"The Logician",profile:"Innovative inventors with an unquenchable thirst for knowledge. You love to analyze how things work and understand the underlying principles of the universe. You are highly logical, objective, and creative, often seeing connections that others miss. You value intellectual competence and independence above all else.",strengths:["Analytical and logical","Innovative and creative","Objective and open-minded","Independent learner","Excellent problem solver"],challenges:["May neglect practical details","Can be disorganized","Dislike rigid schedules and rules","May struggle to communicate emotions"],recs:["Set concrete deadlines to avoid getting lost in theory.","Practice organizing your physical workspace to help manage tasks.","Work on expressing your thoughts in a way others can easily understand.","Balance your intellectual pursuits with physical and social activities."],careers:[["Data Scientist","Technology","$100,000"],["Software Developer","Technology","$105,000"],["Mathematician","Science","$90,000"],["Research Scientist","Science","$85,000"]]},
+ENTJ:{nick:"The Commander",profile:"Bold, imaginative, and strong-willed leaders. You are a natural-born leader who finds a way to make things happen. You are highly logical, strategic, and driven by a desire to organize and improve systems. You value competence, efficiency, and direct communication.",strengths:["Natural leadership","Strategic and efficient","Decisive and confident","Logical and objective","Goal-oriented"],challenges:["Can be perceived as bossy or controlling","May struggle with patience","Can be overly critical of inefficiency","May neglect emotional needs"],recs:["Practice empathy and active listening in team settings.","Allow others to contribute ideas before making a final decision.","Work on giving feedback tactfully rather than bluntly.","Remember that not everyone operates at your rapid pace."],careers:[["Chief Executive Officer","Business","$180,000"],["Operations Manager","Business","$95,000"],["Corporate Lawyer","Legal","$120,000"],["Management Consultant","Business","$95,000"]]},
+ENTP:{nick:"The Debater",profile:"Smart and curious thinkers who cannot resist an intellectual challenge. You are energetic, innovative, and love to debate ideas. You see possibilities everywhere and enjoy brainstorming new solutions. You are highly adaptable and dislike routine, preferring a life of intellectual exploration.",strengths:["Innovative and creative","Quick-witted and adaptable","Excellent debater","Energetic and enthusiastic","Strategic thinker"],challenges:["Can be argumentative","May struggle with follow-through","Dislike routine tasks","Can become easily bored"],recs:["Focus on executing ideas rather than just brainstorming them.","Develop systems to manage routine tasks effectively.","Practice diplomacy when challenging others' ideas.","Learn to appreciate the value of structure and consistency."],careers:[["Entrepreneur","Business","$100,000"],["Marketing Director","Marketing","$130,000"],["Product Manager","Technology","$110,000"],["Lawyer","Legal","$120,000"]]},
+INFJ:{nick:"The Advocate",profile:"Quiet and mystical, yet inspiring and tireless idealists. You have a deep, intuitive understanding of human motivations and a strong desire to help others. You are insightful, creative, and driven by your core values. You seek meaning and connection in everything you do.",strengths:["Insightful and intuitive","Empathetic and compassionate","Creative and visionary","Dedicated to values","Deeply principled"],challenges:["Can be overly idealistic","May burn out from caring too much","Dislike conflict","Can be overly private and reserved"],recs:["Set healthy emotional boundaries to avoid burnout.","Learn to address conflict constructively rather than avoiding it.","Share your insights more openly with trusted colleagues.","Balance your idealism with practical, actionable steps."],careers:[["Counselor/Therapist","Human Services","$50,000"],["Writer/Author","Arts","$65,000"],["Social Worker","Human Services","$50,000"],["Human Resources Manager","Business","$110,000"]]},
+INFP:{nick:"The Mediator",profile:"Sensitive and idealistic, you strive for inner harmony. You are a loyal and empathetic friend, devoted to the people and issues you care about. While you may appear cool or detached at times, you have very strong and passionate feelings. You trust your personal reactions and perceptions and use your values to guide your life.",strengths:["Creative and imaginative","Empathetic and compassionate","Loyal and devoted","Adaptable and flexible","Values-driven"],challenges:["Can be overly idealistic","May take criticism personally","Dislike conflict and tension","Can be impractical or unfocused"],recs:["Break large projects into manageable steps to avoid feeling overwhelmed.","Learn to separate your self-worth from constructive feedback.","Practice speaking up about your needs and values in group settings.","Develop organizational systems to manage daily tasks."],careers:[["Writer/Author","Arts","$65,000"],["Marriage and Family Therapist","Human Services","$50,000"],["Graphic Designer","Arts","$50,000"],["Human Resources Specialist","Business","$60,000"]]},
+ENFJ:{nick:"The Protagonist",profile:"Charismatic and inspiring leaders, able to mesmerize listeners. You are a natural mentor who is highly attuned to the emotions and needs of others. You are empathetic, organized, and driven by a desire to bring out the best in people. You value harmony and cooperation.",strengths:["Charismatic and inspiring","Empathetic and supportive","Organized and decisive","Excellent communicator","Values-driven leader"],challenges:["Can be overly idealistic","May neglect own needs for others","Dislike conflict intensely","Can be sensitive to criticism"],recs:["Set boundaries to ensure you don't burn out from helping others.","Practice making objective decisions that may not please everyone.","Allow yourself time to recharge away from group dynamics.","Learn to accept constructive criticism without taking it personally."],careers:[["Teacher/Educator","Education","$60,000"],["HR Manager","Business","$110,000"],["Non-Profit Director","Human Services","$70,000"],["Public Relations Manager","Marketing","$100,000"]]},
+ENFP:{nick:"The Campaigner",profile:"Enthusiastic, creative, and sociable free spirits. You are energetic, imaginative, and see life as full of exciting possibilities. You make connections between events and people very quickly, and you are driven by a desire to understand and inspire others. You value authenticity and freedom.",strengths:["Enthusiastic and imaginative","Sociable and empathetic","Creative and innovative","Adaptable and spontaneous","Excellent communicator"],challenges:["Can be easily distracted","May struggle with routine","Can be overly idealistic","May have trouble following through"],recs:["Develop time management skills to balance your many interests.","Set concrete deadlines to ensure ideas become reality.","Practice focusing on one project at a time before starting a new one.","Learn to appreciate the value of structure and routine."],careers:[["Marketing Specialist","Marketing","$65,000"],["Event Planner","Business","$50,000"],["Journalist","Media","$50,000"],["Counselor","Human Services","$50,000"]]},
+ISTJ:{nick:"The Logistician",profile:"Practical and fact-minded, reliable and responsible. You are highly organized, logical, and value tradition and order. You are dedicated to your duties and responsibilities, approaching tasks with a methodical and reliable mindset. You trust facts and past experience over abstract theories.",strengths:["Reliable and responsible","Detail-oriented","Logical and practical","Organized and structured","Dedicated and hardworking"],challenges:["Can be resistant to change","May struggle with empathy","Dislike unstructured environments","Can be overly critical of inefficiency"],recs:["Try to be more open to new ideas and spontaneous changes.","Practice empathy when dealing with others' emotional needs.","Communicate your expectations clearly to avoid misunderstandings.","Balance your dedication to work with time for personal relaxation."],careers:[["Accountant","Business","$70,000"],["Project Manager","Business","$90,000"],["Engineer","Technology","$90,000"],["Auditor","Business","$75,000"]]},
+ISFJ:{nick:"The Defender",profile:"Very dedicated and warm protectors, always ready to defend loved ones. You are highly observant, empathetic, and reliable. You value harmony, cooperation, and tradition. You are deeply committed to your responsibilities and the well-being of those around you.",strengths:["Supportive and empathetic","Reliable and hardworking","Detail-oriented","Loyal and committed","Practical and grounded"],challenges:["Can be overly selfless","May resist change","Dislike conflict","May internalize others' stress"],recs:["Learn to say no to avoid overcommitting yourself.","Set emotional boundaries to protect your own well-being.","Practice addressing conflict constructively rather than avoiding it.","Be open to new ways of doing things, even if the old way works."],careers:[["Nurse","Healthcare","$75,000"],["Social Worker","Human Services","$50,000"],["Teacher","Education","$60,000"],["Office Manager","Business","$55,000"]]},
+ESTJ:{nick:"The Executive",profile:"Excellent administrators, unsurpassed at managing things or people. You are highly organized, practical, and logical. You value tradition, order, and structure, and you are dedicated to upholding rules and standards. You are a natural leader who is direct and decisive.",strengths:["Organized and efficient","Logical and practical","Decisive and direct","Reliable and responsible","Strong leader"],challenges:["Can be inflexible","May struggle with empathy","Can be overly critical","Dislike unstructured environments"],recs:["Practice empathy and patience when dealing with others' emotions.","Be open to new ideas and unconventional approaches.","Work on giving feedback tactfully rather than bluntly.","Learn to adapt when plans change unexpectedly."],careers:[["Operations Manager","Business","$95,000"],["Financial Advisor","Business","$90,000"],["Judge","Legal","$130,000"],["School Principal","Education","$100,000"]]},
+ESFJ:{nick:"The Consul",profile:"Extraordinarily caring, social, and popular people, always eager to help. You are highly empathetic, organized, and cooperative. You value harmony, tradition, and the well-being of others. You are a dedicated team player who brings people together.",strengths:["Empathetic and supportive","Sociable and friendly","Organized and reliable","Loyal and dedicated","Practical helper"],challenges:["Can be overly sensitive to criticism","May struggle with change","Can be overly selfless","Dislike conflict"],recs:["Set boundaries to ensure you don't neglect your own needs.","Learn to address conflict constructively rather than avoiding it.","Be open to new ways of doing things, even if the old way works.","Practice making objective decisions that may not please everyone."],careers:[["Nurse","Healthcare","$75,000"],["Event Planner","Business","$50,000"],["HR Specialist","Business","$60,000"],["Teacher","Education","$60,000"]]},
+ISTP:{nick:"The Virtuoso",profile:"Bold and practical experimenters, masters of all kinds of tools. You are highly observant, logical, and adaptable. You enjoy taking things apart to see how they work and using tools to solve problems. You are independent and thrive in hands-on, dynamic environments.",strengths:["Practical and observant","Logical and analytical","Adaptable and flexible","Excellent with tools/technology","Calm under pressure"],challenges:["Can be overly private","May struggle with commitment","Dislike rules and routines","Can be insensitive to others' feelings"],recs:["Work on communicating your thoughts and feelings more openly.","Practice following through on commitments even when bored.","Develop patience for long-term planning and routine tasks.","Be mindful of others' emotions when making decisions."],careers:[["Mechanical Engineer","Engineering","$90,000"],["Pilot","Transportation","$130,000"],["Detective","Law Enforcement","$80,000"],["Software Developer","Technology","$105,000"]]},
+ISFP:{nick:"The Adventurer",profile:"Flexible and charming artists, always ready to explore new things. You are highly observant, empathetic, and creative. You value freedom, aesthetics, and living in the present moment. You are deeply in tune with your surroundings and the feelings of others.",strengths:["Creative and artistic","Empathetic and supportive","Adaptable and flexible","Observant and grounded","Kind and gentle"],challenges:["Can be overly sensitive","May struggle with long-term planning","Dislike conflict","Can be fiercely independent"],recs:["Develop long-term goals and break them into actionable steps.","Learn to address conflict constructively rather than avoiding it.","Set boundaries to protect your emotional well-being.","Practice communicating your needs more directly."],careers:[["Graphic Designer","Arts","$50,000"],["Veterinarian","Healthcare","$95,000"],["Physical Therapist","Healthcare","$90,000"],["Chef","Hospitality","$55,000"]]},
+ESTP:{nick:"The Entrepreneur",profile:"Smart, energetic, and very perceptive people who truly enjoy living on the edge. You are highly observant, logical, and adaptable. You thrive on action, excitement, and solving problems in the moment. You are direct, practical, and highly attuned to your physical environment.",strengths:["Energetic and action-oriented","Adaptable and practical","Observant and perceptive","Excellent problem solver","Direct and confident"],challenges:["Can be impulsive","May struggle with long-term planning","Dislike rules and routines","Can be insensitive to others' feelings"],recs:["Develop long-term goals and stick to them.","Practice patience with routine tasks and schedules.","Be mindful of others' emotions when making decisions.","Work on communicating more tactfully to avoid hurting feelings."],careers:[["Sales Manager","Business","$130,000"],["Paramedic","Healthcare","$45,000"],["Entrepreneur","Business","$100,000"],["Police Officer","Law Enforcement","$65,000"]]},
+ESFP:{nick:"The Entertainer",profile:"Spontaneous, energetic, and enthusiastic entertainers. You are highly observant, empathetic, and adaptable. You thrive on social interaction, excitement, and living in the present moment. You are warm, practical, and love bringing joy to others.",strengths:["Sociable and enthusiastic","Adaptable and practical","Empathetic and supportive","Observant and grounded","Creative and energetic"],challenges:["Can be impulsive","May struggle with long-term planning","Dislike conflict","Can be easily bored"],recs:["Develop long-term goals and break them into actionable steps.","Practice patience with routine tasks and schedules.","Learn to address conflict constructively rather than avoiding it.","Set boundaries to protect your emotional well-being."],careers:[["Event Planner","Business","$50,000"],["Actor/Performer","Arts","$45,000"],["Tour Guide","Hospitality","$35,000"],["Childcare Worker","Human Services","$30,000"]]}
+};
+let Q=[],A=[],STU={},qi=0,busy=false;
+const CIRC=2*Math.PI*52,$=i=>document.getElementById(i);
+function startTest(){
+ const n=$('s-name').value.trim(),e=$('s-email').value.trim(),p=$('s-phone').value.trim();
+ if(!n)return alert('Please enter your Name'); if(!e)return alert('Please enter your Email'); if(!p)return alert('Please enter your Mobile Number');
+ STU={name:n,email:e,phone:p}; Q=QUESTIONS; A=new Array(Q.length).fill(null); qi=0;
+ $('grade-pill').textContent=STU.name;
+ $('form-screen').classList.remove('active'); $('quiz-screen').classList.add('active'); renderQ(); window.scrollTo(0,0);
+}
+function renderQ(){
+ ring(); $('back-btn').style.visibility=qi===0?'hidden':'visible';
+ const b=$('quiz-body');
+ if(qi>=Q.length){ b.innerHTML=`<div class="done-card glass"><div class="done-emoji">🎉</div><h2>All Done, ${STU.name}!</h2><p>You answered all ${Q.length} questions.</p><button class="btn" onclick="finish()">Generate My Report ✨</button></div>`; return; }
+ const q=Q[qi]; let o='';
+ [q.a,q.b].forEach((l,i)=>{o+=`<button type="button" class="opt-row${A[qi]===i+1?' selected':''}" onclick="pick(${i})"><span class="opt-badge">${i+1}</span><span>${l}</span></button>`;});
+ b.innerHTML=`<div class="q-card-big glass"><div class="q-meta"><span class="q-sec">${q.s}</span><span class="q-count">Question ${qi+1} of ${Q.length}</span></div><div class="q-big">${q.t}</div><div class="opts-list">${o}</div><div class="kbd-hint">💡 Press keys <b>1–2</b> to answer faster · ← to go back</div></div>`;
+}
+function pick(i){ if(busy||qi>=Q.length)return; busy=true; A[qi]=i+1;
+ document.querySelectorAll('#quiz-body .opt-row').forEach((r,x)=>r.classList.toggle('selected',x===i));
+ ring(); setTimeout(()=>{busy=false;qi++;renderQ(); if(qi>=Q.length)window.scrollTo({top:0,behavior:'smooth'});},300);
+}
+function back(){ if(busy||qi===0)return; qi--; renderQ(); }
+function ring(){ const d=A.filter(a=>a!==null).length,p=Q.length?d/Q.length:0;
+ $('ring-fill').style.strokeDashoffset=(CIRC*(1-p)).toFixed(1); $('ring-num').textContent=Math.round(p*100)+'%'; $('prog-text').textContent=d+' / '+Q.length+' answered'; }
+document.addEventListener('keydown',e=>{ if(!$('quiz-screen').classList.contains('active'))return;
+ if(e.key>='1'&&e.key<='2'&&qi<Q.length)pick(+e.key-1);
+ else if(e.key==='ArrowLeft'||e.key==='Backspace'){e.preventDefault();back();} });
+function initFx(){
+ requestAnimationFrame(()=>requestAnimationFrame(()=>{document.querySelectorAll('.bar-fill').forEach(b=>b.style.width=b.dataset.w+'%');}));
+ const io=new IntersectionObserver(es=>es.forEach(x=>{if(x.isIntersecting){x.target.classList.add('vis');io.unobserve(x.target)}}),{threshold:.1});
+ document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+ if(typeof confetti==='function'){const C=['#2563EB','#0EA5E9','#10B981','#F59E0B'];confetti({particleCount:130,spread:75,origin:{y:.6},colors:C});setTimeout(()=>confetti({particleCount:80,spread:100,origin:{x:.2,y:.5},colors:C}),250);setTimeout(()=>confetti({particleCount:80,spread:100,origin:{x:.8,y:.5},colors:C}),450);}
+}
+function showReport(html){ $('report-content').innerHTML=html; $('quiz-screen').classList.remove('active'); $('report-screen').classList.add('active'); window.scrollTo(0,0); initFx(); }
+function finish(){
+ const S={E:0,I:0,S:0,N:0,T:0,F:0,J:0,P:0};
+ Q.forEach((q,i)=>S[A[i]===1?q.av:q.bv]++);
+ const type=(S.E>=S.I?'E':'I')+(S.S>=S.N?'S':'N')+(S.T>=S.F?'T':'F')+(S.J>=S.P?'J':'P');
+ const d=typeData[type], P=(x,y)=>Math.round(100*x/((x+y)||1));
+ const dims=[['Extraversion','Introversion',S.E,S.I],['Sensing','Intuition',S.S,S.N],['Thinking','Feeling',S.T,S.F],['Judging','Perceiving',S.J,S.P]];
+ const bars=dims.map(([l,r,a,b])=>`<div class="dual reveal"><div class="bar-label"><span>${l} — ${P(a,b)}%</span><span>${r} — ${P(b,a)}%</span></div><div class="bar-track"><div class="bar-fill f1" data-w="${P(a,b)}"></div></div></div>`).join('');
+ const date=new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+ showReport(`<div class="report-head"><div class="brand">Key to Success · Personality Report</div><h1>${STU.name}</h1><div class="meta"><span>Date<b>${date}</b></span><span>Questions<b>36 of 36</b></span><span>Mobile<b>${STU.phone}</b></span></div></div>
+ <div class="type-hero reveal"><div class="code">${type}</div><div class="nick">${d.nick}</div></div>
+ <div class="rsec reveal"><h2>Your Four Dimensions</h2>${bars}</div>
+ <div class="rsec reveal"><h2>Your Personality Profile</h2><p>${d.profile}</p></div>
+ <div class="rsec reveal"><h2>Strengths & Challenges</h2><div class="grid2"><div class="info-box"><h3>💪 Strengths</h3><ul>${d.strengths.map(s=>`<li>${s}</li>`).join('')}</ul></div><div class="info-box" style="border-left-color:var(--rose)"><h3>⚠️ Challenges</h3><ul>${d.challenges.map(s=>`<li>${s}</li>`).join('')}</ul></div></div></div>
+ <div class="rsec reveal"><h2>Recommendations for Growth</h2><ul>${d.recs.map(r=>`<li>${r}</li>`).join('')}</ul></div>
+ <div class="rsec reveal"><h2>Careers & Pathways for ${type} — ${d.nick}</h2><p>The careers below are all linked to your assessment results.</p>
+ <table class="data"><thead><tr><th>Career Title</th><th>Career Cluster</th><th>Salary</th><th>Rating</th></tr></thead><tbody>${d.careers.map(c=>`<tr><td class="cat">${c[0]}</td><td>${c[1]}</td><td>${c[2]}</td><td class="stars">★★★★★</td></tr>`).join('')}</tbody></table></div>`);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,334 @@
+     1→<!DOCTYPE html>
+     2→<html lang="en">
+     3→<head>
+     4→<meta charset="UTF-8">
+     5→<meta name="viewport" content="width=device-width, initial-scale=1.0">
+     6→<title>Humanities Career Selector</title>
+     7→<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Lora:wght@500;600;700&display=swap" rel="stylesheet">
+     8→<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+     9→<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+    10→<style>
+    11→*{margin:0;padding:0;box-sizing:border-box}
+    12→:root{--bg:#FAF5EC;--text:#1E293B;--muted:#64748B;--blue:#2563EB;--sky:#0EA5E9;--green:#10B981;--rose:#E11D48;--soft:#EFF6FF;--border:#E7E0D2;--navy:#0F172A}
+    13→html{scroll-behavior:smooth}
+    14→body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6;overflow-x:hidden}
+    15→.bg-deco{position:fixed;inset:0;z-index:-1;overflow:hidden}
+    16→.bg-deco div{position:absolute;border-radius:50%;filter:blur(110px);opacity:.15}
+    17→.b1{width:620px;height:620px;background:#60A5FA;top:-18%;left:-12%;animation:drift 14s ease-in-out infinite alternate}
+    18→.b2{width:520px;height:520px;background:#34D399;bottom:-18%;right:-10%;animation:drift 18s ease-in-out infinite alternate-reverse}
+    19→.b3{width:420px;height:420px;background:#F5C98A;top:40%;left:55%;opacity:.12;animation:drift 16s ease-in-out infinite alternate}
+    20→@keyframes drift{from{transform:translate(0,0)}to{transform:translate(50px,40px) scale(1.08)}}
+    21→main{max-width:1000px;margin:0 auto;padding:2rem 1rem}
+    22→.screen{display:none}.screen.active{display:block;animation:fadeUp .5s ease}
+    23→@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+    24→.glass{background:rgba(255,255,255,.8);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.75);box-shadow:0 20px 60px rgba(80,60,20,.1)}
+    25→.form-card{border-radius:24px;padding:2.6rem;max-width:700px;margin:2.5rem auto}
+    26→.form-card h1{font-family:'Lora',serif;font-size:2.3rem;color:var(--navy);line-height:1.2}
+    27→.form-card h1 em{font-style:normal;background:linear-gradient(90deg,var(--blue),var(--sky),var(--green));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+    28→.accent-bar{width:78px;height:5px;border-radius:3px;background:linear-gradient(90deg,var(--blue),var(--green));margin:.6rem 0 1rem}
+    29→p.sub{color:var(--muted);margin-bottom:1.2rem}
+    30→.chips{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.4rem}
+    31→.chip{background:var(--soft);color:var(--blue);border:1px solid #BFDBFE;font-size:.73rem;font-weight:600;padding:.3rem .8rem;border-radius:999px}
+    32→.info-box{background:#FDFBF6;border:1px solid var(--border);border-left:4px solid var(--blue);border-radius:10px;padding:1rem 1.2rem;margin-bottom:1rem;font-size:.9rem}
+    33→.info-box h3{font-size:.95rem;color:var(--navy);margin-bottom:.4rem}
+    34→.form-group{margin-bottom:1.1rem}
+    35→.form-group label{display:block;margin-bottom:.35rem;color:#334155;font-size:.86rem;font-weight:600}
+    36→.form-group input{width:100%;padding:.85rem 1rem;background:rgba(255,255,255,.9);border:2px solid var(--border);border-radius:12px;color:var(--navy);font-family:'Poppins',sans-serif;font-size:1rem}
+    37→.form-group input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 4px rgba(37,99,235,.13)}
+    38→.btn{display:inline-block;padding:.95rem 2.2rem;background:linear-gradient(90deg,var(--blue),var(--sky));color:#fff;border:none;border-radius:12px;font-family:'Poppins',sans-serif;font-weight:600;cursor:pointer;font-size:1rem;transition:.25s;margin-top:.8rem;box-shadow:0 8px 22px rgba(37,99,235,.35)}
+    39→.btn:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(37,99,235,.45)}
+    40→.quiz-wrap{max-width:780px;margin:0 auto}
+    41→.quiz-top{display:flex;align-items:center;gap:1rem;margin:1rem 0 1.4rem}
+    42→.ring-wrap{position:relative;width:76px;height:76px;flex-shrink:0}
+    43→.ring-wrap svg{width:76px;height:76px;transform:rotate(-90deg)}
+    44→.ring-bg{fill:none;stroke:#E7E0D2;stroke-width:8}
+    45→.ring-fill{fill:none;stroke:url(#ringGrad);stroke-width:8;stroke-linecap:round;stroke-dasharray:326.7;stroke-dashoffset:326.7;transition:stroke-dashoffset .5s ease}
+    46→.ring-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--navy)}
+    47→.quiz-meta{flex:1}
+    48→.quiz-meta .t{font-family:'Lora',serif;font-weight:700;color:var(--navy)}
+    49→.quiz-meta .p{font-size:.85rem;color:var(--muted);font-weight:500}
+    50→.stage-pill{background:var(--soft);color:var(--blue);font-size:.72rem;font-weight:700;padding:.35rem .8rem;border-radius:999px;border:1px solid #BFDBFE;white-space:nowrap}
+    51→.q-card-big{border-radius:24px;padding:2.2rem 2.4rem;animation:qIn .3s ease}
+    52→@keyframes qIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:none}}
+    53→.q-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem}
+    54→.q-sec{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--blue);background:var(--soft);border:1px solid #BFDBFE;padding:.25rem .75rem;border-radius:999px}
+    55→.q-count{font-size:.8rem;font-weight:600;color:var(--muted)}
+    56→.q-big{font-family:'Lora',serif;font-size:1.5rem;font-weight:600;color:var(--navy);line-height:1.4;margin-bottom:1.5rem}
+    57→.opts-list{display:flex;flex-direction:column;gap:.65rem}
+    58→.opt-row{display:flex;align-items:center;gap:.9rem;width:100%;text-align:left;padding:.95rem 1.1rem;background:#FDFBF7;border:2px solid var(--border);border-radius:14px;cursor:pointer;font-family:'Poppins',sans-serif;font-size:.98rem;font-weight:600;color:#475569;transition:.16s}
+    59→.opt-row:hover{border-color:var(--blue);color:var(--blue);background:var(--soft);transform:translateX(6px)}
+    60→.opt-badge{width:32px;height:32px;border-radius:50%;background:#EDE7DA;color:#475569;display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:700;flex-shrink:0}
+    61→.opt-row.selected{background:linear-gradient(90deg,var(--blue),var(--sky));color:#fff;border-color:transparent;box-shadow:0 8px 20px rgba(37,99,235,.35)}
+    62→.opt-row.selected .opt-badge{background:rgba(255,255,255,.25);color:#fff}
+    63→.kbd-hint{margin-top:1.1rem;font-size:.76rem;color:#A8A291;text-align:center}
+    64→.quiz-nav{display:flex;justify-content:space-between;margin-top:1.1rem}
+    65→.ghost-btn{background:transparent;border:2px solid var(--border);color:#475569;font-family:'Poppins',sans-serif;font-weight:600;padding:.65rem 1.4rem;border-radius:12px;cursor:pointer;font-size:.9rem}
+    66→.ghost-btn:hover{border-color:var(--blue);color:var(--blue)}
+    67→.done-card{border-radius:24px;padding:3rem 2.5rem;text-align:center}
+    68→.done-emoji{font-size:3rem}
+    69→.done-card h2{font-family:'Lora',serif;font-size:1.9rem;color:var(--navy);margin:.5rem 0}
+    70→.report-card{background:#fff;border-radius:16px;border:1px solid var(--border);box-shadow:0 20px 50px rgba(80,60,20,.12);padding:3rem;margin-bottom:1rem}
+    71→.report-head{border-bottom:3px solid var(--blue);padding-bottom:1.2rem;margin-bottom:1.6rem}
+    72→.report-head .brand{font-family:'Lora',serif;font-weight:700;color:var(--blue);font-size:1.05rem}
+    73→.report-head h1{font-family:'Lora',serif;font-size:2.1rem;color:var(--navy);margin:.4rem 0}
+    74→.report-head .meta{display:flex;gap:1.5rem;flex-wrap:wrap;font-size:.8rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+    75→.report-head .meta b{color:var(--navy);text-transform:none;letter-spacing:0;font-weight:600;margin-left:.3rem}
+    76→.rsec{margin-bottom:2rem}
+    77→.rsec h2{font-family:'Lora',serif;font-size:1.25rem;color:var(--navy);margin:1.4rem 0 .8rem;border-left:4px solid var(--blue);padding-left:.7rem}
+    78→.rsec p{color:#374151;margin-bottom:.7rem;font-size:.93rem}
+    79→.rsec ul{list-style:none;margin:.6rem 0}
+    80→.rsec ul li{position:relative;padding-left:1.4rem;margin-bottom:.45rem;font-size:.93rem;color:#374151}
+    81→.rsec ul li::before{content:'➤';position:absolute;left:0;color:var(--blue);font-size:.72rem;top:4px}
+    82→.bar-item{margin-bottom:.8rem}
+    83→.bar-label{display:flex;justify-content:space-between;align-items:center;font-size:.86rem;margin-bottom:.25rem;font-weight:600;color:#334155;gap:.5rem}
+    84→.bar-track{height:10px;background:#EDE7DA;border-radius:5px;overflow:hidden}
+    85→.bar-fill{height:100%;width:0;border-radius:5px;transition:width 1.1s cubic-bezier(.22,1,.36,1)}
+    86→.f1{background:linear-gradient(90deg,#1D4ED8,#3B82F6)}.f2{background:linear-gradient(90deg,#BE123C,#F43F5E)}.f3{background:linear-gradient(90deg,#B45309,#F59E0B)}.f4{background:linear-gradient(90deg,#047857,#10B981)}
+    87→table.data{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.87rem}
+    88→table.data th,table.data td{border:1px solid #EDE7DA;padding:.6rem .8rem;text-align:left;vertical-align:top}
+    89→table.data th{background:var(--navy);color:#fff;font-weight:600;text-transform:uppercase;letter-spacing:.04em;font-size:.74rem}
+    90→table.data tr:nth-child(even){background:#FAF8F2}
+    91→table.data td.cat{font-weight:600;color:var(--navy)}
+    92→.badge{display:inline-block;padding:.18rem .55rem;border-radius:999px;font-size:.64rem;font-weight:700;text-transform:uppercase;white-space:nowrap}
+    93→.b-high{background:rgba(16,185,129,.12);color:#047857;border:1px solid #047857}
+    94→.b-med{background:rgba(245,158,11,.12);color:#B45309;border:1px solid #B45309}
+    95→.b-low{background:rgba(225,29,72,.1);color:#BE123C;border:1px solid #BE123C}
+    96→.radar-box{position:relative;height:320px;max-width:560px;margin:1rem auto}
+    97→.reveal{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease}
+    98→.reveal.vis{opacity:1;transform:none}
+    99→.print-btn{display:block;width:100%;background:linear-gradient(90deg,var(--blue),var(--sky));color:#fff;border:none;padding:1rem;border-radius:12px;font-family:'Poppins',sans-serif;font-weight:600;cursor:pointer;font-size:1rem;margin-bottom:2rem}
+   100→@media (max-width:768px){.form-card{padding:1.6rem}.q-card-big{padding:1.5rem}.q-big{font-size:1.2rem}.report-card{padding:1.4rem}.stage-pill{display:none}}
+   101→
+   102→/* ============ PRINT — A4 PERFECT ============ */
+   103→@page{size:A4;margin:0}
+   104→@media print{
+   105→ html,body{width:210mm;background:#fff!important;line-height:1.45}
+   106→ *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+   107→ .bg-deco,.print-btn,#form-screen,#quiz-screen{display:none!important}
+   108→ main{max-width:none!important;padding:0!important;margin:0!important}
+   109→ .report-card{box-shadow:none!important;border:none!important;border-radius:0!important;padding:12mm!important;margin:0!important;background:#fff!important;overflow:visible!important}
+   110→ table{border-collapse:collapse!important;page-break-inside:auto!important;break-inside:auto!important}
+   111→ table tr,td,th{page-break-inside:avoid!important;break-inside:avoid!important}
+   112→ table thead{display:table-header-group!important}
+   113→ h1,h2,h3,h4,.bar-item,.info-box,.radar-box,.badge{page-break-inside:avoid!important;break-inside:avoid!important}
+   114→ h1,h2,h3,h4{page-break-after:avoid!important;break-after:avoid!important}
+   115→ p,li{orphans:3;widows:3}
+   116→ .radar-box{height:240px!important;max-width:430px!important;margin:10px auto!important;overflow:hidden!important}
+   117→ canvas{max-width:100%!important;max-height:100%!important}
+   118→ h1,h2,h3,.rsec h2{font-size:1.1rem;margin:1rem 0 .55rem}
+   119→ .rsec p,.rsec ul li{font-size:.85rem;margin-bottom:.4rem}
+   120→ table th,table td{padding:.5rem .6rem!important;font-size:.8rem}
+   121→ .reveal{opacity:1!important;transform:none!important}
+   122→ .bar-fill,.pct{transition:none!important}
+   123→ .pgnext{page-break-before:always;break-before:page}
+   124→}
+   125→</style>
+   126→</head>
+   127→<body>
+   128→<svg width="0" height="0" style="position:absolute"><defs><linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#2563EB"/><stop offset="100%" stop-color="#10B981"/></linearGradient></defs></svg>
+   129→<div class="bg-deco"><div class="b1"></div><div class="b2"></div><div class="b3"></div></div>
+   130→<main>
+   131→<section id="form-screen" class="screen active">
+   132→ <div class="form-card glass">
+   133→  <h1>Humanities Career <em>Selector</em></h1><div class="accent-bar"></div>
+   134→  <p class="sub">Discover which Humanities (Arts) career cluster matches your interests — from Law and Mass Media to History and Psychology.</p>
+   135→  <div class="chips"><span class="chip">📝 76 Questions</span><span class="chip">⏱️ ~20 Minutes</span><span class="chip">🎓 19 Career Clusters</span><span class="chip">📊 Radar + Report</span></div>
+   136→  <div class="info-box"><h3>How to answer</h3><p>Rate how strongly you agree with each statement — from <strong>Strongly Disagree</strong> to <strong>Strongly Agree</strong>. There are no right or wrong answers; answer honestly for the best result.</p></div>
+   137→  <div class="form-group"><label>Student Name</label><input type="text" id="s-name" placeholder="e.g. Aarav Sharma"></div>
+   138→  <div class="form-group"><label>Email Address</label><input type="email" id="s-email" placeholder="you@example.com"></div>
+   139→  <div class="form-group"><label>Mobile Number</label><input type="tel" id="s-phone" placeholder="e.g. 98765 43210"></div>
+   140→  <button class="btn" onclick="startTest()">Start Assessment →</button>
+   141→ </div>
+   142→</section>
+   143→<section id="quiz-screen" class="screen">
+   144→ <div class="quiz-wrap">
+   145→  <div class="quiz-top">
+   146→   <div class="ring-wrap"><svg viewBox="0 0 120 120"><circle class="ring-bg" cx="60" cy="60" r="52"/><circle class="ring-fill" id="ring-fill" cx="60" cy="60" r="52"/></svg><div class="ring-num" id="ring-num">0%</div></div>
+   147→   <div class="quiz-meta"><div class="t">Humanities Aptitude Test</div><div class="p" id="prog-text">0 / 76 answered</div></div>
+   148→   <div class="stage-pill" id="grade-pill"></div>
+   149→  </div>
+   150→  <div id="quiz-body"></div>
+   151→  <div class="quiz-nav"><button type="button" class="ghost-btn" id="back-btn" onclick="back()">← Back</button><div></div></div>
+   152→ </div>
+   153→</section>
+   154→<section id="report-screen" class="screen">
+   155→ <div class="report-card" id="report-content"></div>
+   156→ <button class="print-btn" onclick="window.print()">Print / Save as PDF (A4)</button>
+   157→</section>
+   158→</main>
+   159→<script>
+   160→const CLUSTERS={
+   161→"Teaching and Education Related":{careers:["Nursery or Pre-Primary Teacher, Primary, Middle School,","Secondary and Senior Secondary Teacher, Lecturer and Professor,","Institute Trainer, Tutor, Coaching Centre Trainer, Academic Head or Principal"],work:"Government or private schools, colleges, education companies and NGOs, institutes and coaching centres"},
+   162→"Social Service Related":{careers:["Teacher and Professor, Clinical Psychologist, Social Workers,","Relationship Counselor, Mental Health Professional, Career Counselor"],work:"Schools, colleges, hospitals, NGOs, government and defense departments, industries, training companies"},
+   163→"Public Administration Related":{careers:["Indian Administrative Services, Police, Protective, Revenue,","Foreign Services, Railway Services"],work:"Public service departments, State or Central Government departments"},
+   164→"Physiology and Sports Related":{careers:["Coach, Player, Physical Educationist, Physiotherapist,","Gym Trainer, Yoga Trainer, Alternate Medicine Therapist"],work:"Schools, colleges and training institutes; opportunities to represent at national, state and district level"},
+   165→"Organizing Skills Related":{careers:["Librarian, Documentation Officers"],work:"Public and school/college libraries, documentation work in any office"},
+   166→"Management Related":{careers:["Human Resource Manager, Operations Manager, Finance Manager,","Sales and Marketing Manager"],work:"Specific management jobs in corporations — manufacturing, IT, insurance, banking, services"},
+   167→"Mass Media Related":{careers:["Radio and TV Anchoring, News Reading, Theater Stage and Voice","Over Artist, Public Relations, Photography, Advertisement, Online Media,","Video and Audio Editor, Camera and Light Professional, Sound Technician"],work:"Media and entertainment channels, radio, news channels, magazines, studios and theaters"},
+   168→"Law Related":{careers:["Lawyer — Civil, Marital, Family, Corporate, Tax, Criminal and Judge"],work:"Legal firms, State, District, High Court and Supreme Court"},
+   169→"Languages Related":{careers:["Linguist, Translator, Interpreter, News Reader, Bilingual Educator,","Copy Writer and Editor, Grant and Proposal Writer, Professor,","Teacher and Trainer, Public Relations, Publication, Research"],work:"Diplomat assistance services, Investigation Bureau, publishing houses, newspapers and magazines, documentation departments"},
+   170→"Journalism":{careers:["Journalist – Print or Electronic, Reporter, Editor, Copy Writer,","Screen Play Writer, Content Writer"],work:"Radio, newspapers, magazines, news channels, information blogs and websites"},
+   171→"Industrial Design Related":{careers:["Fashion Designer, Textile Designer, Knitwear Designer, Accessory","Designer, Jewellery Designer, Interior Designer"],work:"Specific industries for specific roles, teaching in vocational colleges"},
+   172→"Hospitality - Travel and Tourism Related":{careers:["Travel Agent, Tourism Manager, Logistics Manager, Transportation","Support, Airhostess, Cabin Crew, Customer Service Manager, Travel Desk","Officer, Event Manager"],work:"Tourism companies, airlines, cruise ships, travel agencies, government transport departments, amusement parks, hotels, malls"},
+   173→"Hospitality - Hotel Industry Related":{careers:["Hotel Manager, Facility Maintenance, Chef, Food and Beverage","Specialist, Cleaning and Housekeeping In Charges, Restaurant and Bar In Charge"],work:"Hotels, motels, restaurants, cafes, resorts, cruises and clubs; teaching in hotel management colleges"},
+   174→"History Related":{careers:["Historian, Archaeologist, Anthropologist, Museum Curator,","History Teacher and Professor"],work:"Schools and colleges, museums, heritage preservation projects, archaeological and anthropological departments"},
+   175→"Geography Related":{careers:["Geographer, Teacher and Professor, Cartographer, Surveyors,","Urban and Rural Planner, GIS Specialist, Climatologist, Environment Specialist"],work:"Population survey organizations, environmental projects, geological departments, weather forecast departments, schools and colleges"},
+   176→"Economics Related":{careers:["Economist, Activist, Reformer, Researcher, Journalist,","Investment Advisor and Financial Analyst, Teacher and Professor"],work:"Banks, finance companies, schools and colleges, media, NGOs"},
+   177→"Computer Related Designing":{careers:["Web Designer, Graphic Designer, Animator, Game Designer,","Illustrator, Multimedia Designer"],work:"IT and technology companies, audio-visual design studios, multimedia and mobile gaming companies"},
+   178→"Civil Education Related":{careers:["Activist, Reformer, Researcher, Journalist, Philosopher, Critic","and Political Analyst, Teacher and Professor"],work:"News agencies, NGOs, governing bodies, schools and colleges"},
+   179→"Beauty Related":{careers:["Beautician, Hair Stylist, Cosmetologist, Life Style Consultant"],work:"Beauty parlors, movie and theater industry, setting up your own enterprise"}
+   180→};
+   181→const QUESTIONS=[
+   182→{t:"I would love to teach in a primary or secondary school.",c:"Teaching and Education Related"},
+   183→{t:"Becoming a college professor is my dream.",c:"Teaching and Education Related"},
+   184→{t:"Working as a trainer in a coaching center appeals to me.",c:"Teaching and Education Related"},
+   185→{t:"I am interested in academic administration and leadership.",c:"Teaching and Education Related"},
+   186→{t:"I want to work as a social worker or relationship counselor.",c:"Social Service Related"},
+   187→{t:"Mental health and clinical psychology interest me.",c:"Social Service Related"},
+   188→{t:"I would like to work for an NGO.",c:"Social Service Related"},
+   189→{t:"Career counseling is a profession I'd enjoy.",c:"Social Service Related"},
+   190→{t:"I aspire to join the Indian Administrative Services (IAS).",c:"Public Administration Related"},
+   191→{t:"Working in police or revenue services appeals to me.",c:"Public Administration Related"},
+   192→{t:"I am interested in foreign services and diplomacy.",c:"Public Administration Related"},
+   193→{t:"Railway and public service departments sound like good careers.",c:"Public Administration Related"},
+   194→{t:"I want to become a sports coach or physical educationist.",c:"Physiology and Sports Related"},
+   195→{t:"Physiotherapy and gym training interest me.",c:"Physiology and Sports Related"},
+   196→{t:"I would like to work as a yoga trainer.",c:"Physiology and Sports Related"},
+   197→{t:"Alternate medicine therapy is a field I want to explore.",c:"Physiology and Sports Related"},
+   198→{t:"I enjoy organizing books and managing libraries.",c:"Organizing Skills Related"},
+   199→{t:"Documentation and record-keeping work appeals to me.",c:"Organizing Skills Related"},
+   200→{t:"I would like to work as an archivist.",c:"Organizing Skills Related"},
+   201→{t:"Managing information systems in offices sounds interesting.",c:"Organizing Skills Related"},
+   202→{t:"I want to work in Human Resource management.",c:"Management Related"},
+   203→{t:"Operations and finance management appeal to me.",c:"Management Related"},
+   204→{t:"I would enjoy a career in sales and marketing management.",c:"Management Related"},
+   205→{t:"Managing corporate operations sounds like a good career.",c:"Management Related"},
+   206→{t:"I want to work in radio or TV anchoring.",c:"Mass Media Related"},
+   207→{t:"News reading and theater voice-over work appeal to me.",c:"Mass Media Related"},
+   208→{t:"I am interested in photography and advertisement.",c:"Mass Media Related"},
+   209→{t:"Video and audio editing for media sounds exciting.",c:"Mass Media Related"},
+   210→{t:"I want to become a lawyer.",c:"Law Related"},
+   211→{t:"Civil and family law interest me.",c:"Law Related"},
+   212→{t:"Corporate and tax law are fields I'd like to practice.",c:"Law Related"},
+   213→{t:"I aspire to be a judge.",c:"Law Related"},
+   214→{t:"I would love to work as a translator or interpreter.",c:"Languages Related"},
+   215→{t:"Bilingual education and teaching languages appeal to me.",c:"Languages Related"},
+   216→{t:"I am interested in writing grant proposals and publications.",c:"Languages Related"},
+   217→{t:"Linguistics and language research fascinate me.",c:"Languages Related"},
+   218→{t:"I want to work as a reporter for a newspaper.",c:"Journalism"},
+   219→{t:"Editing and copywriting are skills I want to pursue.",c:"Journalism"},
+   220→{t:"Writing screenplays or content for websites sounds exciting.",c:"Journalism"},
+   221→{t:"Investigative journalism and news analysis interest me.",c:"Journalism"},
+   222→{t:"I have a keen interest in fashion and textile design.",c:"Industrial Design Related"},
+   223→{t:"Designing jewelry or accessories appeals to me.",c:"Industrial Design Related"},
+   224→{t:"I would enjoy working as an interior designer.",c:"Industrial Design Related"},
+   225→{t:"Creating industrial product designs is fascinating.",c:"Industrial Design Related"},
+   226→{t:"I want to work in the travel and tourism industry.",c:"Hospitality - Travel and Tourism Related"},
+   227→{t:"Managing logistics and transportation sounds like a good career.",c:"Hospitality - Travel and Tourism Related"},
+   228→{t:"I would enjoy working as an event manager.",c:"Hospitality - Travel and Tourism Related"},
+   229→{t:"Working as cabin crew or customer service manager appeals to me.",c:"Hospitality - Travel and Tourism Related"},
+   230→{t:"I am interested in hotel management.",c:"Hospitality - Hotel Industry Related"},
+   231→{t:"Food and beverage service management excites me.",c:"Hospitality - Hotel Industry Related"},
+   232→{t:"I would like to work in housekeeping or facility maintenance.",c:"Hospitality - Hotel Industry Related"},
+   233→{t:"Managing a restaurant or bar sounds like a career I'd enjoy.",c:"Hospitality - Hotel Industry Related"},
+   234→{t:"I am fascinated by ancient history and archaeology.",c:"History Related"},
+   235→{t:"Working in a museum as a curator is my dream.",c:"History Related"},
+   236→{t:"Anthropology and the study of the human past interest me.",c:"History Related"},
+   237→{t:"Heritage preservation projects sound appealing.",c:"History Related"},
+   238→{t:"I enjoy studying maps and geographical formations.",c:"Geography Related"},
+   239→{t:"Urban and rural planning appeal to me.",c:"Geography Related"},
+   240→{t:"GIS and climatology are fields I want to explore.",c:"Geography Related"},
+   241→{t:"Environmental surveying sounds like an important career.",c:"Geography Related"},
+   242→{t:"I want to work as an economist or financial analyst.",c:"Economics Related"},
+   243→{t:"Economic research and activism interest me.",c:"Economics Related"},
+   244→{t:"I would like to write about economic policies as a journalist.",c:"Economics Related"},
+   245→{t:"Teaching economics at a college level is my goal.",c:"Economics Related"},
+   246→{t:"I enjoy designing websites and user interfaces.",c:"Computer Related Designing"},
+   247→{t:"Graphic design and illustration are skills I want to develop.",c:"Computer Related Designing"},
+   248→{t:"I am interested in animation and game design.",c:"Computer Related Designing"},
+   249→{t:"Creating multimedia content feels like a great career path.",c:"Computer Related Designing"},
+   250→{t:"I want to work as a political analyst or activist.",c:"Civil Education Related"},
+   251→{t:"Philosophy and social reform are causes I care about.",c:"Civil Education Related"},
+   252→{t:"I would like to research civil society and governance.",c:"Civil Education Related"},
+   253→{t:"Teaching civics and social sciences appeals to me.",c:"Civil Education Related"},
+   254→{t:"I am interested in cosmetology and life style consulting.",c:"Beauty Related"},
+   255→{t:"Hair styling and makeup artistry excite me.",c:"Beauty Related"},
+   256→{t:"I would like to work in the movie or theater industry doing makeup.",c:"Beauty Related"},
+   257→{t:"Opening my own beauty enterprise sounds like a great plan.",c:"Beauty Related"}
+   258→];
+   259→const LIKERT=['Strongly Disagree','Disagree','Neutral','Agree','Strongly Agree'];
+   260→let Q=[],A=[],STU={},qi=0,busy=false,radar=null;
+   261→const CIRC=2*Math.PI*52,$=i=>document.getElementById(i);
+   262→function startTest(){
+   263→ const n=$('s-name').value.trim(),e=$('s-email').value.trim(),p=$('s-phone').value.trim();
+   264→ if(!n)return alert('Please enter your Name'); if(!e)return alert('Please enter your Email'); if(!p)return alert('Please enter your Mobile Number');
+   265→ STU={name:n,email:e,phone:p}; Q=QUESTIONS; A=new Array(Q.length).fill(null); qi=0;
+   266→ $('grade-pill').textContent=STU.name;
+   267→ $('form-screen').classList.remove('active'); $('quiz-screen').classList.add('active'); renderQ(); window.scrollTo(0,0);
+   268→}
+   269→function renderQ(){
+   270→ ring(); $('back-btn').style.visibility=qi===0?'hidden':'visible';
+   271→ const b=$('quiz-body');
+   272→ if(qi>=Q.length){ b.innerHTML=`<div class="done-card glass"><div class="done-emoji">🎉</div><h2>All Done, ${STU.name}!</h2><p>You answered all ${Q.length} questions.</p><button class="btn" onclick="finish()">Generate My Report ✨</button></div>`; return; }
+   273→ const q=Q[qi]; let o='';
+   274→ LIKERT.forEach((l,i)=>{o+=`<button type="button" class="opt-row${A[qi]===i+1?' selected':''}" onclick="pick(${i})"><span class="opt-badge">${i+1}</span><span>${l}</span></button>`;});
+   275→ b.innerHTML=`<div class="q-card-big glass"><div class="q-meta"><span class="q-sec">Rate Yourself</span><span class="q-count">Question ${qi+1} of ${Q.length}</span></div><div class="q-big">${q.t}</div><div class="opts-list">${o}</div><div class="kbd-hint">💡 Press keys <b>1–5</b> to answer faster · ← to go back</div></div>`;
+   276→}
+   277→function pick(i){ if(busy||qi>=Q.length)return; busy=true; A[qi]=i+1;
+   278→ document.querySelectorAll('#quiz-body .opt-row').forEach((r,x)=>r.classList.toggle('selected',x===i));
+   279→ ring(); setTimeout(()=>{busy=false;qi++;renderQ(); if(qi>=Q.length)window.scrollTo({top:0,behavior:'smooth'});},300);
+   280→}
+   281→function back(){ if(busy||qi===0)return; qi--; renderQ(); }
+   282→function ring(){ const d=A.filter(a=>a!==null).length,p=Q.length?d/Q.length:0;
+   283→ $('ring-fill').style.strokeDashoffset=(CIRC*(1-p)).toFixed(1); $('ring-num').textContent=Math.round(p*100)+'%'; $('prog-text').textContent=d+' / '+Q.length+' answered'; }
+   284→document.addEventListener('keydown',e=>{ if(!$('quiz-screen').classList.contains('active'))return;
+   285→ if(e.key>='1'&&e.key<='5'&&qi<Q.length)pick(+e.key-1);
+   286→ else if(e.key==='ArrowLeft'||e.key==='Backspace'){e.preventDefault();back();} });
+   287→function countUp(el){const t=+el.dataset.target,d=1300,t0=performance.now();(function s(x){const p=Math.min((x-t0)/d,1);el.textContent=Math.round(t*(1-Math.pow(1-p,3)))+'%';p<1&&requestAnimationFrame(s)})(t0);}
+   288→function initFx(){
+   289→ requestAnimationFrame(()=>requestAnimationFrame(()=>{document.querySelectorAll('.bar-fill').forEach(b=>b.style.width=b.dataset.w+'%');document.querySelectorAll('.pct').forEach(countUp);}));
+   290→ const io=new IntersectionObserver(es=>es.forEach(x=>{if(x.isIntersecting){x.target.classList.add('vis');io.unobserve(x.target)}}),{threshold:.1});
+   291→ document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+   292→ if(typeof confetti==='function'){const C=['#2563EB','#0EA5E9','#10B981','#F59E0B'];confetti({particleCount:130,spread:75,origin:{y:.6},colors:C});setTimeout(()=>confetti({particleCount:80,spread:100,origin:{x:.2,y:.5},colors:C}),250);setTimeout(()=>confetti({particleCount:80,spread:100,origin:{x:.8,y:.5},colors:C}),450);}
+   293→}
+   294→function makeRadar(id,labels,vals){ if(typeof Chart==='undefined')return; const c=$(id); if(!c)return;
+   295→ if(radar)radar.destroy();
+   296→ radar=new Chart(c,{type:'radar',data:{labels,datasets:[{data:vals,fill:true,backgroundColor:'rgba(37,99,235,.25)',borderColor:'#1D4ED8',borderWidth:2.5,pointBackgroundColor:'#1D4ED8',pointRadius:4}]},options:{responsive:true,maintainAspectRatio:false,scales:{r:{min:0,max:100,ticks:{stepSize:20,backdropColor:'transparent',color:'#475569',font:{size:10}},grid:{color:'#C9D3E0'},angleLines:{color:'#C9D3E0'},pointLabels:{color:'#0F172A',font:{family:'Poppins',weight:'600',size:10}}}},plugins:{legend:{display:false}}}});}
+   297→window.addEventListener('beforeprint',()=>{if(radar){radar.resize();radar.update('none');}});
+   298→function showReport(html){ $('report-content').innerHTML=html; $('quiz-screen').classList.remove('active'); $('report-screen').classList.add('active'); window.scrollTo(0,0); initFx(); }
+   299→function finish(){
+   300→ const sc={}; Object.keys(CLUSTERS).forEach(c=>sc[c]=0);
+   301→ Q.forEach((q,i)=>{ if(A[i]) sc[q.c]+=A[i]; });
+   302→ const sorted=Object.entries(sc).sort((a,b)=>b[1]-a[1]);
+   303→ const third=Math.floor(sorted.length/3), lv={};
+   304→ sorted.forEach(([c],i)=>lv[c]= i<third?'High' : i<third*2?'Medium' : 'Low');
+   305→ const top8=sorted.slice(0,8);
+   306→ const bars=top8.map(([c,s],i)=>{const p=Math.round(s/20*100);return `<div class="bar-item reveal"><div class="bar-label"><span>${c}</span><span><span class="pct" data-target="${p}">0%</span> <span class="badge b-${lv[c].toLowerCase()}">${lv[c]}</span></span></div><div class="bar-track"><div class="bar-fill f${i%4+1}" data-w="${p}"></div></div></div>`;}).join('');
+   307→ const rows=Object.keys(CLUSTERS).map(c=>`<tr><td class="cat">${c}</td><td><span class="badge b-${lv[c].toLowerCase()}">${lv[c]}</span></td><td>${CLUSTERS[c].careers.join('<br>')}</td><td>${CLUSTERS[c].work}</td></tr>`).join('');
+   308→ const date=new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+   309→ showReport(`<div class="report-head"><div class="brand">Humanities Career Selector · Report</div><h1>${STU.name}</h1><div class="meta"><span>Date<b>${date}</b></span><span>Phone<b>${STU.phone}</b></span><span>Questions<b>${Q.length} of ${Q.length}</b></span></div></div>
+   310→ <div class="rsec reveal"><h2>What This Report Gives You</h2><ul>
+   311→ <li>Brief knowledge about all available Humanities careers and their wide career options in India.</li>
+   312→ <li>An answer to which career option of Humanities you should select.</li>
+   313→ <li>Humanities and Social Sciences develop specific arts and skills — and require a certain level of interest to study. This psychometric report, scientifically designed and customized uniquely for you, matches your activity choices and work-situation preferences with professional careers of Humanities.</li>
+   314→ <li>Results displayed in graphical forms — radar chart, interest level graph and detailed tables.</li></ul></div>
+   315→ <div class="rsec reveal"><h2>How to Select Your Humanities Career</h2><ul>
+   316→ <li>See the Result Graph and Table below.</li>
+   317→ <li>Locate the scores which fall in the High, Medium and Low range.</li>
+   318→ <li>Each score has a Humanities career name attached — this guides you about the career you should opt for and the nature of work you are interested in.</li>
+   319→ <li>The final data table tells you in detail about all Humanities careers including their work areas.</li></ul></div>
+   320→ <div class="rsec reveal"><h2>Interest Profile — Top 8 Clusters</h2><div class="radar-box"><canvas id="radarC"></canvas></div></div>
+   321→ <div class="rsec"><h2>Interest Level Graph</h2><div style="background:#FAF8F2;border:1px solid #EDE7DA;border-radius:12px;padding:1.2rem">${bars}</div></div>
+   322→ <div class="rsec reveal"><h2>Interest Level Descriptors</h2>
+   323→ <table class="data"><thead><tr><th style="width:16%">Interest Level</th><th>Description</th></tr></thead><tbody>
+   324→ <tr><td><span class="badge b-high">High Level</span></td><td>This level indicates High interest in the given Humanities Career Options with awareness and knowledge about the subject and career, as well as enthusiasm to face work life situations accepting its pros and cons. The student has deep understanding as well as interest to opt for the given career options, and knows what kind of professional personality is required — so he or she has the zeal to develop as a professional accordingly. It is recommended to select career options from this level while maintaining motivation and taking study seriously with equal zeal to attain thorough knowledge and a very successful career.</td></tr>
+   325→ <tr><td><span class="badge b-med">Medium Level</span></td><td>This level indicates Medium interest in the given Humanities Career Options — the student is moderately able and interested to enjoy the pros and cons of work life situations, with moderate and superficial understanding and average general awareness about the given career. Medium interest could mean that if today's small-scale tasks are not well accomplished, future on-job tasks may become mundane. Hence it is advisable that students selecting from this level develop optimum zeal, motivation and a dedicated study pattern to grow as a professional in the field.</td></tr>
+   326→ <tr><td><span class="badge b-low">Low Level</span></td><td>This level indicates Low interest as well as lack of understanding, awareness and knowledge about the given Humanities Career Options. There is profound reluctance in utilizing skills to do small-scale tasks in the given career option, which portrays dissatisfaction towards the pros and cons of the work life situations. It will be an uphill task to increase knowledge in a career option one is not interested in.</td></tr>
+   327→ </tbody></table></div>
+   328→ <div class="rsec reveal"><h2>Career Clusters, Levels & Work Areas</h2>
+   329→ <table class="data"><thead><tr><th style="width:20%">Career Cluster</th><th style="width:10%">Level</th><th style="width:38%">Career Options</th><th>Work Areas</th></tr></thead><tbody>${rows}</tbody></table></div>`);
+   330→ makeRadar('radarC', top8.map(([c])=>c), top8.map(([c,s])=>Math.round(s/20*100)));
+   331→}
+   332→</script>
+   333→</body>
+   334→</html>

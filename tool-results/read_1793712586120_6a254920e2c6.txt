@@ -1,0 +1,502 @@
+     1→<!DOCTYPE html>
+     2→<html lang="en">
+     3→<head>
+     4→<meta charset="UTF-8">
+     5→<meta name="viewport" content="width=device-width, initial-scale=1.0">
+     6→<title>Ideal Career Test - Psychometric & Aptitude Assessment</title>
+     7→<script src="https://cdn.tailwindcss.com"></script>
+     8→<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+     9→<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    10→<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    11→
+    12→<style>
+    13→body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; color: #1e293b; }
+    14→::-webkit-scrollbar { width: 8px; height: 8px; }
+    15→::-webkit-scrollbar-track { background: #f1f5f9; }
+    16→::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    17→.q-card { transition: all 0.2s ease-in-out; border: 1px solid #e2e8f0; }
+    18→.q-card:hover { border-color: #cbd5e1; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+    19→.custom-radio { appearance: none; width: 18px; height: 18px; border: 2px solid #cbd5e1; border-radius: 50%; outline: none; cursor: pointer; position: relative; vertical-align: middle; transition: border-color 0.2s ease; }
+    20→.custom-radio:checked { border-color: #3B6990; background-color: #ffffff; }
+    21→.custom-radio:checked::after { content: ''; position: absolute; top: 3px; left: 3px; width: 8px; height: 8px; background-color: #3B6990; border-radius: 50%; }
+    22→.report-page { width: 100%; max-width: 900px; min-height: 1100px; background: white; box-shadow: 0 10px 25px rgba(0,0,0,0.08); border-radius: 16px; margin-bottom: 30px; padding: 32px; position: relative; box-sizing: border-box; }
+    23→@media print {
+    24→  body { background: white !important; padding: 0 !important; }
+    25→  .no-print { display: none !important; }
+    26→  .report-page { box-shadow: none !important; border: none !important; margin: 0 !important; width: 100% !important; max-width: 100% !important; min-height: auto !important; padding: 20px !important; page-break-after: always; page-break-inside: avoid; }
+    27→  .report-container { display: block !important; }
+    28→}
+    29→.step-line { height: 3px; background: #cbd5e1; position: absolute; top: 20px; left: 5%; right: 5%; z-index: 1; }
+    30→.step-line-progress { height: 3px; background: #2AA99B; position: absolute; top: 20px; left: 5%; z-index: 2; transition: width 0.3s ease; }
+    31→.passage-box { background-color: #f8fafc; border-left: 4px solid #3B6990; padding: 16px; border-radius: 8px; margin-bottom: 12px; font-size: 13px; line-height: 1.6; color: #475569; }
+    32→.code-display { font-family: monospace; font-size: 1.1rem; letter-spacing: 2px; background: #1e293b; color: #38bdf8; padding: 8px 16px; border-radius: 6px; display: inline-block; margin: 8px 0; }
+    33→</style>
+    34→</head>
+    35→<body class="min-h-screen flex flex-col">
+    36→
+    37→<!-- Header -->
+    38→<header class="bg-[#3B6990] text-white shadow-md sticky top-0 z-40 no-print">
+    39→  <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+    40→    <div class="flex items-center space-x-3 cursor-pointer" onclick="jumpToSection(state.currentSectionIdx)">
+    41→      <div class="bg-amber-400 p-2 rounded-xl text-slate-900 shadow-sm flex items-center justify-center w-10 h-10">
+    42→        <i class="fa-solid fa-graduation-cap text-xl"></i>
+    43→      </div>
+    44→      <div>
+    45→        <h1 class="text-lg font-bold tracking-tight leading-none">Discover Ideal Career</h1>
+    46→        <p class="text-xs text-blue-200 mt-0.5">Psychometric & Career Aptitude Portal</p>
+    47→      </div>
+    48→    </div>
+    49→    <div class="flex items-center space-x-3">
+    50→      <div id="currentUserBadge" class="hidden sm:flex items-center bg-blue-900/40 border border-blue-300/30 px-3 py-1.5 rounded-full text-xs">
+    51→        <i class="fa-solid fa-user-graduate mr-2 text-amber-300"></i>
+    52→        <span id="headerStudentName" class="font-medium text-white">Student</span>
+    53→      </div>
+    54→    </div>
+    55→  </div>
+    56→</header>
+    57→
+    58→<!-- Navigation Section Tracker -->
+    59→<nav id="testTrackerNav" class="bg-[#4A779D] text-white pt-4 pb-3 shadow-inner no-print border-t border-blue-400/30">
+    60→  <div class="max-w-7xl mx-auto px-2 sm:px-6">
+    61→    <div class="relative flex justify-between items-center z-10 px-2 sm:px-6">
+    62→      <div class="step-line hidden md:block"></div>
+    63→      <div id="trackerProgressBar" class="step-line-progress hidden md:block" style="width: 14%;"></div>
+    64→      <div class="tracker-node cursor-pointer flex flex-col items-center z-10" onclick="jumpToSection(1)">
+    65→        <div id="node-1" class="w-8 h-8 rounded-full bg-amber-500 text-slate-900 flex items-center justify-center font-bold text-xs ring-4 ring-[#4A779D] shadow">1</div>
+    66→        <span class="text-[10px] sm:text-xs font-semibold mt-1 uppercase tracking-tight text-center max-w-[70px] leading-tight text-white">Self Identification</span>
+    67→      </div>
+    68→      <div class="tracker-node cursor-pointer flex flex-col items-center z-10" onclick="jumpToSection(2)">
+    69→        <div id="node-2" class="w-8 h-8 rounded-full bg-slate-300 text-slate-700 flex items-center justify-center font-bold text-xs ring-4 ring-[#4A779D]">2</div>
+    70→        <span class="text-[10px] sm:text-xs font-semibold mt-1 uppercase tracking-tight text-center max-w-[70px] leading-tight text-slate-200">Work Situations</span>
+    71→      </div>
+    72→      <div class="tracker-node cursor-pointer flex flex-col items-center z-10" onclick="jumpToSection(3)">
+    73→        <div id="node-3" class="w-8 h-8 rounded-full bg-slate-300 text-slate-700 flex items-center justify-center font-bold text-xs ring-4 ring-[#4A779D]">3</div>
+    74→        <span class="text-[10px] sm:text-xs font-semibold mt-1 uppercase tracking-tight text-center max-w-[70px] leading-tight text-slate-200">Incomplete Sequence</span>
+    75→      </div>
+    76→      <div class="tracker-node cursor-pointer flex flex-col items-center z-10" onclick="jumpToSection(4)">
+    77→        <div id="node-4" class="w-8 h-8 rounded-full bg-slate-300 text-slate-700 flex items-center justify-center font-bold text-xs ring-4 ring-[#4A779D]">4</div>
+    78→        <span class="text-[10px] sm:text-xs font-semibold mt-1 uppercase tracking-tight text-center max-w-[70px] leading-tight text-slate-200">Identical Codes</span>
+    79→      </div>
+    80→      <div class="tracker-node cursor-pointer flex flex-col items-center z-10" onclick="jumpToSection(5)">
+    81→        <div id="node-5" class="w-8 h-8 rounded-full bg-slate-300 text-slate-700 flex items-center justify-center font-bold text-xs ring-4 ring-[#4A779D]">5</div>
+    82→        <span class="text-[10px] sm:text-xs font-semibold mt-1 uppercase tracking-tight text-center max-w-[70px] leading-tight text-slate-200">Logical Scenarios</span>
+    83→      </div>
+    84→      <div class="tracker-node cursor-pointer flex flex-col items-center z-10" onclick="jumpToSection(6)">
+    85→        <div id="node-6" class="w-8 h-8 rounded-full bg-slate-300 text-slate-700 flex items-center justify-center font-bold text-xs ring-4 ring-[#4A779D]">6</div>
+    86→        <span class="text-[10px] sm:text-xs font-semibold mt-1 uppercase tracking-tight text-center max-w-[70px] leading-tight text-slate-200">Important Factor</span>
+    87→      </div>
+    88→      <div class="tracker-node cursor-pointer flex flex-col items-center z-10" onclick="jumpToSection(7)">
+    89→        <div id="node-7" class="w-8 h-8 rounded-full bg-slate-300 text-slate-700 flex items-center justify-center font-bold text-xs ring-4 ring-[#4A779D]">7</div>
+    90→        <span class="text-[10px] sm:text-xs font-semibold mt-1 uppercase tracking-tight text-center max-w-[70px] leading-tight text-slate-200">Situational Exploration</span>
+    91→      </div>
+    92→    </div>
+    93→    <div class="mt-4 max-w-4xl mx-auto bg-white rounded-lg p-2.5 shadow border border-slate-200 text-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3">
+    94→      <div class="flex items-center space-x-3 w-full sm:w-auto">
+    95→        <div class="bg-teal-100 text-teal-800 p-2 rounded-lg">
+    96→          <i id="sectionHeaderIcon" class="fa-solid fa-user-check text-xl"></i>
+    97→        </div>
+    98→        <div class="text-sm font-bold tracking-wide uppercase text-slate-700">
+    99→          <span id="sectionNameLabel">SELF IDENTIFICATION</span> : <span id="sectionPercentLabel" class="text-teal-600">0%</span> Completed
+   100→        </div>
+   101→      </div>
+   102→      <div class="w-full sm:w-64 bg-slate-200 rounded-full h-3.5 overflow-hidden border border-slate-300">
+   103→        <div id="sectionProgressBarFill" class="bg-teal-500 h-full transition-all duration-300" style="width: 0%;"></div>
+   104→      </div>
+   105→    </div>
+   106→  </div>
+   107→</nav>
+   108→
+   109→<!-- Main Container -->
+   110→<main class="flex-grow max-w-5xl w-full mx-auto p-4 sm:p-6">
+   111→
+   112→  <!-- TEST VIEW (All questions in a section rendered on one page) -->
+   113→  <div id="testView" class="block">
+   114→    <div class="mb-6 bg-amber-50 border border-amber-200 p-4 rounded-xl">
+   115→      <h2 class="text-2xl font-extrabold text-amber-700 tracking-tight">Welcome to Your Career Assessment</h2>
+   116→      <p class="text-slate-700 mt-1 text-sm leading-relaxed">
+   117→        Please read each question carefully and select the best answer for you. Scroll down to answer all questions in this section, then click <strong>"Complete Section & Proceed"</strong> at the bottom.
+   118→      </p>
+   119→    </div>
+   120→
+   121→    <!-- All Questions for Active Section Rendered Here -->
+   122→    <div id="questionsContainer" class="space-y-4"></div>
+   123→
+   124→    <!-- Section Navigation Footer -->
+   125→    <div class="mt-8 mb-12 flex items-center justify-between bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+   126→      <button id="prevSecBtn" onclick="navigateSection(-1)" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-sm transition flex items-center gap-2 disabled:opacity-40">
+   127→        <i class="fa-solid fa-arrow-left"></i> Previous Section
+   128→      </button>
+   129→      <div class="text-xs text-slate-500">
+   130→        Section Progress: <span id="answeredCount" class="font-bold text-slate-800">0</span> / <span id="totalSecQuestions" class="font-bold">0</span> answered
+   131→      </div>
+   132→      <button id="nextSecBtn" onclick="navigateSection(1)" class="px-6 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-900 font-bold rounded-xl text-sm transition shadow-md flex items-center gap-2">
+   133→        <span id="nextBtnText">Complete Section & Proceed</span>
+   134→        <i class="fa-solid fa-arrow-right"></i>
+   135→      </button>
+   136→    </div>
+   137→  </div>
+   138→
+   139→  <!-- REPORT VIEW (5 Printable Pages) -->
+   140→  <div id="reportView" class="hidden">
+   141→    <div class="no-print bg-white p-4 rounded-xl shadow border border-slate-200 mb-6 flex flex-wrap items-center justify-between gap-4">
+   142→      <div class="flex items-center space-x-3">
+   143→        <div class="bg-blue-100 text-blue-800 p-2 rounded-lg"><i class="fa-solid fa-file-pdf text-xl"></i></div>
+   144→        <div>
+   145→          <h3 class="font-bold text-slate-800">Ideal Career Test Comprehensive Report</h3>
+   146→          <p class="text-xs text-slate-500">Ready for viewing, standard print, and PDF export</p>
+   147→        </div>
+   148→      </div>
+   149→      <div class="flex items-center space-x-3">
+   150→        <button onclick="jumpToSection(7)" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg text-sm transition flex items-center gap-2"><i class="fa-solid fa-pen-to-square"></i> Back to Test</button>
+   151→        <button onclick="openAdminModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-amber-400 font-semibold rounded-lg text-sm transition flex items-center gap-2"><i class="fa-solid fa-user-lock"></i> Super User Edit</button>
+   152→        <button onclick="window.print()" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg text-sm transition shadow flex items-center gap-2"><i class="fa-solid fa-download"></i> Download PDF</button>
+   153→      </div>
+   154→    </div>
+   155→
+   156→    <div class="report-container flex flex-col items-center">
+   157→      <!-- PAGE 1: OVERVIEW & TOP 3 CAREERS -->
+   158→      <div class="report-page flex flex-col justify-between">
+   159→        <div>
+   160→          <div class="flex items-center justify-between border-2 border-slate-700 rounded-xl px-4 py-2 mb-6">
+   161→            <div class="bg-slate-500 text-white font-bold text-sm px-4 py-1.5 rounded-md uppercase tracking-wide">Ideal Career Test Report</div>
+   162→            <div class="text-slate-600 font-semibold text-sm" id="repHeaderStudentName1">Student</div>
+   163→            <div class="text-slate-500 text-sm" id="repHeaderDate1">Date</div>
+   164→          </div>
+   165→          <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+   166→            <div class="md:col-span-5 flex flex-col justify-between border-r border-slate-200 pr-4">
+   167→              <div>
+   168→                <div class="bg-blue-50/60 rounded-xl p-4 border border-blue-100 mb-6">
+   169→                  <div class="flex items-center justify-between mb-3 border-b border-blue-100 pb-2">
+   170→                    <div id="techLogoContainer" class="h-10 flex items-center">
+   171→                      <img id="techLogoImg" src="https://placehold.co/120x40/3B6990/ffffff?text=Tech+Logo" alt="Logo" class="h-8 object-contain">
+   172→                    </div>
+   173→                    <span class="text-[10px] font-bold text-blue-700 bg-blue-100 px-2 py-0.5 rounded">STUDENT PROFILE</span>
+   174→                  </div>
+   175→                  <div class="space-y-2 text-xs">
+   176→                    <div class="flex"><span class="font-bold text-slate-700 w-20">Name:</span> <span id="repStudentName" class="font-medium text-slate-900">Student</span></div>
+   177→                    <div class="flex"><span class="font-bold text-slate-700 w-20">Phone:</span> <span id="repStudentPhone" class="font-medium text-slate-900">-</span></div>
+   178→                    <div class="flex"><span class="font-bold text-slate-700 w-20">Email:</span> <span id="repStudentEmail" class="font-medium text-slate-900">-</span></div>
+   179→                    <div class="flex"><span class="font-bold text-slate-700 w-20">Date:</span> <span id="repTestDate" class="font-medium text-slate-900">-</span></div>
+   180→                  </div>
+   181→                </div>
+   182→              </div>
+   183→              <div class="bg-amber-100/70 border border-amber-200 rounded-xl p-4 text-center relative overflow-hidden my-2">
+   184→                <h4 class="text-amber-800 font-extrabold text-lg leading-tight">Your Top <span class="text-3xl text-slate-800 font-black">3</span></h4>
+   185→                <p class="text-amber-900 font-bold text-base">Ideal Career Fields</p>
+   186→                <div class="mt-3 text-left text-xs text-slate-600 space-y-1.5">
+   187→                  <p class="flex items-start gap-1.5"><i class="fa-solid fa-check text-emerald-600 mt-0.5"></i> These careers match your core interests and strengths.</p>
+   188→                  <p class="flex items-start gap-1.5"><i class="fa-solid fa-check text-emerald-600 mt-0.5"></i> Based on comprehensive psychometric evaluation.</p>
+   189→                </div>
+   190→              </div>
+   191→            </div>
+   192→            <div class="md:col-span-7 space-y-5">
+   193→              <h2 class="text-2xl font-extrabold text-amber-600 tracking-tight text-center md:text-left">Top Recommended Careers</h2>
+   194→              <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm relative">
+   195→                <div class="flex items-start space-x-3">
+   196→                  <div class="w-9 h-9 rounded-full bg-amber-500 text-white font-black text-lg flex items-center justify-center shrink-0 shadow">1</div>
+   197→                  <div>
+   198→                    <h3 id="c1Title" class="text-lg font-bold text-slate-900">Health Science & Social Service</h3>
+   199→                    <p id="c1Desc" class="text-xs text-slate-600 mt-1 leading-relaxed">Helping people through medical treatment, counseling, education, and community support.</p>
+   200→                    <div id="c1List" class="grid grid-cols-2 sm:grid-cols-3 gap-x-2 gap-y-1 mt-3 text-[11px] font-semibold text-slate-700"></div>
+   201→                  </div>
+   202→                </div>
+   203→              </div>
+   204→              <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm relative">
+   205→                <div class="flex items-start space-x-3">
+   206→                  <div class="w-9 h-9 rounded-full bg-amber-500 text-white font-black text-lg flex items-center justify-center shrink-0 shadow">2</div>
+   207→                  <div>
+   208→                    <h3 id="c2Title" class="text-lg font-bold text-slate-900">Science & Research</h3>
+   209→                    <p id="c2Desc" class="text-xs text-slate-600 mt-1 leading-relaxed">Solving complex problems using research, technology, data analysis, and laboratory science.</p>
+   210→                    <div id="c2List" class="grid grid-cols-2 sm:grid-cols-3 gap-x-2 gap-y-1 mt-3 text-[11px] font-semibold text-slate-700"></div>
+   211→                  </div>
+   212→                </div>
+   213→              </div>
+   214→              <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm relative">
+   215→                <div class="flex items-start space-x-3">
+   216→                  <div class="w-9 h-9 rounded-full bg-amber-500 text-white font-black text-lg flex items-center justify-center shrink-0 shadow">3</div>
+   217→                  <div>
+   218→                    <h3 id="c3Title" class="text-lg font-bold text-slate-900">Engineering & Technology</h3>
+   219→                    <p id="c3Desc" class="text-xs text-slate-600 mt-1 leading-relaxed">Designing, building, and maintaining computers, structures, machines, and technical systems.</p>
+   220→                    <div id="c3List" class="grid grid-cols-2 sm:grid-cols-3 gap-x-2 gap-y-1 mt-3 text-[11px] font-semibold text-slate-700"></div>
+   221→                  </div>
+   222→                </div>
+   223→              </div>
+   224→            </div>
+   225→          </div>
+   226→        </div>
+   227→        <div class="pt-4 border-t border-slate-200 flex items-center justify-between text-xs text-slate-400">
+   228→          <span>Discover Ideal Career Assessment</span><span>Page 1 of 5</span>
+   229→        </div>
+   230→      </div>
+   231→
+   232→      <!-- PAGE 2: MOTIVATORS -->
+   233→      <div class="report-page flex flex-col justify-between">
+   234→        <div>
+   235→          <div class="flex items-center justify-between border-2 border-slate-700 rounded-xl px-4 py-2 mb-6">
+   236→            <div class="bg-slate-500 text-white font-bold text-sm px-4 py-1.5 rounded-md uppercase tracking-wide">Ideal Career Test Report</div>
+   237→            <div class="text-slate-600 font-semibold text-sm" id="repHeaderStudentName2">Student</div>
+   238→            <div class="text-slate-500 text-sm" id="repHeaderDate2">Date</div>
+   239→          </div>
+   240→          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+   241→            <div class="space-y-4">
+   242→              <h2 class="text-2xl font-extrabold text-amber-600 tracking-tight">Career Motivators</h2>
+   243→              <p class="text-xs text-slate-700 leading-relaxed"><strong class="text-slate-900">Career Motivators</strong> are the factors that make you feel happy and satisfied with your work. These include money, independence, helping others, stability, leadership, and personal interest.</p>
+   244→              <p class="text-xs text-slate-700 leading-relaxed">Every person is motivated by different things. Choosing a career that matches your personal motivators will make you more successful and satisfied in the long run.</p>
+   245→              <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+   246→                <h4 class="text-xs font-bold text-slate-900 uppercase tracking-wide">Examples of Motivators:</h4>
+   247→                <p class="text-[11px] text-slate-600 flex items-start gap-2"><i class="fa-solid fa-check text-emerald-600 mt-0.5"></i> A business owner might be motivated by income and leadership.</p>
+   248→                <p class="text-[11px] text-slate-600 flex items-start gap-2"><i class="fa-solid fa-check text-emerald-600 mt-0.5"></i> A doctor or social worker is often motivated by helping society and gaining respect.</p>
+   249→                <p class="text-[11px] text-slate-600 flex items-start gap-2"><i class="fa-solid fa-check text-emerald-600 mt-0.5"></i> An artist or writer is usually motivated by freedom and creative passion.</p>
+   250→              </div>
+   251→            </div>
+   252→            <div class="space-y-4">
+   253→              <h2 class="text-2xl font-extrabold text-amber-600 tracking-tight">Top Motivators for <span id="motivatorStudentName">Student</span></h2>
+   254→              <div id="topMotivatorsList" class="space-y-4"></div>
+   255→            </div>
+   256→          </div>
+   257→        </div>
+   258→        <div class="pt-4 border-t border-slate-200 flex items-center justify-between text-xs text-slate-400">
+   259→          <span>Discover Ideal Career Assessment</span><span>Page 2 of 5</span>
+   260→        </div>
+   261→      </div>
+   262→
+   263→      <!-- PAGE 3: CHART & APTITUDE INTRO -->
+   264→      <div class="report-page flex flex-col justify-between">
+   265→        <div>
+   266→          <div class="flex items-center justify-between border-2 border-slate-700 rounded-xl px-4 py-2 mb-6">
+   267→            <div class="bg-slate-500 text-white font-bold text-sm px-4 py-1.5 rounded-md uppercase tracking-wide">Ideal Career Test Report</div>
+   268→            <div class="text-slate-600 font-semibold text-sm" id="repHeaderStudentName3">Student</div>
+   269→            <div class="text-slate-500 text-sm" id="repHeaderDate3">Date</div>
+   270→          </div>
+   271→          <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+   272→            <div class="bg-blue-50/50 p-5 rounded-2xl border border-blue-100 flex flex-col items-center">
+   273→              <h3 class="text-xl font-extrabold text-amber-600 mb-4 text-center">Career Motivator Breakdown</h3>
+   274→              <div class="w-64 h-64 relative"><canvas id="motivatorDoughnutChart"></canvas></div>
+   275→              <p class="text-[11px] text-slate-500 text-center mt-4">Visual breakdown of your internal drivers.</p>
+   276→            </div>
+   277→            <div class="space-y-4">
+   278→              <h2 class="text-2xl font-extrabold text-amber-600 tracking-tight">Aptitude Report</h2>
+   279→              <p class="text-xs text-slate-700 leading-relaxed">Aptitude means your natural ability to learn new skills or solve problems easily. While hard work is always needed, having a natural strength in a field makes your career journey smoother.</p>
+   280→              <p class="text-xs text-slate-700 leading-relaxed">By identifying your strongest aptitudes early, you can pick courses and job paths where you will naturally excel.</p>
+   281→              <div class="bg-amber-50 p-3 rounded-lg border border-amber-200 text-amber-800 text-xs font-semibold">Your scores across five key aptitude areas are detailed on the next page.</div>
+   282→            </div>
+   283→          </div>
+   284→        </div>
+   285→        <div class="pt-4 border-t border-slate-200 flex items-center justify-between text-xs text-slate-400">
+   286→          <span>Discover Ideal Career Assessment</span><span>Page 3 of 5</span>
+   287→        </div>
+   288→      </div>
+   289→
+   290→      <!-- PAGE 4: APTITUDE TABLE & CHART -->
+   291→      <div class="report-page flex flex-col justify-between">
+   292→        <div>
+   293→          <div class="flex items-center justify-between border-2 border-slate-700 rounded-xl px-4 py-2 mb-6">
+   294→            <div class="bg-slate-500 text-white font-bold text-sm px-4 py-1.5 rounded-md uppercase tracking-wide">Ideal Career Test Report</div>
+   295→            <div class="text-slate-600 font-semibold text-sm" id="repHeaderStudentName4">Student</div>
+   296→            <div class="text-slate-500 text-sm" id="repHeaderDate4">Date</div>
+   297→          </div>
+   298→          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+   299→            <div>
+   300→              <h2 class="text-xl font-extrabold text-amber-600 tracking-tight mb-3">Aptitude Scores for <span id="aptitudeStudentName">Student</span></h2>
+   301→              <div class="bg-blue-50/50 rounded-xl overflow-hidden border border-blue-100">
+   302→                <table class="w-full text-left border-collapse">
+   303→                  <thead>
+   304→                    <tr class="bg-slate-200 text-slate-800 text-xs uppercase font-extrabold border-b border-slate-300">
+   305→                      <th class="p-2.5 w-1/4">Aptitude</th>
+   306→                      <th class="p-2.5 w-1/2">Description</th>
+   307→                      <th class="p-2.5 w-1/4 text-center">Score</th>
+   308→                    </tr>
+   309→                  </thead>
+   310→                  <tbody class="divide-y divide-slate-200 text-xs text-slate-700">
+   311→                    <tr><td class="p-2.5 font-bold uppercase text-slate-800">Critical Reasoning</td><td class="p-2.5">Ability to think logically and solve complex situations.</td><td id="scoreCritical" class="p-2.5 text-center font-black text-amber-600 text-xl">0</td></tr>
+   312→                    <tr><td class="p-2.5 font-bold uppercase text-slate-800">Numerical Aptitude</td><td class="p-2.5">Ability to work quickly with numbers, math, and patterns.</td><td id="scoreNumerical" class="p-2.5 text-center font-black text-amber-600 text-xl">0</td></tr>
+   313→                    <tr><td class="p-2.5 font-bold uppercase text-slate-800">Verbal Aptitude</td><td class="p-2.5">Understanding vocabulary, reading, and language usage.</td><td id="scoreVerbal" class="p-2.5 text-center font-black text-amber-600 text-xl">0</td></tr>
+   314→                    <tr><td class="p-2.5 font-bold uppercase text-slate-800">Speed & Accuracy</td><td class="p-2.5">Comparing codes and details rapidly without mistakes.</td><td id="scoreAcuteness" class="p-2.5 text-center font-black text-amber-600 text-xl">0</td></tr>
+   315→                    <tr><td class="p-2.5 font-bold uppercase text-slate-800">Spatial Reasoning</td><td class="p-2.5">Understanding visual shapes, rotation, and patterns.</td><td id="scoreSpatial" class="p-2.5 text-center font-black text-amber-600 text-xl">0</td></tr>
+   316→                  </tbody>
+   317→                </table>
+   318→              </div>
+   319→            </div>
+   320→            <div class="flex flex-col justify-center bg-slate-50 p-4 rounded-xl border border-slate-200">
+   321→              <h3 class="text-lg font-bold text-slate-800 mb-3 text-center">Aptitude Score Comparison</h3>
+   322→              <div class="w-full h-72 relative"><canvas id="aptitudeBarChart"></canvas></div>
+   323→            </div>
+   324→          </div>
+   325→        </div>
+   326→        <div class="pt-4 border-t border-slate-200 flex items-center justify-between text-xs text-slate-400">
+   327→          <span>Discover Ideal Career Assessment</span><span>Page 4 of 5</span>
+   328→        </div>
+   329→      </div>
+   330→
+   331→      <!-- PAGE 5: RIASEC & PERSONALITY -->
+   332→      <div class="report-page flex flex-col justify-between">
+   333→        <div>
+   334→          <div class="flex items-center justify-between border-2 border-slate-700 rounded-xl px-4 py-2 mb-6">
+   335→            <div class="bg-slate-500 text-white font-bold text-sm px-4 py-1.5 rounded-md uppercase tracking-wide">Ideal Career Test Report</div>
+   336→            <div class="text-slate-600 font-semibold text-sm" id="repHeaderStudentName5">Student</div>
+   337→            <div class="text-slate-500 text-sm" id="repHeaderDate5">Date</div>
+   338→          </div>
+   339→          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+   340→            <div class="space-y-4">
+   341→              <h2 class="text-xl font-extrabold text-amber-600 tracking-tight">Holland Code Interest Profile</h2>
+   342→              <div class="w-full h-56 relative bg-slate-50 p-2 rounded-xl border border-slate-200"><canvas id="interestBarChart"></canvas></div>
+   343→              <div class="bg-blue-50/50 rounded-xl p-3 border border-blue-100 text-[11px] space-y-1.5">
+   344→                <div><strong class="text-blue-900">REALISTIC (R):</strong> Working with hands, tools, and outdoor tasks.</div>
+   345→                <div><strong class="text-blue-900">INVESTIGATIVE (I):</strong> Science, research, logic, and solving mysteries.</div>
+   346→                <div><strong class="text-blue-900">ARTISTIC (A):</strong> Creativity, design, writing, and self-expression.</div>
+   347→                <div><strong class="text-blue-900">SOCIAL (S):</strong> Teaching, counseling, and helping people.</div>
+   348→                <div><strong class="text-blue-900">ENTERPRISING (E):</strong> Leadership, business, and public speaking.</div>
+   349→                <div><strong class="text-blue-900">CONVENTIONAL (C):</strong> Organization, finance, and managing details.</div>
+   350→              </div>
+   351→            </div>
+   352→            <div class="space-y-4">
+   353→              <h2 class="text-xl font-extrabold text-amber-600 tracking-tight">Personality Summary</h2>
+   354→              <div class="bg-amber-50 border border-amber-200 p-3.5 rounded-xl text-amber-900 font-bold text-sm leading-snug">Profile Summary: <span id="personalitySummaryText">Analytical + Creative</span></div>
+   355→              <div class="bg-emerald-50/70 border border-emerald-200 p-4 rounded-xl space-y-2">
+   356→                <h4 class="text-xs font-bold text-emerald-900 uppercase tracking-wide flex items-center gap-1.5"><i class="fa-solid fa-star text-amber-500"></i> YOUR KEY STRENGTHS:</h4>
+   357→                <ul id="shineList" class="text-xs text-emerald-900 space-y-1 font-semibold pl-2"></ul>
+   358→              </div>
+   359→              <div class="bg-rose-50/70 border border-rose-200 p-4 rounded-xl space-y-2">
+   360→                <h4 class="text-xs font-bold text-rose-900 uppercase tracking-wide flex items-center gap-1.5"><i class="fa-solid fa-bullseye text-rose-600"></i> AREAS TO DEVELOP:</h4>
+   361→                <ul id="workOnList" class="text-xs text-rose-900 space-y-1 font-semibold pl-2"></ul>
+   362→              </div>
+   363→            </div>
+   364→          </div>
+   365→        </div>
+   366→        <div class="pt-4 border-t border-slate-200 flex items-center justify-between text-xs text-slate-400">
+   367→          <span>Discover Ideal Career Assessment</span><span>Page 5 of 5</span>
+   368→        </div>
+   369→      </div>
+   370→    </div>
+   371→  </div>
+   372→</main>
+   373→
+   374→<!-- ADMIN / EDIT MODAL -->
+   375→<div id="adminModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden no-print">
+   376→  <div class="bg-white rounded-2xl shadow-2xl max-w-xl w-full mx-4 overflow-hidden border border-slate-200">
+   377→    <div class="bg-[#3B6990] text-white p-4 px-6 flex items-center justify-between">
+   378→      <div class="flex items-center space-x-2"><i class="fa-solid fa-shield-halved text-amber-400 text-lg"></i><h3 class="font-bold text-lg">Super User Report Editor</h3></div>
+   379→      <button onclick="closeAdminModal()" class="text-blue-200 hover:text-white transition"><i class="fa-solid fa-xmark text-xl"></i></button>
+   380→    </div>
+   381→    <div id="adminPinState" class="p-6 space-y-4">
+   382→      <p class="text-xs text-slate-600">Enter PIN to edit report details, student info, and score overrides.</p>
+   383→      <div>
+   384→        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Access PIN (Default: 1234)</label>
+   385→        <input type="password" id="adminPinInput" placeholder="Enter PIN..." class="w-full border border-slate-300 rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+   386→      </div>
+   387→      <div id="pinErrorMsg" class="text-xs text-rose-600 font-semibold hidden">Incorrect PIN. Please try again.</div>
+   388→      <div class="flex justify-end gap-3 pt-2">
+   389→        <button onclick="closeAdminModal()" class="px-4 py-2 bg-slate-100 text-slate-700 text-sm font-semibold rounded-xl">Cancel</button>
+   390→        <button onclick="verifyAdminPin()" class="px-5 py-2 bg-blue-600 text-white text-sm font-bold rounded-xl shadow">Authenticate</button>
+   391→      </div>
+   392→    </div>
+   393→    <div id="adminFormState" class="p-6 space-y-4 max-h-[75vh] overflow-y-auto hidden">
+   394→      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+   395→        <div><label class="block text-xs font-bold text-slate-700 mb-1">Student Full Name</label><input type="text" id="adminName" class="w-full border border-slate-300 rounded-lg px-3 py-1.5 text-sm"></div>
+   396→        <div><label class="block text-xs font-bold text-slate-700 mb-1">Phone Number</label><input type="text" id="adminPhone" class="w-full border border-slate-300 rounded-lg px-3 py-1.5 text-sm"></div>
+   397→        <div><label class="block text-xs font-bold text-slate-700 mb-1">Email Address</label><input type="email" id="adminEmail" class="w-full border border-slate-300 rounded-lg px-3 py-1.5 text-sm"></div>
+   398→        <div><label class="block text-xs font-bold text-slate-700 mb-1">Assessment Date</label><input type="text" id="adminDate" class="w-full border border-slate-300 rounded-lg px-3 py-1.5 text-sm"></div>
+   399→      </div>
+   400→      <div><label class="block text-xs font-bold text-slate-700 mb-1">Logo Image URL</label><input type="text" id="adminLogoUrl" class="w-full border border-slate-300 rounded-lg px-3 py-1.5 text-sm"></div>
+   401→      <div class="border-t border-slate-200 pt-4">
+   402→        <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wide mb-3">Score Overrides (0-10)</h4>
+   403→        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
+   404→          <div><label class="block text-slate-600 mb-1">Critical Reasoning</label><input type="number" id="admScoreCritical" min="0" max="10" class="w-full border border-slate-300 rounded-lg px-2.5 py-1"></div>
+   405→          <div><label class="block text-slate-600 mb-1">Numerical Aptitude</label><input type="number" id="admScoreNumerical" min="0" max="10" class="w-full border border-slate-300 rounded-lg px-2.5 py-1"></div>
+   406→          <div><label class="block text-slate-600 mb-1">Verbal Aptitude</label><input type="number" id="admScoreVerbal" min="0" max="10" class="w-full border border-slate-300 rounded-lg px-2.5 py-1"></div>
+   407→          <div><label class="block text-slate-600 mb-1">Speed & Accuracy</label><input type="number" id="admScoreAcuteness" min="0" max="10" class="w-full border border-slate-300 rounded-lg px-2.5 py-1"></div>
+   408→          <div><label class="block text-slate-600 mb-1">Spatial Reasoning</label><input type="number" id="admScoreSpatial" min="0" max="10" class="w-full border border-slate-300 rounded-lg px-2.5 py-1"></div>
+   409→        </div>
+   410→      </div>
+   411→      <div class="flex justify-end gap-3 pt-3 border-t border-slate-200">
+   412→        <button onclick="closeAdminModal()" class="px-4 py-2 bg-slate-100 text-slate-700 text-sm font-semibold rounded-xl">Cancel</button>
+   413→        <button onclick="saveAdminChanges()" class="px-5 py-2 bg-emerald-600 text-white text-sm font-bold rounded-xl shadow">Save & Apply</button>
+   414→      </div>
+   415→    </div>
+   416→  </div>
+   417→</div>
+   418→
+   419→<script>
+   420→// ============ STATE ============
+   421→const state = {
+   422→  isAdminAuthenticated: false,
+   423→  currentView: 'test',
+   424→  currentSectionIdx: 1,
+   425→  student: { name: 'Student Name', phone: '+91 98765 43210', email: 'student@example.com', date: new Date().toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' }), logoUrl: 'https://placehold.co/140x45/3B6990/ffffff?text=Ideal+Tech' },
+   426→  scores: { critical: 0, numerical: 0, verbal: 0, acuteness: 0, spatial: 0 },
+   427→  motivators: { money: 0, freedom: 0, stability: 0, leisure: 0, service: 0, variety: 0, leadership: 0, respect: 0, challenge: 0, interest: 0 },
+   428→  riasec: { R: 0, I: 0, A: 0, S: 0, E: 0, C: 0 },
+   429→  bigFive: { openness: 0, conscientiousness: 0, extraversion: 0, agreeableness: 0, stability: 0 },
+   430→  answers: {}
+   431→};
+   432→
+   433→const sections = [
+   434→  { id: 0, name: 'START', icon: 'fa-play' },
+   435→  { id: 1, name: 'SELF IDENTIFICATION', icon: 'fa-user-check' },
+   436→  { id: 2, name: 'WORK SITUATIONS', icon: 'fa-briefcase' },
+   437→  { id: 3, name: 'INCOMPLETE SEQUENCE', icon: 'fa-arrow-right-1-2' },
+   438→  { id: 4, name: 'IDENTICAL CODES', icon: 'fa-barcode' },
+   439→  { id: 5, name: 'LOGICAL SCENARIOS', icon: 'fa-brain' },
+   440→  { id: 6, name: 'IMPORTANT FACTOR', icon: 'fa-list-check' },
+   441→  { id: 7, name: 'SITUATIONAL EXPLORATION', icon: 'fa-compass' }
+   442→];
+   443→
+   444→// ============ QUESTION BANK (Simplified English & Clear Textual Items) ============
+   445→const questionBank = {
+   446→  // SECTION 1: SELF IDENTIFICATION
+   447→  1: [
+   448→    { id:'q1', num:1, text:'Do you prefer going to a party over staying quietly at home?', options:['Yes','No'], scoring:{bigFive:{extraversion:{Yes:1,No:0}}} },
+   449→    { id:'q2', num:2, text:'Is it important to you that people around you respect and like you?', options:['Yes','No'], scoring:{bigFive:{agreeableness:{Yes:1,No:0}}} },
+   450→    { id:'q3', num:3, text:'Do you quickly offer help or advice when someone asks for it?', options:['Yes','No'], scoring:{bigFive:{conscientiousness:{Yes:1,No:0}}} },
+   451→    { id:'q4', num:4, text:'Would your friends describe you as talkative and friendly?', options:['Yes','No'], scoring:{bigFive:{extraversion:{Yes:1,No:0}}} },
+   452→    { id:'q5', num:5, text:'Do you enjoy lighthearted pranks or funny jokes?', options:['Yes','No'], scoring:{bigFive:{extraversion:{Yes:1,No:0}}} },
+   453→    { id:'q6', num:6, text:'Do you like starting conversations with people you do not know well?', options:['Yes','No'], scoring:{bigFive:{extraversion:{Yes:1,No:0}}} },
+   454→    { id:'q7', num:7, text:'Does it upset you if someone cuts in line in front of you?', options:['Yes','No'], scoring:{bigFive:{agreeableness:{Yes:0,No:1}}} },
+   455→    { id:'q8', num:8, text:'Would you speak up if someone breaks a clear rule in public?', options:['Yes','No'], scoring:{bigFive:{conscientiousness:{Yes:1,No:0}}} },
+   456→    { id:'q9', num:9, text:'Do you usually complete your work without making a plan in advance?', options:['Yes','No'], scoring:{bigFive:{conscientiousness:{Yes:0,No:1}}} },
+   457→    { id:'q10', num:10, text:'Do you enjoy organizing trips or meetups for your group of friends?', options:['Yes','No'], scoring:{bigFive:{extraversion:{Yes:1,No:0}}} },
+   458→    { id:'q11', num:11, text:'Do you easily get deeply focused while watching TV or videos?', options:['Yes','No'], scoring:{bigFive:{openness:{Yes:0,No:1}}} },
+   459→    { id:'q12', num:12, text:'Do you work better when you are part of a team rather than working alone?', options:['Yes','No'], scoring:{riasec:{S:{Yes:1,No:0}}} },
+   460→    { id:'q13', num:13, text:'Are you usually the first person at home to answer the phone or door?', options:['Yes','No'], scoring:{bigFive:{extraversion:{Yes:1,No:0}}} },
+   461→    { id:'q14', num:14, text:'Do you share your feelings easily with your family and close friends?', options:['Yes','No'], scoring:{bigFive:{agreeableness:{Yes:1,No:0}}} },
+   462→    { id:'q15', num:15, text:'Do you often make decisions quickly based on your instincts?', options:['Yes','No'], scoring:{bigFive:{openness:{Yes:1,No:0}}} },
+   463→    { id:'q16', num:16, text:'Do you express your emotions openly when you feel happy or upset?', options:['Yes','No'], scoring:{bigFive:{stability:{Yes:0,No:1}}} },
+   464→    { id:'q17', num:17, text:'Do you prefer a flexible daily routine instead of a strict schedule?', options:['Yes','No'], scoring:{bigFive:{conscientiousness:{Yes:0,No:1}}} },
+   465→    { id:'q18', num:18, text:'Does doing experiments in a science laboratory sound uninteresting to you?', options:['Yes','No'], scoring:{riasec:{I:{Yes:0,No:1}}} },
+   466→    { id:'q19', num:19, text:'Are Math and Science among your least favorite school subjects?', options:['Yes','No'], scoring:{riasec:{I:{Yes:0,No:1}}} },
+   467→    { id:'q20', num:20, text:'Do you gladly accept responsibilities given to you at home or school?', options:['Yes','No'], scoring:{bigFive:{conscientiousness:{Yes:1,No:0}}} },
+   468→    { id:'q21', num:21, text:'Do you enjoy reading stories, writing, or trying creative arts?', options:['Yes','No'], scoring:{riasec:{A:{Yes:1,No:0}}} },
+   469→    { id:'q22', num:22, text:'Is it easy for you to admit when you are feeling sad or worried?', options:['Yes','No'], scoring:{bigFive:{agreeableness:{Yes:1,No:0}}} },
+   470→    { id:'q23', num:23, text:'Are your daily choices driven mostly by your heart rather than logic?', options:['Yes','No'], scoring:{bigFive:{stability:{Yes:0,No:1}}} },
+   471→    { id:'q24', num:24, text:'Does your mood change quickly throughout the day?', options:['Yes','No'], scoring:{bigFive:{stability:{Yes:0,No:1}}} },
+   472→    { id:'q25', num:25, text:'Is making new friends a simple and natural process for you?', options:['Yes','No'], scoring:{bigFive:{extraversion:{Yes:1,No:0}}} },
+   473→    { id:'q26', num:26, text:'Are you comfortable talking about personal feelings in group discussions?', options:['Yes','No'], scoring:{bigFive:{extraversion:{Yes:1,No:0}}} },
+   474→    { id:'q27', num:27, text:'Do you enjoy thinking about creative ideas, art, or literature?', options:['Yes','No'], scoring:{riasec:{A:{Yes:1,No:0}}} },
+   475→    { id:'q28', num:28, text:'Do you usually finish school projects right before the deadline?', options:['Yes','No'], scoring:{bigFive:{conscientiousness:{Yes:0,No:1}}} }
+   476→  ],
+   477→
+   478→  // SECTION 2: WORK SITUATIONS
+   479→  2: [
+   480→    { id:'q29', num:29, text:'Would you enjoy a career writing articles for newspapers or online magazines?', options:['Yes, I would love to','Maybe','Never'], scoring:{riasec:{A:{'Yes, I would love to':2,'Maybe':1,'Never':0}}} },
+   481→    { id:'q30', num:30, text:'Would you enjoy managing the daily operations of a company or business?', options:['Yes, I would love to','Maybe','Never'], scoring:{riasec:{E:{'Yes, I would love to':2,'Maybe':1,'Never':0}}} },
+   482→    { id:'q31', num:31, text:'Would you enjoy writing investigative reports on current world issues?', options:['Yes, I would love to','Maybe','Never'], scoring:{riasec:{I:{'Yes, I would love to':2,'Maybe':1,'Never':0}}} },
+   483→    { id:'q32', num:32, text:'Would you enjoy performing on stage in plays, theater, or movies?', options:['Yes, I would love to','Maybe','Never'], scoring:{riasec:{A:{'Yes, I would love to':2,'Maybe':1,'Never':0}}} },
+   484→    { id:'q33', num:33, text:'Would you enjoy designing modern clothes or fashion collections?', options:['Yes, I would love to','Maybe','Never'], scoring:{riasec:{A:{'Yes, I would love to':2,'Maybe':1,'Never':0}}} },
+   485→    { id:'q34', num:34, text:'Would you enjoy playing sports professionally as part of an official team?', options:['Yes, I would love to','Maybe','Never'], scoring:{riasec:{R:{'Yes, I would love to':2,'Maybe':1,'Never':0}}} },
+   486→    { id:'q35', num:35, text:'Would you enjoy repairing electrical tools or fixing broken machinery?', options:['Yes, I would love to','Maybe','Never'], scoring:{riasec:{R:{'Yes, I would love to':2,'Maybe':1,'Never':0}}} },
+   487→    { id:'q36', num:36, text:'Would you enjoy running community programs to support people in need?', options:['Yes, I would love to','Maybe','Never'], scoring:{riasec:{S:{'Yes, I would love to':2,'Maybe':1,'Never':0}}} },
+   488→    { id:'q37', num:37, text:'Would you enjoy investigating crime scenes and searching for scientific evidence?', options:['Yes, I would love to','Maybe','Never'], scoring:{riasec:{I:{'Yes, I would love to':2,'Maybe':1,'Never':0}}} },
+   489→    { id:'q38', num:38, text:'Would you enjoy speaking in public to persuade people to donate to charity?', options:['Yes, I would love to','Maybe','Never'], scoring:{riasec:{E:{'Yes, I would love to':2,'Maybe':1,'Never':0}}} },
+   490→    { id:'q39', num:39, text:'Would you enjoy writing software programs or creating mobile applications?', options:['Yes, I would love to','Maybe','Never'], scoring:{riasec:{I:{'Yes, I would love to':2,'Maybe':1,'Never':0}}} },
+   491→    { id:'q40', num:40, text:'Would you enjoy teaching and guiding young students in a classroom?', options:['Yes, I would love to','Maybe','Never'], scoring:{riasec:{S:{'Yes, I would love to':2,'Maybe':1,'Never':0}}} },
+   492→    { id:'q41', num:41, text:'Would you enjoy studying ancient history and translating old manuscripts?', options:['Yes, I would love to','Maybe','Never'], scoring:{riasec:{I:{'Yes, I would love to':2,'Maybe':1,'Never':0}}} },
+   493→    { id:'q42', num:42, text:'Would you enjoy caring for sick or injured patients in a hospital?', options:['Yes, I would love to','Maybe','Never'], scoring:{riasec:{S:{'Yes, I would love to':2,'Maybe':1,'Never':0}}} },
+   494→    { id:'q43', num:43, text:'Would you enjoy editing articles and reviewing books for publication?', options:['Yes, I would love to','Maybe','Never'], scoring:{riasec:{A:{'Yes, I would love to':2,'Maybe':1,'Never':0}}} },
+   495→    { id:'q44', num:44, text:'Would you enjoy operating heavy construction equipment or industrial machines?', options:['Yes, I would love to','Maybe','Never'], scoring:{riasec:{R:{'Yes, I would love to':2,'Maybe':1,'Never':0}}} },
+   496→    { id:'q45', num:45, text:'Would you enjoy decorating room interiors and painting artistic murals?', options:['Yes, I would love to','Maybe','Never'], scoring:{riasec:{A:{'Yes, I would love to':2,'Maybe':1,'Never':0}}} },
+   497→    { id:'q46', num:46, text:'Would you enjoy serving in the military or border security forces?', options:['Yes, I would love to','Maybe','Never'], scoring:{riasec:{R:{'Yes, I would love to':2,'Maybe':1,'Never':0}}} },
+   498→    { id:'q47', num:47, text:'Would you enjoy working as a counselor to support people through personal problems?', options:['Yes, I would love to','Maybe','Never'], scoring:{riasec:{S:{'Yes, I would love to':2,'Maybe':1,'Never':0}}} },
+   499→    { id:'q48', num:48, text:'Would you enjoy joining a scientific space mission to explore other planets?', options:['Yes, I would love to','Maybe','Never'], scoring:{riasec:{I:{'Yes, I would love to':2,'Maybe':1,'Never':0}}} },
+   500→    { id:'q49', num:49, text:'Would you enjoy leading a project team to deliver business results?', options:['Yes, I would love to','Maybe','Never'], scoring:{riasec:{E:{'Yes, I would love to':2,'Maybe':1,'Never':0}}} },
+
+[showing lines 1-500 of 1019; use offset=501 with limit to continue reading]
