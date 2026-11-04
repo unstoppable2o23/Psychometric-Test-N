@@ -50,6 +50,8 @@ export const api = {
   adminCreateStudent: (body: any) => req('/api/admin/students', { method: 'POST', body: JSON.stringify(body) }),
   adminStudent: (id: string) => req<{ student: any }>(`/api/admin/students/${id}`),
   adminUpdateStudent: (id: string, body: any) => req(`/api/admin/students/${id}`, { method: 'PATCH', body: JSON.stringify(body) }),
+  resetStudentPassword: (id: string, password: string) =>
+    req(`/api/students/${id}/reset-password`, { method: 'POST', body: JSON.stringify({ password }) }),
   adminAssign: (body: { studentIds: string[]; assessmentIds: string[] }) => req('/api/admin/assign', { method: 'POST', body: JSON.stringify(body) }),
   adminAssignments: () => req<{ assignments: any[] }>('/api/admin/assign'),
   adminReports: () => req<{ reports: any[] }>('/api/admin/reports'),

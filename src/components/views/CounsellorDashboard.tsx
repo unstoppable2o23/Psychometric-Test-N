@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { ResetPasswordDialog } from '@/components/ResetPasswordDialog'
 import { Users, FileText, BookOpen, Download, Eye, Stethoscope } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -77,9 +78,9 @@ function StudentsTab() {
   return (
     <div className="rounded-xl border border-slate-200 overflow-hidden bg-white">
       <table className="w-full text-sm">
-        <thead className="bg-slate-50 text-slate-600 text-xs uppercase"><tr><th className="text-left px-4 py-3 font-semibold">Name</th><th className="text-left px-4 py-3 font-semibold">Email</th><th className="text-left px-4 py-3 font-semibold hidden sm:table-cell">Phone</th></tr></thead>
+        <thead className="bg-slate-50 text-slate-600 text-xs uppercase"><tr><th className="text-left px-4 py-3 font-semibold">Name</th><th className="text-left px-4 py-3 font-semibold hidden sm:table-cell">Email</th><th className="text-left px-4 py-3 font-semibold hidden md:table-cell">Phone</th><th className="text-right px-4 py-3 font-semibold">Actions</th></tr></thead>
         <tbody className="divide-y divide-slate-100">
-          {students.map((s: any) => (<tr key={s.id} className="hover:bg-slate-50"><td className="px-4 py-3 font-medium text-slate-800">{s.name}</td><td className="px-4 py-3 text-slate-600">{s.email}</td><td className="px-4 py-3 text-slate-600 hidden sm:table-cell">{s.phone}</td></tr>))}
+          {students.map((s: any) => (<tr key={s.id} className="hover:bg-slate-50"><td className="px-4 py-3 font-medium text-slate-800">{s.name}</td><td className="px-4 py-3 text-slate-600 hidden sm:table-cell">{s.email}</td><td className="px-4 py-3 text-slate-600 hidden md:table-cell">{s.phone || '—'}</td><td className="px-4 py-3 text-right"><ResetPasswordDialog studentId={s.id} studentName={s.name} /></td></tr>))}
         </tbody>
       </table>
     </div>

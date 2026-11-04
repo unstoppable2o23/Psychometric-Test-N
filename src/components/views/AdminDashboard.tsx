@@ -12,6 +12,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from '@/components/ui/dialog'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Checkbox } from '@/components/ui/checkbox'
+import { ResetPasswordDialog } from '@/components/ResetPasswordDialog'
 import { Users, FileText, ClipboardList, Stethoscope, Activity, ShieldCheck, UserPlus, Download, Search, BookOpen, Award } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -129,7 +130,10 @@ function StudentsTab() {
                     <td className="px-4 py-3 text-slate-600 hidden sm:table-cell">{s.email}</td>
                     <td className="px-4 py-3 text-slate-600 hidden md:table-cell">{s.phone}</td>
                     <td className="px-4 py-3"><Badge variant={s.isActive ? 'default' : 'secondary'} className={s.isActive ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-100' : ''}>{s.isActive ? 'Active' : 'Inactive'}</Badge></td>
-                    <td className="px-4 py-3 text-right"><Button size="sm" variant="ghost" onClick={() => toggleActive(s)} className="text-xs">{s.isActive ? 'Deactivate' : 'Activate'}</Button></td>
+                    <td className="px-4 py-3 text-right whitespace-nowrap">
+                      <Button size="sm" variant="ghost" onClick={() => toggleActive(s)} className="text-xs">{s.isActive ? 'Deactivate' : 'Activate'}</Button>
+                      <ResetPasswordDialog studentId={s.id} studentName={s.name} />
+                    </td>
                   </tr>
                 ))}
               </tbody>
