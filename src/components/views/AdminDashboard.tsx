@@ -13,7 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogT
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Checkbox } from '@/components/ui/checkbox'
 import { ResetPasswordDialog } from '@/components/ResetPasswordDialog'
-import { Users, FileText, ClipboardList, Stethoscope, Activity, ShieldCheck, UserPlus, Download, Search, BookOpen, Award } from 'lucide-react'
+import { Users, FileText, ClipboardList, Stethoscope, Activity, ShieldCheck, UserPlus, Download, Search, BookOpen, Award, Ticket } from 'lucide-react'
 import { toast } from 'sonner'
 
 export function AdminDashboard() {
@@ -25,12 +25,13 @@ export function AdminDashboard() {
         <p className="text-slate-500 mt-1">Manage students, assessments, reports and counsellors.</p>
       </div>
       <Tabs value={tab} onValueChange={setTab}>
-        <TabsList className="grid grid-cols-2 sm:grid-cols-6 w-full mb-6 h-auto">
+        <TabsList className="grid grid-cols-3 sm:grid-cols-7 w-full mb-6 h-auto">
           <TabsTrigger value="overview" className="text-xs gap-1.5 py-2"><Activity className="w-4 h-4" /> Overview</TabsTrigger>
           <TabsTrigger value="students" className="text-xs gap-1.5 py-2"><Users className="w-4 h-4" /> Students</TabsTrigger>
           <TabsTrigger value="assign" className="text-xs gap-1.5 py-2"><ClipboardList className="w-4 h-4" /> Assign</TabsTrigger>
           <TabsTrigger value="reports" className="text-xs gap-1.5 py-2"><FileText className="w-4 h-4" /> Reports</TabsTrigger>
           <TabsTrigger value="counsellors" className="text-xs gap-1.5 py-2"><Stethoscope className="w-4 h-4" /> Counsellors</TabsTrigger>
+          <TabsTrigger value="allocations" className="text-xs gap-1.5 py-2"><Ticket className="w-4 h-4" /> Allocs</TabsTrigger>
           <TabsTrigger value="audit" className="text-xs gap-1.5 py-2"><BookOpen className="w-4 h-4" /> Audit</TabsTrigger>
         </TabsList>
         <TabsContent value="overview"><OverviewTab /></TabsContent>
@@ -38,6 +39,7 @@ export function AdminDashboard() {
         <TabsContent value="assign"><AssignTab /></TabsContent>
         <TabsContent value="reports"><ReportsTab /></TabsContent>
         <TabsContent value="counsellors"><CounsellorsTab /></TabsContent>
+        <TabsContent value="allocations"><AllocationsTab /></TabsContent>
         <TabsContent value="audit"><AuditTab /></TabsContent>
       </Tabs>
     </div>
@@ -403,6 +405,108 @@ function AuditTab() {
         </div>
       </CardContent>
     </Card>
+  )
+}
+
+function AllocationsTab() {
+  const [allocations, setAllocations] = useState<any[]>([])
+  const [counsellors, setCounsellors] = useState<any[]>([])
+  const [assessments, setAssessments] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [selCounsellor, setSelCounsellor] = useState('')
+  const [selAssessment, setSelAssessment] = useState('')
+  const [qty, setQty] = useState('10')
+  const [busy, setBusy] = useState(false)
+
+  const load = async () => {
+    setLoading(true)
+    try {
+      const [a, c, asg] = await Promise.all([api.adminAllocations(), api.adminCounsellors(), api.assessments()])
+      setAllocations(a.allocations); setCounsellors(c.counsellors); setAssessments(asg.assessments)
+    } catch (e: any) { toast.error(e.message) }
+    finally { setLoading(false) }
+  }
+  useEffect(() => { load() }, [])
+
+  async function setAllocation() {
+    if (!selCounsellor || !selAssessment) return toast.error('Select a counsellor and an assessment')
+    const n = parseInt(qty, 10)
+    if (isNaN(n) || n < 0) return toast.error('Enter a valid quantity')
+    setBusy(true)
+    try { await api.adminSetAllocation({ counsellorId: selCounsellor, assessmentId: selAssessment, quantity: n }); toast.success(`Allocation set: ${n} credits`); load() } catch (e: any) { toast.error(e.message) }
+    finally { setBusy(false) }
+  }
+
+  async function removeAlloc(id: string) {
+    try { await api.adminDeleteAllocation(id); toast.success('Allocation removed'); load() } catch (e: any) { toast.error(e.message) }
+  }
+
+  return (
+    <div className="space-y-5">
+      <Card className="border-slate-200">
+        <CardHeader><CardTitle className="text-sm flex items-center gap-2"><Ticket className="w-4 h-4 text-teal-600" /> Allocate Test Credits to a Counsellor</CardTitle></CardHeader>
+        <CardContent className="grid sm:grid-cols-4 gap-3 items-end">
+          <div className="space-y-1.5">
+            <Label>Counsellor</Label>
+            <Select value={selCounsellor} onValueChange={setSelCounsellor}>
+              <SelectTrigger><SelectValue placeholder="Select counsellor…" /></SelectTrigger>
+              <SelectContent>{counsellors.map((c) => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}</SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-1.5">
+            <Label>Assessment</Label>
+            <Select value={selAssessment} onValueChange={setSelAssessment}>
+              <SelectTrigger><SelectValue placeholder="Select test…" /></SelectTrigger>
+              <SelectContent>{assessments.map((a) => <SelectItem key={a.id} value={a.id}>{a.title}</SelectItem>)}</SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-1.5">
+            <Label>Quantity (credits)</Label>
+            <Input type="number" min={0} value={qty} onChange={(e) => setQty(e.target.value)} />
+          </div>
+          <Button onClick={setAllocation} disabled={busy} className="bg-teal-600 hover:bg-teal-700"><Ticket className="w-4 h-4" /> Set Allocation</Button>
+        </CardContent>
+      </Card>
+
+      {loading ? <Skeletons n={3} /> : allocations.length === 0 ? (
+        <Card className="border-dashed"><CardContent className="py-10 text-center text-slate-500">No allocations yet. Allocate test credits to counsellors above.</CardContent></Card>
+      ) : (
+        <Card className="border-slate-200">
+          <CardHeader><CardTitle className="text-sm">All Allocations & Usage</CardTitle></CardHeader>
+          <CardContent className="p-0">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-slate-50 text-slate-600 text-xs uppercase"><tr>
+                  <th className="text-left px-4 py-3 font-semibold">Counsellor</th>
+                  <th className="text-left px-4 py-3 font-semibold hidden sm:table-cell">Test</th>
+                  <th className="text-center px-4 py-3 font-semibold">Allocated</th>
+                  <th className="text-center px-4 py-3 font-semibold">Used</th>
+                  <th className="text-center px-4 py-3 font-semibold">Available</th>
+                  <th className="text-right px-4 py-3 font-semibold">Actions</th>
+                </tr></thead>
+                <tbody className="divide-y divide-slate-100">
+                  {allocations.map((a) => {
+                    const avail = a.quantity - a.used
+                    return (
+                      <tr key={a.id} className="hover:bg-slate-50">
+                        <td className="px-4 py-3 font-medium text-slate-800">{a.counsellor.name}</td>
+                        <td className="px-4 py-3 text-slate-600 hidden sm:table-cell">{a.assessment.title}</td>
+                        <td className="px-4 py-3 text-center font-semibold text-slate-700">{a.quantity}</td>
+                        <td className="px-4 py-3 text-center text-amber-600 font-medium">{a.used}</td>
+                        <td className="px-4 py-3 text-center"><Badge variant="outline" className={avail > 0 ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-100 text-slate-400'}>{avail}</Badge></td>
+                        <td className="px-4 py-3 text-right">
+                          <Button size="sm" variant="ghost" className="text-xs text-rose-500 hover:text-rose-700" onClick={() => removeAlloc(a.id)} disabled={a.used > 0}>{a.used > 0 ? 'In use' : 'Remove'}</Button>
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+    </div>
   )
 }
 

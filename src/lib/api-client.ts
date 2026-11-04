@@ -68,6 +68,14 @@ export const api = {
   counsellorDashboard: () => req<any>('/api/counsellor/dashboard'),
   counsellorManuals: () => req<{ manuals: any[] }>('/api/counsellor/manuals'),
   counsellorManual: (assessmentId: string) => req<{ manual: any }>(`/api/counsellor/manuals/${assessmentId}`),
+  counsellorAllocations: () => req<{ allocations: any[]; totalAllocated: number; totalUsed: number; totalAvailable: number }>('/api/counsellor/allocations'),
+  counsellorAssign: (body: { studentId: string; assessmentId: string }) =>
+    req<{ assignmentId: string; token: string; testUrl: string; alreadyAssigned?: boolean }>('/api/counsellor/assign', { method: 'POST', body: JSON.stringify(body) }),
+  counsellorAssignments: () => req<{ assignments: any[] }>('/api/counsellor/assignments'),
+  adminAllocations: () => req<{ allocations: any[] }>('/api/admin/allocations'),
+  adminSetAllocation: (body: { counsellorId: string; assessmentId: string; quantity: number }) =>
+    req('/api/admin/allocations', { method: 'POST', body: JSON.stringify(body) }),
+  adminDeleteAllocation: (id: string) => req(`/api/admin/allocations/${id}`, { method: 'DELETE' }),
 
   // reports
   report: (id: string) => req<{ report: any }>(`/api/reports/${id}`),

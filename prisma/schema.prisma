@@ -42,6 +42,7 @@ model User {
   counsellorStudents     CounsellorStudent[]  @relation("CounsellorSide")
   studentUnderCounsellor CounsellorStudent[]  @relation("StudentSide")
   counsellorReports      CounsellorReportAccess[]
+  counsellorAllocations  CounsellorAllocation[]
   auditLogs              AuditLog[]
 }
 
@@ -80,6 +81,7 @@ model Assessment {
   attempts   Attempt[]
   reports    Report[]
   manuals    InterpretationManual[]
+  allocations CounsellorAllocation[]
 }
 
 model Question {
@@ -240,6 +242,25 @@ model CounsellorReportAccess {
   counsellor User   @relation(fields: [counsellorId], references: [id])
   report    Report  @relation(fields: [reportId], references: [id], onDelete: Cascade)
 
+  @@index([counsellorId])
+}
+
+// ---------------------------------------------------------------------------
+// COUNSELLOR TEST ALLOCATIONS (credit pool per counsellor per assessment)
+// ---------------------------------------------------------------------------
+model CounsellorAllocation {
+  id           String   @id @default(cuid())
+  counsellorId String
+  assessmentId String
+  quantity     Int      // total credits allocated
+  used         Int      @default(0) // credits consumed by assignments
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  counsellor User       @relation(fields: [counsellorId], references: [id], onDelete: Cascade)
+  assessment Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+
+  @@unique([counsellorId, assessmentId])
   @@index([counsellorId])
 }
 
