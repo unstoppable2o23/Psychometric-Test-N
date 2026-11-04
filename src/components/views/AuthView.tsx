@@ -75,10 +75,6 @@ function Landing({ onGetStarted, onSignIn }: { onGetStarted: () => void; onSignI
             </div>
           ))}
         </div>
-
-        <div className="mt-12 text-xs text-slate-400">
-          Default admin: <button onClick={onSignIn} className="font-mono text-teal-600 hover:underline">admin@psychometric.test / Admin@123</button>
-        </div>
       </section>
     </div>
   )
