@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Server-side A4 psychometric report PDF generator (ReportLab + matplotlib).
+Server-side A4 psychometric report PDF generator (pure ReportLab, no external dependencies).
 Called from the Next.js API route via child_process.
 
 Usage:
@@ -22,12 +22,8 @@ Input JSON shape:
   }
 }
 """
-import sys, os, json, tempfile
+import sys, os, json
 from datetime import datetime
-
-import matplotlib
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt
 
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import mm
@@ -36,9 +32,10 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.enums import TA_LEFT, TA_CENTER, TA_RIGHT
 from reportlab.platypus import (
     BaseDocTemplate, PageTemplate, Frame, Paragraph, Spacer, Table, TableStyle,
-    Image, PageBreak, KeepTogether,
+    PageBreak, KeepTogether,
 )
 from reportlab.pdfgen import canvas
+from reportlab.graphics.shapes import Drawing, Rect, String, Line
 
 # --- Palette (professional, non-indigo/blue-primary) -----------------------
 NAVY = colors.HexColor("#0F2A43")
@@ -56,45 +53,39 @@ MARGIN = 18 * mm
 CONTENT_W = PAGE_W - 2 * MARGIN
 
 
-def build_chart(score, tmpdir):
-    """Horizontal bar chart of dimension percentages -> PNG path."""
-    dims = score.get("dimensions", [])[:12]  # cap for readability
+def build_chart(score):
+    """Horizontal bar chart of dimension percentages as a ReportLab Drawing (vector, no matplotlib)."""
+    dims = score.get("dimensions", [])[:12]
     if not dims:
         return None
-    labels = [d["name"][:28] for d in dims]
-    pcts = [d.get("pct", 0) for d in dims]
-    levels = [d.get("level", "") for d in dims]
 
-    fig, ax = plt.subplots(figsize=(7.2, max(2.2, 0.42 * len(dims) + 0.8)))
-    bar_colors = []
-    for p in pcts:
-        if p >= 70:
-            bar_colors.append("#15803D")
-        elif p >= 40:
-            bar_colors.append("#0E7C66")
-        else:
-            bar_colors.append("#B45309")
-    y = range(len(labels))
-    ax.barh(y, pcts, color=bar_colors, height=0.62, zorder=3)
-    ax.set_yticks(list(y))
-    ax.set_yticklabels(labels, fontsize=9, color="#0F2A43")
-    ax.invert_yaxis()
-    ax.set_xlim(0, 100)
-    ax.set_xlabel("Score (%)", fontsize=9, color="#334155")
-    ax.set_title("Dimension Profile", fontsize=11, color="#0F2A43", fontweight="bold", pad=10)
-    ax.tick_params(axis="x", labelsize=8, colors="#64748B")
-    ax.grid(axis="x", color="#E2E8F0", linewidth=0.8, zorder=0)
-    for spine in ["top", "right"]:
-        ax.spines[spine].set_visible(False)
-    for spine in ["left", "bottom"]:
-        ax.spines[spine].set_color("#CBD5E1")
-    for i, p in enumerate(pcts):
-        ax.text(p + 1.5, i, f"{p}%", va="center", fontsize=8, color="#334155", fontweight="bold")
-    plt.tight_layout()
-    path = os.path.join(tmpdir, "chart.png")
-    fig.savefig(path, dpi=180, bbox_inches="tight", facecolor="white")
-    plt.close(fig)
-    return path
+    label_w = 150
+    bar_area_w = CONTENT_W - label_w - 45
+    row_h = 22
+    title_h = 28
+    total_h = title_h + len(dims) * row_h + 8
+    d = Drawing(CONTENT_W, total_h)
+    d.add(String(0, total_h - 6, "Dimension Profile", fontName="Helvetica-Bold", fontSize=11, fillColor=NAVY))
+
+    def bar_color(pct):
+        if pct >= 70: return colors.HexColor("#15803D")
+        if pct >= 40: return colors.HexColor("#0E7C66")
+        return colors.HexColor("#B45309")
+
+    for i, dim in enumerate(dims):
+        y = total_h - title_h - (i + 1) * row_h + 4
+        name = (dim.get("name") or dim.get("code") or "")[:30]
+        pct = dim.get("pct", 0)
+        # label
+        d.add(String(0, y + 2, name, fontName="Helvetica", fontSize=8, fillColor=SLATE))
+        # grid line at 100%
+        d.add(Line(label_w, y + 2, label_w + bar_area_w, y + 2, strokeColor=colors.HexColor("#E2E8F0"), strokeWidth=0.5))
+        # bar
+        bar_w = max(1, bar_area_w * pct / 100.0)
+        d.add(Rect(label_w, y - 2, bar_w, 12, fillColor=bar_color(pct), strokeColor=None))
+        # percentage text
+        d.add(String(label_w + bar_area_w + 6, y + 2, f"{pct}%", fontName="Helvetica-Bold", fontSize=8, fillColor=SLATE))
+    return d
 
 
 def header_footer(canv: canvas.Canvas, doc):
@@ -196,13 +187,10 @@ def build(data, out_path):
         story.append(Spacer(1, 10))
 
     # Chart
-    tmpdir = tempfile.mkdtemp()
-    chart_path = build_chart(score, tmpdir)
-    if chart_path:
+    chart = build_chart(score)
+    if chart:
         story.append(Paragraph("Dimension Profile", H2))
-        img = Image(chart_path, width=CONTENT_W, height=CONTENT_W * 0.5)
-        img._restrictSize(CONTENT_W, 120 * mm)
-        story.append(img)
+        story.append(chart)
         story.append(Spacer(1, 8))
 
     # Domain breakdown (stream-selector style)

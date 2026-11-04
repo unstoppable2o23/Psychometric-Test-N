@@ -12,6 +12,7 @@ import { toast } from 'sonner'
 
 export function StudentDashboard() {
   const user = useApp((s) => s.user)!
+  const viewReport = useApp((s) => s.viewReport)
   const [data, setData] = useState<{ student: any; assignments: any[] } | null>(null)
   const [loading, setLoading] = useState(true)
   const [starting, setStarting] = useState<string | null>(null)
@@ -85,6 +86,7 @@ export function StudentDashboard() {
               starting={starting === a.id}
               testLink={testLink?.assignmentId === a.id ? testLink : null}
               onStart={() => handleStart(a.id, a.assessment.title)}
+              onViewReport={() => a.reportId && viewReport(a.reportId)}
               onClearLink={() => setTestLink(null)}
             />
           ))}
@@ -94,7 +96,7 @@ export function StudentDashboard() {
   )
 }
 
-function AssignmentCard({ a, starting, testLink, onStart, onClearLink }: { a: any; starting: boolean; testLink: { url: string; title: string } | null; onStart: () => void; onClearLink: () => void }) {
+function AssignmentCard({ a, starting, testLink, onStart, onViewReport, onClearLink }: { a: any; starting: boolean; testLink: { url: string; title: string } | null; onStart: () => void; onViewReport: () => void; onClearLink: () => void }) {
   const statusColors: Record<string, string> = {
     ASSIGNED: 'bg-blue-50 text-blue-700 border-blue-200',
     IN_PROGRESS: 'bg-amber-50 text-amber-700 border-amber-200',
@@ -141,7 +143,7 @@ function AssignmentCard({ a, starting, testLink, onStart, onClearLink }: { a: an
               {a.button === 'START' && <Button onClick={onStart} disabled={starting} className="bg-teal-600 hover:bg-teal-700"><Play className="w-4 h-4" /> {starting ? 'Preparing…' : 'Start Test'}</Button>}
               {a.button === 'CONTINUE' && <Button onClick={onStart} disabled={starting} className="bg-amber-600 hover:bg-amber-700"><RefreshCw className={`w-4 h-4 ${starting ? 'animate-spin' : ''}`} /> Continue</Button>}
               {a.button === 'COMPLETED' && <Button disabled variant="secondary"><CheckCircle2 className="w-4 h-4" /> Completed</Button>}
-              {a.button === 'VIEW_REPORT' && <Button variant="default" className="bg-emerald-600 hover:bg-emerald-700"><FileText className="w-4 h-4" /> View Report</Button>}
+              {a.button === 'VIEW_REPORT' && <Button onClick={onViewReport} variant="default" className="bg-emerald-600 hover:bg-emerald-700"><FileText className="w-4 h-4" /> View Report</Button>}
               {a.status === 'COMPLETED' && a.reportAvailable && a.button !== 'VIEW_REPORT' && (
                 <Button disabled variant="outline" className="text-slate-400"><Lock className="w-3.5 h-3.5" /> Report locked</Button>
               )}

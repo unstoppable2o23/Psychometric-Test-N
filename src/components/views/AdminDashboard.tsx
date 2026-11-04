@@ -13,7 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogT
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Checkbox } from '@/components/ui/checkbox'
 import { ResetPasswordDialog } from '@/components/ResetPasswordDialog'
-import { Users, FileText, ClipboardList, Stethoscope, Activity, ShieldCheck, UserPlus, Download, Search, BookOpen, Award, Ticket } from 'lucide-react'
+import { Users, FileText, ClipboardList, Stethoscope, Activity, ShieldCheck, UserPlus, Download, Search, BookOpen, Award, Ticket, Lock } from 'lucide-react'
 import { toast } from 'sonner'
 
 export function AdminDashboard() {
@@ -275,6 +275,9 @@ function ReportsTab() {
   async function assign(reportId: string, cIds: string[]) {
     try { await api.adminAssignReport(reportId, cIds); toast.success('Report access granted'); setAssignFor(null); load() } catch (e: any) { toast.error(e.message) }
   }
+  async function unlock(reportId: string) {
+    try { await api.adminUnlockReport(reportId); toast.success('Report unlocked — student can now view & download it'); load() } catch (e: any) { toast.error(e.message) }
+  }
   return (
     <div className="space-y-4">
       {loading ? <Skeletons n={3} /> : reports.length === 0 ? (
@@ -286,16 +289,19 @@ function ReportsTab() {
               <CardContent className="pt-5">
                 <div className="flex items-start justify-between gap-2 mb-2">
                   <div><p className="font-semibold text-slate-900 text-sm">{r.student.name}</p><p className="text-xs text-slate-500">{r.assessment.title}</p></div>
-                  <Badge variant="outline" className="text-[10px]">{r.paymentStatus}</Badge>
+                  {r.paymentStatus === 'PAID'
+                    ? <Badge className="text-[10px] bg-emerald-100 text-emerald-700 hover:bg-emerald-100">Unlocked</Badge>
+                    : <Badge variant="outline" className="text-[10px] bg-slate-100 text-slate-500">Locked</Badge>}
                 </div>
                 {r.scoreResult?.recommendation && <p className="text-xs text-slate-600 bg-slate-50 rounded-lg p-2 mt-2 line-clamp-2">{r.scoreResult.recommendation}</p>}
                 <div className="flex items-center gap-1.5 mt-3 mb-3 flex-wrap">
                   {r.counsellorAccess.map((c: any) => <Badge key={c.id} variant="secondary" className="text-[10px]">{c.counsellor.name}</Badge>)}
                   {r.counsellorAccess.length === 0 && <span className="text-xs text-slate-400">No counsellor access</span>}
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-2 flex-wrap">
                   <Button size="sm" variant="outline" onClick={() => viewReport(r.id)}><FileText className="w-3.5 h-3.5" /> View</Button>
                   <a href={api.reportDownloadUrl(r.id)} target="_blank" rel="noreferrer"><Button size="sm" variant="outline"><Download className="w-3.5 h-3.5" /> PDF</Button></a>
+                  {r.paymentStatus !== 'PAID' && <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700" onClick={() => unlock(r.id)}><Lock className="w-3.5 h-3.5" /> Unlock for Student</Button>}
                   <Select value="" onValueChange={(v) => { if (v) assign(r.id, [v]) }}>
                     <SelectTrigger className="h-8 text-xs w-36"><SelectValue placeholder="Grant access…" /></SelectTrigger>
                     <SelectContent>{counsellors.map((c) => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}</SelectContent>

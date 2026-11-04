@@ -35,6 +35,7 @@ export const GET = apiHandler(async () => {
       startedAt: a.startedAt,
       assessment: a.assessment,
       reportAvailable: !!report,
+      reportId: report?.id ?? null,
       reportPaymentStatus: report?.paymentStatus ?? null,
     }
   })

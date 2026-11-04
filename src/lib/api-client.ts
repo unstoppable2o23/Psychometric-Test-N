@@ -61,6 +61,8 @@ export const api = {
   adminReports: () => req<{ reports: any[] }>('/api/admin/reports'),
   adminAssignReport: (reportId: string, counsellorIds: string[]) =>
     req(`/api/admin/reports/${reportId}/assign`, { method: 'POST', body: JSON.stringify({ counsellorIds }) }),
+  adminUnlockReport: (reportId: string) =>
+    req(`/api/admin/reports/${reportId}/unlock`, { method: 'POST' }),
   adminCounsellors: () => req<{ counsellors: any[] }>('/api/admin/counsellors'),
   adminCreateCounsellor: (body: any) => req('/api/admin/counsellors', { method: 'POST', body: JSON.stringify(body) }),
   adminAssignCounsellor: (body: { counsellorId: string; studentIds: string[] }) =>
