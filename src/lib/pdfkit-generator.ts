@@ -1,0 +1,434 @@
+// Pure JavaScript PDF generator using pdf-lib — zero native dependencies,
+// runs safely in the Next.js/Turbopack runtime. No Python, no zlib crashes.
+import { PDFDocument, StandardFonts, rgb, PDFFont, PDFPage } from 'pdf-lib'
+import fs from 'fs'
+
+const PAGE_W = 595.28
+const PAGE_H = 841.89
+const MARGIN = 51
+
+// Sanitize text for WinAnsi-encoded standard fonts (replace Unicode chars
+// that Helvetica/Helvetica-Bold cannot encode with ASCII equivalents).
+function sanitize(text: string): string {
+  return text
+    .replace(/≥/g, '>=').replace(/≤/g, '<=').replace(/→/g, '->').replace(/←/g, '<-')
+    .replace(/—/g, '-').replace(/–/g, '-').replace(/'/g, "'").replace(/'/g, "'")
+    .replace(/"/g, '"').replace(/"/g, '"').replace(/•/g, '*').replace(/·/g, '-')
+    .replace(/&bull;/g, '*').replace(/&middot;/g, '-').replace(/&mdash;/g, '-')
+    .replace(/&ndash;/g, '-').replace(/&rarr;/g, '->').replace(/&ldquo;/g, '"')
+    .replace(/&rdquo;/g, '"').replace(/&lsquo;/g, "'").replace(/&rsquo;/g, "'")
+    .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+    .replace(/\u00A0/g, ' ').replace(/\u2026/g, '...')
+}
+
+function hex(h: string): ReturnType<typeof rgb> {
+  const r = parseInt(h.slice(1, 3), 16) / 255
+  const g = parseInt(h.slice(3, 5), 16) / 255
+  const b = parseInt(h.slice(5, 7), 16) / 255
+  return rgb(r, g, b)
+}
+
+const C = {
+  NAVY: hex('#0F2A43'), TEAL: hex('#0E7C66'), AMBER: hex('#B45309'),
+  SLATE: hex('#334155'), MUTED: hex('#64748B'), LIGHT: hex('#F1F5F9'),
+  BORDER: hex('#CBD5E1'), GREEN: hex('#15803D'), WHITE: rgb(1, 1, 1),
+  BG_LIGHT: hex('#FAFAFA'), EMERALD_BG: hex('#ECFDF5'),
+}
+
+function lvlColor(level: string) {
+  if (['High', 'Dominant'].includes(level)) return C.GREEN
+  if (['Moderate'].includes(level)) return C.TEAL
+  return C.AMBER
+}
+
+// Wrap text to fit a max width given a font + size. Returns array of lines.
+function wrapText(text: string, font: PDFFont, size: number, maxWidth: number): string[] {
+  text = sanitize(text)
+  const words = text.split(/\s+/)
+  const lines: string[] = []
+  let line = ''
+  for (const word of words) {
+    const test = line ? `${line} ${word}` : word
+    if (font.widthOfTextAtSize(test, size) <= maxWidth) {
+      line = test
+    } else {
+      if (line) lines.push(line)
+      line = word
+    }
+  }
+  if (line) lines.push(line)
+  return lines
+}
+
+export interface ReportPdfData {
+  platform: string
+  reportId: string
+  student: { name: string; email: string; phone?: string | null }
+  assessment: { title: string; purpose?: string; category?: string; description?: string }
+  attempt: { startedAt?: string; completedAt?: string }
+  score: {
+    dimensions: any[]
+    totalScore?: number | null
+    recommendation?: string | null
+    topDimensions?: string[]
+    domainBreakdown?: any[]
+  }
+}
+
+export async function generateReportPdf(data: ReportPdfData, id: string): Promise<string> {
+  const outPath = `${process.cwd()}/var/reports/report-${id}.pdf`
+  fs.mkdirSync(`${process.cwd()}/var/reports`, { recursive: true })
+
+  const doc = await PDFDocument.create()
+  const font = await doc.embedFont(StandardFonts.Helvetica)
+  const fontBold = await doc.embedFont(StandardFonts.HelveticaBold)
+  let page = doc.addPage([PAGE_W, PAGE_H])
+  const contentW = PAGE_W - 2 * MARGIN
+  let pages = [page]
+
+  function drawHF(p: PDFPage, pn: number) {
+    p.drawRectangle({ x: 0, y: PAGE_H - 40, width: PAGE_W, height: 40, color: C.NAVY })
+    p.drawText('Psychometric Testing Platform', { x: MARGIN, y: PAGE_H - 20, size: 10, font: fontBold, color: C.WHITE })
+    p.drawText('Confidential Assessment Report', { x: PAGE_W - MARGIN - 150, y: PAGE_H - 20, size: 8, font, color: C.WHITE })
+    p.drawLine({ start: { x: MARGIN, y: PAGE_H - 35 }, end: { x: PAGE_W - MARGIN, y: PAGE_H - 35 }, thickness: 0.5, color: C.BORDER })
+    p.drawText(`Page ${pn}`, { x: PAGE_W - MARGIN - 40, y: 18, size: 7.5, font, color: C.MUTED })
+  }
+
+  let y = PAGE_H - 55
+  let pn = 1
+  drawHF(page, pn)
+
+  function newPage() {
+    page = doc.addPage([PAGE_W, PAGE_H])
+    pages.push(page)
+    pn++
+    drawHF(page, pn)
+    y = PAGE_H - 55
+  }
+
+  function ensureSpace(needed: number) {
+    if (y - needed < 45) newPage()
+  }
+
+  function drawText(text: string, opts: { x?: number; size?: number; font?: PDFFont; color?: any; maxW?: number; lineHeight?: number } = {}) {
+    const sz = opts.size ?? 10
+    const f = opts.font ?? font
+    const col = opts.color ?? C.SLATE
+    const maxW = opts.maxW ?? contentW
+    const lh = opts.lineHeight ?? sz + 2
+    const x = opts.x ?? MARGIN
+    const lines = wrapText(text, f, sz, maxW)
+    for (const line of lines) {
+      ensureSpace(lh)
+      page.drawText(line, { x, y: y - sz, size: sz, font: f, color: col })
+      y -= lh
+    }
+  }
+
+  function heading(text: string, size = 14, color = C.TEAL) {
+    ensureSpace(size + 8)
+    page.drawText(text, { x: MARGIN, y: y - size, size, font: fontBold, color })
+    y -= size + 6
+  }
+
+  function spacer(h = 8) { y -= h }
+
+  // --- Title ---
+  page.drawText('Psychometric Assessment Report', { x: MARGIN, y: y - 18, size: 18, font: fontBold, color: C.NAVY })
+  y -= 24
+  page.drawText(data.assessment.title, { x: MARGIN, y: y - 12, size: 12, font: fontBold, color: C.TEAL })
+  y -= 18
+
+  // --- Student info table ---
+  const infoRows = [
+    ['Student Name', data.student.name, 'Email', data.student.email],
+    ['Mobile', data.student.phone || '—', 'Category', data.assessment.category || '—'],
+    ['Assessment Date', fmtDate(data.attempt.completedAt || data.attempt.startedAt), 'Report ID', (data.reportId || '').slice(0, 12)],
+  ]
+  const colW = [70, 160, 70, contentW - 300]
+  infoRows.forEach((row, i) => {
+    ensureSpace(26)
+    page.drawRectangle({ x: MARGIN, y: y - 22, width: contentW, height: 24, color: i % 2 === 0 ? C.LIGHT : C.WHITE })
+    page.drawRectangle({ x: MARGIN, y: y - 22, width: contentW, height: 24, borderColor: C.BORDER, borderWidth: 0.25 })
+    let x = MARGIN
+    row.forEach((cell, j) => {
+      page.drawText(String(cell), { x: x + 5, y: y - 14, size: 9, font: j % 2 === 1 ? fontBold : font, color: j % 2 === 0 ? C.MUTED : C.SLATE })
+      x += colW[j]
+    })
+    y -= 24
+  })
+  spacer(10)
+
+  // --- Purpose ---
+  if (data.assessment.purpose) {
+    heading('About This Assessment')
+    drawText(data.assessment.purpose, { size: 10 })
+    spacer(6)
+  }
+
+  // --- Recommendation ---
+  if (data.score.recommendation) {
+    heading('Key Recommendation')
+    const recLines = wrapText(data.score.recommendation, font, 11, contentW - 20)
+    const recH = recLines.length * 15 + 16
+    ensureSpace(recH)
+    page.drawRectangle({ x: MARGIN, y: y - recH, width: contentW, height: recH, color: C.EMERALD_BG })
+    page.drawRectangle({ x: MARGIN, y: y - recH, width: contentW, height: recH, borderColor: C.GREEN, borderWidth: 0.75 })
+    recLines.forEach((line, i) => {
+      page.drawText(line, { x: MARGIN + 10, y: y - 15 - i * 15, size: 11, font, color: C.NAVY })
+    })
+    y -= recH + 8
+    spacer(8)
+  }
+
+  // --- Chart ---
+  const dims = data.score.dimensions || []
+  if (dims.length > 0) {
+    heading('Dimension Profile')
+    const chartDims = dims.slice(0, 12)
+    const labelW = 150
+    const barAreaW = contentW - labelW - 45
+    const rowH = 20
+    ensureSpace(chartDims.length * rowH + 10)
+    chartDims.forEach((d, i) => {
+      const ry = y - i * rowH
+      const pct = d.pct || 0
+      const name = (d.name || d.code || '').slice(0, 30)
+      page.drawText(name, { x: MARGIN, y: ry - 10, size: 8, font, color: C.SLATE })
+      page.drawLine({ start: { x: MARGIN + labelW, y: ry - 2 }, end: { x: MARGIN + labelW + barAreaW, y: ry - 2 }, thickness: 0.5, color: hex('#E2E8F0') })
+      const barW = Math.max(1, barAreaW * pct / 100)
+      page.drawRectangle({ x: MARGIN + labelW, y: ry - 12, width: barW, height: 10, color: lvlColor(d.level || '') })
+      page.drawText(`${pct}%`, { x: MARGIN + labelW + barAreaW + 5, y: ry - 10, size: 8, font: fontBold, color: C.SLATE })
+    })
+    y -= chartDims.length * rowH + 10
+    spacer(8)
+  }
+
+  // --- Domain breakdown ---
+  if (data.score.domainBreakdown?.length) {
+    heading('Stream Comparison')
+    const br = data.score.domainBreakdown
+    const bcolW = [30, contentW - 30 - 45 - 45 - 50, 45, 45, 50]
+    const headers = ['Rank', 'Stream', 'Apt', 'Int', 'Comp']
+    ensureSpace(22)
+    page.drawRectangle({ x: MARGIN, y: y - 18, width: contentW, height: 20, color: C.NAVY })
+    let bx = MARGIN
+    headers.forEach((h, i) => {
+      page.drawText(h, { x: bx + 4, y: y - 13, size: 9, font: fontBold, color: C.WHITE })
+      bx += bcolW[i]
+    })
+    y -= 20
+    br.forEach((b, i) => {
+      ensureSpace(22)
+      if (i % 2 === 1) page.drawRectangle({ x: MARGIN, y: y - 18, width: contentW, height: 20, color: C.LIGHT })
+      bx = MARGIN
+      const cells = [String(i + 1), (b.title || b.code || '').slice(0, 25), String(b.aptitude), String(b.interest), String(b.composite)]
+      cells.forEach((c, j) => {
+        page.drawText(c, { x: bx + 4, y: y - 13, size: 9, font: j === 4 ? fontBold : font, color: C.SLATE })
+        bx += bcolW[j]
+      })
+      y -= 20
+    })
+    spacer(10)
+  }
+
+  // --- Dimension table ---
+  if (dims.length > 0) {
+    heading('Detailed Dimension Breakdown')
+    const tcolW = [contentW - 22 - 22 - 22 - 40, 22, 22, 22, 40]
+    const headers = ['Dimension', 'Score', 'Max', '%', 'Level']
+    ensureSpace(22)
+    page.drawRectangle({ x: MARGIN, y: y - 18, width: contentW, height: 20, color: C.NAVY })
+    let bx = MARGIN
+    headers.forEach((h, i) => {
+      page.drawText(h, { x: bx + 4, y: y - 13, size: 9, font: fontBold, color: C.WHITE })
+      bx += tcolW[i]
+    })
+    y -= 20
+    dims.forEach((d, i) => {
+      ensureSpace(20)
+      if (i % 2 === 1) page.drawRectangle({ x: MARGIN, y: y - 16, width: contentW, height: 18, color: C.LIGHT })
+      bx = MARGIN
+      const cells = [(d.name || d.code || '').slice(0, 28), String(d.score || 0), String(d.maxScore || 0), `${d.pct || 0}%`, d.level || '—']
+      cells.forEach((c, j) => {
+        page.drawText(c, { x: bx + 4, y: y - 12, size: 9, font: j === 4 ? fontBold : font, color: C.SLATE })
+        bx += tcolW[j]
+      })
+      y -= 18
+    })
+    spacer(8)
+  }
+
+  // --- Detailed dimension analysis ---
+  if (dims.length > 0) {
+    newPage()
+    heading('Detailed Dimension Analysis', 14, C.TEAL)
+    drawText('This section provides an in-depth analysis of each measured dimension, including the score, interpretation level, key strengths and recommended development areas.')
+    spacer(8)
+
+    for (const d of dims) {
+      const lvl = d.level || ''
+      const lc = lvlColor(lvl)
+      const dimName = d.name || d.code || ''
+      const dimDesc = d.dimensionDescription || d.description || ''
+
+      // Calculate body height
+      const bodyTexts: string[] = []
+      if (dimDesc) bodyTexts.push(`What this measures: ${dimDesc}`)
+      bodyTexts.push(`Score: ${d.score || 0} / ${d.maxScore || 0} (${d.pct || 0}%) — ${lvl} level. ${d.description || ''}`)
+      const strengths = d.strengths || []
+      const devAreas = d.developmentAreas || []
+
+      const bodyLines: { text: string; indent: number; color: any; bold: boolean; size: number }[] = []
+      bodyTexts.forEach((t) => {
+        wrapText(t, font, 8.5, contentW - 20).forEach((l) => bodyLines.push({ text: l, indent: 0, color: C.SLATE, bold: false, size: 8.5 }))
+      })
+      if (strengths.length) {
+        bodyLines.push({ text: `Key strengths (${lvl.toLowerCase()} score):`, indent: 0, color: C.GREEN, bold: true, size: 8.5 })
+        strengths.slice(0, 5).forEach((s) => wrapText(`• ${s}`, font, 8.5, contentW - 30).forEach((l) => bodyLines.push({ text: l, indent: 12, color: C.SLATE, bold: false, size: 8.5 })))
+      }
+      if (devAreas.length) {
+        bodyLines.push({ text: 'Development areas to focus on:', indent: 0, color: C.AMBER, bold: true, size: 8.5 })
+        devAreas.slice(0, 5).forEach((s) => wrapText(`• ${s}`, font, 8.5, contentW - 30).forEach((l) => bodyLines.push({ text: l, indent: 12, color: C.SLATE, bold: false, size: 8.5 })))
+      }
+
+      const bodyH = bodyLines.length * 11 + 12
+      ensureSpace(24 + bodyH)
+
+      // Header bar
+      page.drawRectangle({ x: MARGIN, y: y - 22, width: contentW, height: 24, color: lc })
+      page.drawText(dimName, { x: MARGIN + 8, y: y - 16, size: 10, font: fontBold, color: C.WHITE })
+      page.drawText(`${d.pct || 0}% · ${lvl}`, { x: MARGIN + contentW * 0.7, y: y - 16, size: 10, font: fontBold, color: C.WHITE })
+      y -= 24
+
+      // Body background + border
+      page.drawRectangle({ x: MARGIN, y: y - bodyH, width: contentW, height: bodyH, color: C.BG_LIGHT })
+      page.drawRectangle({ x: MARGIN, y: y - bodyH, width: 3, height: bodyH, color: lc })
+      page.drawRectangle({ x: MARGIN, y: y - bodyH, width: contentW, height: bodyH, borderColor: C.BORDER, borderWidth: 0.25 })
+
+      let by = y - 4
+      for (const bl of bodyLines) {
+        page.drawText(bl.text, { x: MARGIN + 8 + bl.indent, y: by - 8, size: bl.size, font: bl.bold ? fontBold : font, color: bl.color })
+        by -= 11
+      }
+      y -= bodyH + 8
+      spacer(6)
+    }
+  }
+
+  // --- Next Steps ---
+  spacer(10)
+  heading('Next Steps & Recommendations')
+  drawText('Based on the assessment results, the following next steps are recommended:')
+  const steps = [
+    'Review this report carefully and reflect on how the dimension scores align with your self-perception.',
+    'Identify your top 2-3 dimensions as potential areas of natural strength to leverage in academic and career planning.',
+    'Select 1-2 development areas and create a concrete action plan with specific, measurable goals.',
+    'Discuss this report with a qualified career counsellor or mentor to contextualise the findings.',
+    'Re-take the assessment after 6-12 months to track changes in your profile over time.',
+  ]
+  steps.forEach((s) => {
+    drawText(`• ${s}`, { size: 10, maxW: contentW - 10 })
+  })
+
+  // --- Disclaimer ---
+  spacer(12)
+  heading('Important Note')
+  drawText('This report is based on a self-report psychometric screening instrument and is intended for guidance purposes only. It is not a clinical diagnosis. Results should be interpreted alongside one-to-one counselling, academic records and other relevant context. For career-critical decisions, please consult a qualified career counsellor.', { size: 8.5, color: C.MUTED })
+
+  doc.setTitle(`${data.assessment.title} Report - ${data.student.name}`)
+  doc.setAuthor('Psychometric Testing Platform')
+  doc.setCreator('Psychometric Testing Platform')
+
+  const pdfBytes = await doc.save()
+  fs.writeFileSync(outPath, pdfBytes)
+  return outPath
+}
+
+function fmtDate(s?: string): string {
+  if (!s) return '—'
+  try { return new Date(s.replace('Z', '')).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) }
+  catch { return String(s) }
+}
+
+// --- Counsellor interpretation manual PDF ---
+export interface ManualContent {
+  title: string; purpose: string; constructsMeasured: string; targetPopulation: string
+  scoringMethodology: string; behaviouralIndicators: string[]; strengthsAndDevelopment: string
+  counsellingApproach: string; limitations: string; sampleInterpretation: string
+  dimensions: { name: string; description: string; high: string; moderate: string; low: string }[]
+}
+
+export async function generateManualPdf(content: ManualContent, id: string): Promise<string> {
+  const outPath = `${process.cwd()}/var/reports/manual-${id}.pdf`
+  fs.mkdirSync(`${process.cwd()}/var/reports`, { recursive: true })
+
+  const doc = await PDFDocument.create()
+  const font = await doc.embedFont(StandardFonts.Helvetica)
+  const fontBold = await doc.embedFont(StandardFonts.HelveticaBold)
+  let page = doc.addPage([PAGE_W, PAGE_H])
+  const PLUM = hex('#5B21B6')
+  let pn = 1
+
+  function drawHF(p: PDFPage) {
+    p.drawRectangle({ x: 0, y: PAGE_H - 40, width: PAGE_W, height: 40, color: PLUM })
+    p.drawText('Counsellor Interpretation Manual', { x: MARGIN, y: PAGE_H - 20, size: 10, font: fontBold, color: C.WHITE })
+    p.drawText('CONFIDENTIAL', { x: PAGE_W - MARGIN - 70, y: PAGE_H - 20, size: 8, font, color: C.WHITE })
+    p.drawLine({ start: { x: MARGIN, y: 25 }, end: { x: PAGE_W - MARGIN, y: 25 }, thickness: 0.5, color: C.BORDER })
+    p.drawText(`Page ${pn}`, { x: PAGE_W - MARGIN - 40, y: 18, size: 7.5, font, color: C.MUTED })
+  }
+  drawHF(page)
+
+  let y = PAGE_H - 55
+  function newPage() { page = doc.addPage([PAGE_W, PAGE_H]); pn++; drawHF(page); y = PAGE_H - 55 }
+  function ensureSpace(h: number) { if (y - h < 45) newPage() }
+  function heading(text: string, size = 13, color = PLUM) { ensureSpace(size + 8); page.drawText(text, { x: MARGIN, y: y - size, size, font: fontBold, color }); y -= size + 6 }
+  function body(text: string, size = 9.5) {
+    const lines = wrapText(text, font, size, contentW)
+    for (const l of lines) { ensureSpace(size + 2); page.drawText(l, { x: MARGIN, y: y - size, size, font, color: C.SLATE }); y -= size + 2 }
+  }
+  const contentW = PAGE_W - 2 * MARGIN
+
+  heading(content.title, 17, PLUM); y -= 4
+  const sections: [string, string][] = [
+    ['Purpose', content.purpose], ['Constructs Measured', content.constructsMeasured],
+    ['Target Population', content.targetPopulation], ['Scoring Methodology', content.scoringMethodology],
+  ]
+  sections.forEach(([h, b]) => { heading(h); body(b) })
+
+  if (content.dimensions?.length) {
+    heading('Dimensions & Interpretation Bands')
+    content.dimensions.forEach((d) => {
+      ensureSpace(60)
+      page.drawText(d.name, { x: MARGIN, y: y - 10, size: 9.5, font: fontBold, color: C.SLATE }); y -= 12
+      body(d.description.slice(0, 150), 8.5)
+      const bands: [string, string, any][] = [['High: ', d.high, C.GREEN], ['Moderate: ', d.moderate, C.TEAL], ['Low: ', d.low, C.AMBER]]
+      bands.forEach(([label, val, col]) => {
+        const lines = wrapText(`${label}${val.slice(0, 150)}`, font, 8, contentW)
+        lines.forEach((l) => { ensureSpace(11); page.drawText(l, { x: MARGIN, y: y - 8, size: 8, font: fontBold, color: col }); y -= 11 })
+      })
+      y -= 4
+    })
+  }
+
+  heading('Behavioural Indicators')
+  content.behaviouralIndicators?.forEach((b) => {
+    const lines = wrapText(`• ${b}`, font, 9.5, contentW - 10)
+    lines.forEach((l) => { ensureSpace(12); page.drawText(l, { x: MARGIN + 10, y: y - 10, size: 9.5, font, color: C.SLATE }); y -= 12 })
+  })
+
+  const more: [string, string][] = [
+    ['Strengths & Development Areas', content.strengthsAndDevelopment],
+    ['Counselling Approach', content.counsellingApproach],
+    ['Assessment Limitations', content.limitations],
+    ['Sample Interpretation', content.sampleInterpretation],
+  ]
+  more.forEach(([h, b]) => { heading(h); body(b) })
+
+  doc.setTitle(content.title)
+  doc.setAuthor('Psychometric Testing Platform')
+
+  const pdfBytes = await doc.save()
+  fs.writeFileSync(outPath, pdfBytes)
+  return outPath
+}
