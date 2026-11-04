@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Brain, GraduationCap, ShieldCheck, Stethoscope, Sparkles, Lock, FileText, BarChart3 } from 'lucide-react'
+import { Brain, GraduationCap, ShieldCheck, Stethoscope, Sparkles } from 'lucide-react'
 import { toast } from 'sonner'
 
 export function AuthView() {
@@ -60,19 +60,6 @@ function Landing({ onGetStarted, onSignIn }: { onGetStarted: () => void; onSignI
                 <p className="text-sm text-slate-600 mt-1.5 leading-relaxed">{f.desc}</p>
               </CardContent>
             </Card>
-          ))}
-        </div>
-
-        <div className="mt-16 grid sm:grid-cols-3 gap-4 max-w-4xl mx-auto">
-          {[
-            { icon: Lock, title: 'Server-side scoring', desc: 'Answers & scoring keys never reach the browser' },
-            { icon: FileText, title: 'A4 PDF reports', desc: 'Professional vector PDFs with charts' },
-            { icon: BarChart3, title: '9 assessments', desc: '680+ questions preserved from source' },
-          ].map((s) => (
-            <div key={s.title} className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/70 border border-slate-200">
-              <s.icon className="w-5 h-5 text-teal-600 flex-shrink-0" />
-              <div className="text-left"><p className="text-sm font-semibold text-slate-800">{s.title}</p><p className="text-xs text-slate-500">{s.desc}</p></div>
-            </div>
           ))}
         </div>
       </section>
