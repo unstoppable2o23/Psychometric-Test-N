@@ -25,7 +25,7 @@ export const GET = apiHandler(async (req: NextRequest) => {
 const createSchema = z.object({
   name: z.string().min(2),
   email: z.string().email(),
-  phone: z.string().min(7),
+  phone: z.string().min(7).optional(),
   password: z.string().min(8).optional(),
   assignAssessmentIds: z.array(z.string()).optional(),
 })
@@ -43,7 +43,7 @@ export const POST = apiHandler(async (req: NextRequest) => {
 
   const student = await db.user.create({
     data: {
-      name, email: email.toLowerCase(), phone, role: 'STUDENT',
+      name, email: email.toLowerCase(), phone: phone || null, role: 'STUDENT',
       passwordHash: hashPassword(password || 'Student@123'), isActive: true,
     },
   })

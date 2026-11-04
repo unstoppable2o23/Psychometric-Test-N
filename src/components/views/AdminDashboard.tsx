@@ -148,7 +148,8 @@ function CreateStudentDialog({ assessments, onCreated }: { assessments: any[]; o
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     const fd = new FormData(e.currentTarget)
-    const body = { name: String(fd.get('name')), email: String(fd.get('email')), phone: String(fd.get('phone')), password: String(fd.get('password') || ''), assignAssessmentIds: selectedAssessments }
+    const phone = String(fd.get('phone') || '').trim()
+    const body = { name: String(fd.get('name')), email: String(fd.get('email')), ...(phone ? { phone } : {}), password: String(fd.get('password') || ''), assignAssessmentIds: selectedAssessments }
     setBusy(true)
     try { await api.adminCreateStudent(body); toast.success('Student created' + (selectedAssessments.length ? ` & ${selectedAssessments.length} test(s) assigned` : '')); setOpen(false); onCreated() } catch (e: any) { toast.error(e.message) } finally { setBusy(false) }
   }
@@ -160,7 +161,7 @@ function CreateStudentDialog({ assessments, onCreated }: { assessments: any[]; o
         <form onSubmit={submit} className="space-y-3">
           <div><Label>Name</Label><Input name="name" required minLength={2} /></div>
           <div><Label>Email</Label><Input name="email" type="email" required /></div>
-          <div><Label>Phone</Label><Input name="phone" required /></div>
+          <div><Label>Phone <span className="text-xs text-slate-400">(optional)</span></Label><Input name="phone" /></div>
           <div><Label>Password <span className="text-xs text-slate-400">(optional — default: Student@123)</span></Label><Input name="password" type="password" placeholder="At least 8 characters" /></div>
           <div>
             <Label className="mb-2 block">Assign tests immediately (optional)</Label>

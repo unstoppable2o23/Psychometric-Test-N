@@ -8,7 +8,7 @@ import { z } from 'zod'
 const schema = z.object({
   name: z.string().min(2, 'Full name must be at least 2 characters'),
   email: z.string().email('Invalid email address'),
-  phone: z.string().regex(/^[0-9+\-\s()]{7,15}$/, 'Invalid mobile number'),
+  phone: z.string().regex(/^[0-9+\-\s()]{7,15}$/, 'Invalid mobile number').optional(),
   password: z.string().min(8, 'Password must be at least 8 characters'),
 })
 
@@ -24,7 +24,7 @@ export const POST = apiHandler(async (req: NextRequest) => {
 
   const user = await db.user.create({
     data: {
-      name, email: email.toLowerCase(), phone,
+      name, email: email.toLowerCase(), phone: phone || null,
       role: 'STUDENT', passwordHash: hashPassword(password), isActive: true,
     },
   })

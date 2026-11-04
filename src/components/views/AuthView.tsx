@@ -77,10 +77,11 @@ function AuthForm({ mode }: { mode: 'login' | 'register' }) {
     e.preventDefault()
     const fd = new FormData(e.currentTarget)
     const body = Object.fromEntries(fd.entries())
+    const phone = String(body.phone || '').trim()
     setBusy(true)
     try {
       if (mode === 'register') {
-        const { user } = await api.register({ name: String(body.name), email: String(body.email), phone: String(body.phone), password: String(body.password) })
+        const { user } = await api.register({ name: String(body.name), email: String(body.email), ...(phone ? { phone } : {}), password: String(body.password) })
         toast.success(`Welcome, ${user.name}! Your student account is ready.`)
         setUser(user)
       } else {
@@ -136,8 +137,8 @@ function AuthForm({ mode }: { mode: 'login' | 'register' }) {
             </div>
             {mode === 'register' && (
               <div className="space-y-1.5">
-                <Label htmlFor="phone">Mobile Number</Label>
-                <Input id="phone" name="phone" required placeholder="9876543210" />
+                <Label htmlFor="phone">Mobile Number <span className="text-slate-400 font-normal">(optional)</span></Label>
+                <Input id="phone" name="phone" placeholder="9876543210" />
               </div>
             )}
             <div className="space-y-1.5">
