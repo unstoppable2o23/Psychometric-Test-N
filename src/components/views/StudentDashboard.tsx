@@ -12,7 +12,6 @@ import { toast } from 'sonner'
 
 export function StudentDashboard() {
   const user = useApp((s) => s.user)!
-  const startTest = useApp((s) => s.startTest)
   const [data, setData] = useState<{ student: any; assignments: any[] } | null>(null)
   const [loading, setLoading] = useState(true)
   const [starting, setStarting] = useState<string | null>(null)
@@ -28,8 +27,10 @@ export function StudentDashboard() {
     setStarting(assignmentId)
     try {
       const { token } = await api.startTest(assignmentId)
-      toast.success(`Starting: ${title}`)
-      startTest(token)
+      // Open the test in a new browser tab via the unique secure link.
+      // The token is validated server-side; the session cookie carries over.
+      window.open(`/?test=${token}`, '_blank', 'noopener')
+      toast.success(`${title} opened in a new tab`)
     } catch (e: any) { toast.error(e.message) } finally { setStarting(null) }
   }
 

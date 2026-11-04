@@ -19,7 +19,6 @@ const MILESTONES = [
 
 export function TestRunner() {
   const token = useApp((s) => s.testToken)!
-  const setView = useApp((s) => s.setView)
   const [state, setState] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [selected, setSelected] = useState<string | null>(null)
@@ -29,6 +28,12 @@ export function TestRunner() {
   const [milestone, setMilestone] = useState<typeof MILESTONES[number] | null>(null)
   const advancingRef = useRef(false)
 
+  // The test runs in its own tab (opened via /?test=TOKEN). Navigating to "/"
+  // returns the user to their dashboard (the session cookie carries over).
+  const goDashboard = useCallback(() => {
+    window.location.href = '/'
+  }, [])
+
   const loadQuestion = useCallback(async () => {
     try {
       const s = await api.getTestQuestion(token)
@@ -36,9 +41,9 @@ export function TestRunner() {
       setSelected(s.existingAnswer ?? null)
     } catch (e: any) {
       toast.error(e.message)
-      setView('student-dashboard')
+      goDashboard()
     } finally { setLoading(false) }
-  }, [token, setView])
+  }, [token, goDashboard])
 
   useEffect(() => { loadQuestion() }, [loadQuestion])
 
@@ -113,7 +118,7 @@ export function TestRunner() {
   }
 
   if (done) {
-    return <CompletionScreen recommendation={done.recommendation} onViewDashboard={() => setView('student-dashboard')} />
+    return <CompletionScreen recommendation={done.recommendation} onViewDashboard={goDashboard} />
   }
 
   if (!state) return null
