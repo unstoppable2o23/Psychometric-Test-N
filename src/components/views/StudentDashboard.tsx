@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Play, RefreshCw, CheckCircle2, FileText, Clock, ListChecks, Trophy, Lock, BookOpen } from 'lucide-react'
+import { Play, RefreshCw, CheckCircle2, FileText, Clock, ListChecks, Trophy, Lock, BookOpen, ExternalLink } from 'lucide-react'
 import { toast } from 'sonner'
 
 export function StudentDashboard() {
@@ -15,6 +15,7 @@ export function StudentDashboard() {
   const [data, setData] = useState<{ student: any; assignments: any[] } | null>(null)
   const [loading, setLoading] = useState(true)
   const [starting, setStarting] = useState<string | null>(null)
+  const [testLink, setTestLink] = useState<{ assignmentId: string; url: string; title: string } | null>(null)
 
   const load = async () => {
     setLoading(true)
@@ -25,26 +26,14 @@ export function StudentDashboard() {
 
   async function handleStart(assignmentId: string, title: string) {
     setStarting(assignmentId)
-    // Open the new tab SYNCHRONOUSLY (before any await) so the browser
-    // recognises it as a user-initiated gesture and doesn't block the popup.
-    // Show a loading placeholder while the secure token is being generated.
-    const win = window.open('', '_blank')
-    if (win) {
-      win.document.write('<!DOCTYPE html><html><head><title>Preparing your test…</title></head><body style="font-family:system-ui,sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;background:#f8fafc;"><div style="text-align:center"><div style="width:40px;height:40px;border:4px solid #ccfbf1;border-top-color:#0d9488;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 16px"></div><p style="color:#475569;font-size:16px;margin:0">Preparing your assessment…</p></div><style>@keyframes spin{to{transform:rotate(360deg)}}</style></body></html>')
-      win.document.close()
-    }
     try {
       const { token } = await api.startTest(assignmentId)
-      const testUrl = `/?test=${token}`
-      if (win) {
-        win.location.href = testUrl
-        toast.success(`${title} opened in a new tab`)
-      } else {
-        // Popup blocked — fall back to navigating the current tab
-        window.location.href = testUrl
-      }
+      // Show an "Open Test" link button instead of using window.open (which
+      // gets blocked by popup blockers when called after an async operation).
+      // A user-initiated click on an <a target="_blank"> link is never blocked.
+      setTestLink({ assignmentId, url: `/?test=${token}`, title })
+      toast.success(`${title} is ready — click "Open Test" to begin`)
     } catch (e: any) {
-      if (win) win.close()
       toast.error(e.message)
     } finally { setStarting(null) }
   }
@@ -90,7 +79,14 @@ export function StudentDashboard() {
       ) : (
         <div className="grid sm:grid-cols-2 gap-4">
           {data!.assignments.map((a) => (
-            <AssignmentCard key={a.id} a={a} starting={starting === a.id} onStart={() => handleStart(a.id, a.assessment.title)} />
+            <AssignmentCard
+              key={a.id}
+              a={a}
+              starting={starting === a.id}
+              testLink={testLink?.assignmentId === a.id ? testLink : null}
+              onStart={() => handleStart(a.id, a.assessment.title)}
+              onClearLink={() => setTestLink(null)}
+            />
           ))}
         </div>
       )}
@@ -98,7 +94,7 @@ export function StudentDashboard() {
   )
 }
 
-function AssignmentCard({ a, starting, onStart }: { a: any; starting: boolean; onStart: () => void }) {
+function AssignmentCard({ a, starting, testLink, onStart, onClearLink }: { a: any; starting: boolean; testLink: { url: string; title: string } | null; onStart: () => void; onClearLink: () => void }) {
   const statusColors: Record<string, string> = {
     ASSIGNED: 'bg-blue-50 text-blue-700 border-blue-200',
     IN_PROGRESS: 'bg-amber-50 text-amber-700 border-amber-200',
@@ -136,12 +132,20 @@ function AssignmentCard({ a, starting, onStart }: { a: any; starting: boolean; o
           )}
           {a.status === 'ASSIGNED' && <div className="flex-1 text-xs text-slate-400">Not started</div>}
 
-          {a.button === 'START' && <Button onClick={onStart} disabled={starting} className="bg-teal-600 hover:bg-teal-700"><Play className="w-4 h-4" /> Start Test</Button>}
-          {a.button === 'CONTINUE' && <Button onClick={onStart} disabled={starting} className="bg-amber-600 hover:bg-amber-700"><RefreshCw className={`w-4 h-4 ${starting ? 'animate-spin' : ''}`} /> Continue</Button>}
-          {a.button === 'COMPLETED' && <Button disabled variant="secondary"><CheckCircle2 className="w-4 h-4" /> Completed</Button>}
-          {a.button === 'VIEW_REPORT' && <Button variant="default" className="bg-emerald-600 hover:bg-emerald-700"><FileText className="w-4 h-4" /> View Report</Button>}
-          {a.status === 'COMPLETED' && a.reportAvailable && a.button !== 'VIEW_REPORT' && (
-            <Button disabled variant="outline" className="text-slate-400"><Lock className="w-3.5 h-3.5" /> Report locked</Button>
+          {testLink ? (
+            <a href={testLink.url} target="_blank" rel="noreferrer">
+              <Button className="bg-teal-600 hover:bg-teal-700 animate-pulse"><ExternalLink className="w-4 h-4" /> Open Test</Button>
+            </a>
+          ) : (
+            <>
+              {a.button === 'START' && <Button onClick={onStart} disabled={starting} className="bg-teal-600 hover:bg-teal-700"><Play className="w-4 h-4" /> {starting ? 'Preparing…' : 'Start Test'}</Button>}
+              {a.button === 'CONTINUE' && <Button onClick={onStart} disabled={starting} className="bg-amber-600 hover:bg-amber-700"><RefreshCw className={`w-4 h-4 ${starting ? 'animate-spin' : ''}`} /> Continue</Button>}
+              {a.button === 'COMPLETED' && <Button disabled variant="secondary"><CheckCircle2 className="w-4 h-4" /> Completed</Button>}
+              {a.button === 'VIEW_REPORT' && <Button variant="default" className="bg-emerald-600 hover:bg-emerald-700"><FileText className="w-4 h-4" /> View Report</Button>}
+              {a.status === 'COMPLETED' && a.reportAvailable && a.button !== 'VIEW_REPORT' && (
+                <Button disabled variant="outline" className="text-slate-400"><Lock className="w-3.5 h-3.5" /> Report locked</Button>
+              )}
+            </>
           )}
         </div>
       </CardContent>

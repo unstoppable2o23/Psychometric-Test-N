@@ -31,6 +31,8 @@ export const api = {
     req<{ user: AuthUser }>('/api/auth/login', { method: 'POST', body: JSON.stringify(body) }),
   logout: () => req('/api/auth/logout', { method: 'POST' }),
   me: () => req<{ user: AuthUser | null }>('/api/auth/me'),
+  changePassword: (currentPassword: string, newPassword: string) =>
+    req('/api/auth/change-password', { method: 'POST', body: JSON.stringify({ currentPassword, newPassword }) }),
 
   // assessments
   assessments: () => req<{ assessments: any[] }>('/api/assessments'),

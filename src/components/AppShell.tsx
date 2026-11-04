@@ -7,6 +7,7 @@ import { AdminDashboard } from '@/components/views/AdminDashboard'
 import { CounsellorDashboard } from '@/components/views/CounsellorDashboard'
 import { ReportView } from '@/components/views/ReportView'
 import { Brain, LogOut, ShieldCheck, GraduationCap, Stethoscope } from 'lucide-react'
+import { ChangePasswordDialog } from '@/components/ChangePasswordDialog'
 
 export function AppShell() {
   const user = useApp((s) => s.user)
@@ -30,12 +31,13 @@ export function AppShell() {
           </button>
 
           {user ? (
-            <div className="flex items-center gap-2 sm:gap-3">
+            <div className="flex items-center gap-1 sm:gap-2">
               <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100">
                 <RoleIcon className="w-4 h-4 text-teal-600" />
                 <span className="text-xs font-semibold text-slate-700">{user.name}</span>
                 <span className="text-[10px] uppercase tracking-wide text-slate-400 font-bold">{user.role.replace('_', ' ')}</span>
               </div>
+              <ChangePasswordDialog />
               <button onClick={logout} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium text-slate-600 hover:text-rose-600 hover:bg-rose-50 transition-colors">
                 <LogOut className="w-4 h-4" /> <span className="hidden sm:inline">Sign out</span>
               </button>
