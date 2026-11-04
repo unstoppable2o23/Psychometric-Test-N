@@ -25,13 +25,28 @@ export function StudentDashboard() {
 
   async function handleStart(assignmentId: string, title: string) {
     setStarting(assignmentId)
+    // Open the new tab SYNCHRONOUSLY (before any await) so the browser
+    // recognises it as a user-initiated gesture and doesn't block the popup.
+    // Show a loading placeholder while the secure token is being generated.
+    const win = window.open('', '_blank')
+    if (win) {
+      win.document.write('<!DOCTYPE html><html><head><title>Preparing your test…</title></head><body style="font-family:system-ui,sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;background:#f8fafc;"><div style="text-align:center"><div style="width:40px;height:40px;border:4px solid #ccfbf1;border-top-color:#0d9488;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 16px"></div><p style="color:#475569;font-size:16px;margin:0">Preparing your assessment…</p></div><style>@keyframes spin{to{transform:rotate(360deg)}}</style></body></html>')
+      win.document.close()
+    }
     try {
       const { token } = await api.startTest(assignmentId)
-      // Open the test in a new browser tab via the unique secure link.
-      // The token is validated server-side; the session cookie carries over.
-      window.open(`/?test=${token}`, '_blank', 'noopener')
-      toast.success(`${title} opened in a new tab`)
-    } catch (e: any) { toast.error(e.message) } finally { setStarting(null) }
+      const testUrl = `/?test=${token}`
+      if (win) {
+        win.location.href = testUrl
+        toast.success(`${title} opened in a new tab`)
+      } else {
+        // Popup blocked — fall back to navigating the current tab
+        window.location.href = testUrl
+      }
+    } catch (e: any) {
+      if (win) win.close()
+      toast.error(e.message)
+    } finally { setStarting(null) }
   }
 
   const completed = data?.assignments.filter((a) => a.status === 'COMPLETED').length || 0
