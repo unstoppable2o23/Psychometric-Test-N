@@ -121,14 +121,29 @@ export function ReportView() {
           {dims.length > 0 && (
             <div>
               <h3 className="font-bold text-slate-800 mb-3">Detailed Breakdown</h3>
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {dims.map((d: any, i: number) => (
-                  <div key={i} className="flex items-start gap-3 p-3 rounded-lg border-l-4 bg-slate-50" style={{ borderColor: LEVEL_COLORS[d.level] || '#0E7C66' }}>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2"><p className="font-semibold text-slate-800 text-sm">{d.name}</p><Badge variant="outline" className="text-[10px]">{d.level}</Badge></div>
-                      <p className="text-xs text-slate-500 mt-0.5">{d.description}</p>
+                  <div key={i} className="rounded-lg border-l-4 bg-slate-50 overflow-hidden" style={{ borderColor: LEVEL_COLORS[d.level] || '#0E7C66' }}>
+                    <div className="flex items-start justify-between gap-3 p-3">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2"><p className="font-semibold text-slate-800 text-sm">{d.name}</p><Badge variant="outline" className="text-[10px]">{d.level}</Badge></div>
+                        {d.dimensionDescription && <p className="text-xs text-slate-500 mt-0.5">{d.dimensionDescription}</p>}
+                        <p className="text-xs text-slate-500 mt-1">{d.description}</p>
+                      </div>
+                      <div className="text-right flex-shrink-0"><p className="text-lg font-bold text-slate-900">{d.pct}%</p><p className="text-[10px] text-slate-400">{d.score}/{d.maxScore}</p></div>
                     </div>
-                    <div className="text-right flex-shrink-0"><p className="text-lg font-bold text-slate-900">{d.pct}%</p><p className="text-[10px] text-slate-400">{d.score}/{d.maxScore}</p></div>
+                    {d.strengths?.length > 0 && (
+                      <div className="px-3 pb-2">
+                        <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-wide mb-1">Strengths</p>
+                        <ul className="space-y-0.5">{d.strengths.slice(0, 3).map((s: string, j: number) => <li key={j} className="text-xs text-slate-600 flex gap-1.5"><span className="text-emerald-500">+</span><span>{s}</span></li>)}</ul>
+                      </div>
+                    )}
+                    {d.developmentAreas?.length > 0 && (
+                      <div className="px-3 pb-3">
+                        <p className="text-[10px] font-bold text-amber-600 uppercase tracking-wide mb-1">Development Areas</p>
+                        <ul className="space-y-0.5">{d.developmentAreas.slice(0, 3).map((s: string, j: number) => <li key={j} className="text-xs text-slate-600 flex gap-1.5"><span className="text-amber-500">&rarr;</span><span>{s}</span></li>)}</ul>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>

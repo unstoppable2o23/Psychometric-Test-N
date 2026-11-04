@@ -239,25 +239,85 @@ def build(data, out_path):
         story.append(dt)
         story.append(Spacer(1, 8))
 
-        # Interpretation per dimension (top 6 to keep report focused)
-        story.append(Paragraph("Interpretation Notes", H2))
-        for d in dims[:8]:
+        # Detailed per-dimension interpretation (ALL dimensions, with strengths
+        # and development areas — makes the report comprehensive and multi-page)
+        story.append(PageBreak())
+        story.append(Paragraph("Detailed Dimension Analysis", H2))
+        story.append(Paragraph(
+            "This section provides an in-depth analysis of each measured dimension, including the score, "
+            "interpretation level, key strengths and recommended development areas. Use this analysis to "
+            "identify natural inclinations and areas for focused growth.",
+            BODY,
+        ))
+        story.append(Spacer(1, 8))
+
+        for d in dims:
             lvl = d.get("level", "")
             lvl_color = GREEN if lvl in ("High", "Dominant") else TEAL if lvl in ("Moderate",) else AMBER
-            para = Paragraph(
-                f'<b>{d.get("name", d.get("code"))}</b> — {d.get("pct", 0)}% ({lvl}). {d.get("description", "")}',
-                BODY,
-            )
-            tbl = Table([[para]], colWidths=[CONTENT_W])
-            tbl.setStyle(TableStyle([
+            dim_name = d.get("name", d.get("code", ""))
+            dim_desc = d.get("dimensionDescription") or d.get("description", "")
+
+            # Header bar for each dimension
+            header_tbl = Table([[
+                Paragraph(f'<font color="white"><b>{dim_name}</b></font>', ParagraphStyle("DimHdr", parent=BODY, fontSize=10, textColor=colors.white, leading=13)),
+                Paragraph(f'<font color="white"><b>{d.get("pct", 0)}% &middot; {lvl}</b></font>', ParagraphStyle("DimHdrR", parent=BODY, fontSize=10, textColor=colors.white, leading=13, alignment=TA_RIGHT)),
+            ]], colWidths=[CONTENT_W * 0.7, CONTENT_W * 0.3])
+            header_tbl.setStyle(TableStyle([
+                ("BACKGROUND", (0, 0), (-1, -1), lvl_color),
                 ("LEFTPADDING", (0, 0), (-1, -1), 8),
                 ("RIGHTPADDING", (0, 0), (-1, -1), 8),
                 ("TOPPADDING", (0, 0), (-1, -1), 5),
                 ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
-                ("LINEBEFORE", (0, 0), (0, -1), 2.5, lvl_color),
-                ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#FAFAFA")),
+                ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
             ]))
-            story.append(KeepTogether([tbl, Spacer(1, 4)]))
+
+            # Body content for each dimension
+            body_cells = []
+            if dim_desc:
+                body_cells.append(Paragraph(f"<b>What this measures:</b> {dim_desc}", SMALL))
+            body_cells.append(Paragraph(f"<b>Score:</b> {d.get('score', 0)} / {d.get('maxScore', 0)} ({d.get('pct', 0)}%) &mdash; {lvl} level. {d.get('description', '')}", SMALL))
+
+            strengths = d.get("strengths") or []
+            dev_areas = d.get("developmentAreas") or []
+            if strengths:
+                body_cells.append(Paragraph(f"<b>Key strengths associated with a {lvl.lower()} score:</b>", SMALL))
+                for s in strengths[:5]:
+                    body_cells.append(Paragraph(f"&bull; {s}", SMALL))
+            if dev_areas:
+                body_cells.append(Paragraph(f"<b>Development areas to focus on:</b>", SMALL))
+                for s in dev_areas[:5]:
+                    body_cells.append(Paragraph(f"&bull; {s}", SMALL))
+
+            body_tbl = Table([[c] for c in body_cells], colWidths=[CONTENT_W])
+            body_tbl.setStyle(TableStyle([
+                ("LEFTPADDING", (0, 0), (-1, -1), 8),
+                ("RIGHTPADDING", (0, 0), (-1, -1), 8),
+                ("TOPPADDING", (0, 0), (-1, -1), 3),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
+                ("BACKGROUND", (0, 0), (-1, -1), colors.HexColor("#FAFAFA")),
+                ("LINEBEFORE", (0, 0), (0, -1), 2.5, lvl_color),
+                ("BOX", (0, 0), (-1, -1), 0.25, BORDER),
+            ]))
+
+            story.append(KeepTogether([header_tbl, body_tbl, Spacer(1, 10)]))
+
+    # Next Steps
+    story.append(Spacer(1, 10))
+    story.append(Paragraph("Next Steps & Recommendations", H2))
+    story.append(Paragraph(
+        "Based on the assessment results, the following next steps are recommended:",
+        BODY,
+    ))
+    next_steps = [
+        "Review this report carefully and reflect on how the dimension scores align with your self-perception and experiences.",
+        "Identify your top 2-3 dimensions as potential areas of natural strength to leverage in academic and career planning.",
+        "Select 1-2 development areas and create a concrete action plan with specific, measurable goals.",
+        "Discuss this report with a qualified career counsellor or mentor to contextualise the findings for your specific situation.",
+        "Re-take the assessment after 6-12 months to track changes in your profile over time.",
+    ]
+    for step in next_steps:
+        story.append(Paragraph(f"&bull; {step}", BODY))
+        story.append(Spacer(1, 2))
 
     # Disclaimer
     story.append(Spacer(1, 12))
@@ -265,7 +325,8 @@ def build(data, out_path):
     story.append(Paragraph(
         "This report is based on a self-report psychometric screening instrument and is intended for guidance purposes only. "
         "It is not a clinical diagnosis. Results should be interpreted alongside one-to-one counselling, academic records and other "
-        "relevant context. For career-critical decisions, please consult a qualified career counsellor.",
+        "relevant context. For career-critical decisions, please consult a qualified career counsellor. Scores are influenced by "
+        "self-awareness, mood and test-taking attitude on the day of assessment.",
         SMALL,
     ))
 

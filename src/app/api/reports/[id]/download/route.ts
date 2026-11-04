@@ -49,9 +49,26 @@ export const GET = apiHandler(async (req: NextRequest, { params }: { params: Pro
     platform: 'Psychometric Testing Platform',
     reportId: report.id,
     student: report.student,
-    assessment: report.assessment,
+    assessment: {
+      ...report.assessment,
+      purpose: normAssessment.purpose,
+      targetPopulation: normAssessment.targetPopulation,
+      description: normAssessment.description,
+      instructions: normAssessment.instructions,
+    },
     attempt: report.attempt,
-    score: result,
+    score: {
+      ...result,
+      dimensions: result.dimensions.map((d) => {
+        const dimDef = normAssessment.dimensions.find((dd) => dd.code === d.code || dd.name === d.name)
+        return {
+          ...d,
+          strengths: dimDef?.strengths || [],
+          developmentAreas: dimDef?.developmentAreas || [],
+          dimensionDescription: dimDef?.description || '',
+        }
+      }),
+    },
   }
 
   const pdfPath = await generateReportPdf(pdfData, report.id)

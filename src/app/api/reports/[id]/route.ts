@@ -1,7 +1,8 @@
 import { NextRequest } from 'next/server'
 import { db } from '@/lib/db'
-import { getCurrentUser, requireRole } from '@/lib/auth'
+import { getCurrentUser } from '@/lib/auth'
 import { apiHandler, json, error } from '@/lib/api'
+import { getAssessment } from '@/lib/assessments/loader'
 
 // GET /api/reports/[id] — view a report. Role-checked:
 //   - Super Admin: any report
@@ -42,13 +43,26 @@ export const GET = apiHandler(async (_req: NextRequest, { params }: { params: Pr
 
   const dims = scoreResult ? JSON.parse(scoreResult.dimensions) : []
   const topDims = scoreResult?.topDimensions ? JSON.parse(scoreResult.topDimensions) : []
+
+  // Enrich dimensions with strengths/development areas from the assessment definition
+  const normAssessment = getAssessment(report.assessment.slug)
+  const enrichedDims = normAssessment ? dims.map((d: any) => {
+    const dimDef = normAssessment.dimensions.find((dd) => dd.code === d.code || dd.name === d.name)
+    return {
+      ...d,
+      strengths: dimDef?.strengths || [],
+      developmentAreas: dimDef?.developmentAreas || [],
+      dimensionDescription: dimDef?.description || '',
+    }
+  }) : dims
+
   return json({
     report: {
       id: report.id, generatedAt: report.generatedAt, accessLevel: report.accessLevel,
       paymentStatus: report.paymentStatus,
       student: report.student, assessment: report.assessment, attempt: report.attempt,
       score: {
-        dimensions: dims, totalScore: scoreResult?.totalScore ?? null,
+        dimensions: enrichedDims, totalScore: scoreResult?.totalScore ?? null,
         recommendation: scoreResult?.recommendation ?? null, topDimensions: topDims,
       },
     },
