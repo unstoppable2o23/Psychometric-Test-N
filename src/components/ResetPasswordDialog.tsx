@@ -8,7 +8,24 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogT
 import { KeyRound } from 'lucide-react'
 import { toast } from 'sonner'
 
-export function ResetPasswordDialog({ studentId, studentName, trigger }: { studentId: string; studentName: string; trigger?: React.ReactNode }) {
+/**
+ * Reset Password dialog.
+ * - adminMode (default): uses the admin endpoint — Super Admin can reset ANY
+ *   user's password (student or counsellor).
+ * - non-admin (counsellor resetting a student): uses the student endpoint with
+ *   assignment-based authorization.
+ */
+export function ResetPasswordDialog({
+  userId,
+  userName,
+  adminMode = true,
+  trigger,
+}: {
+  userId: string
+  userName: string
+  adminMode?: boolean
+  trigger?: React.ReactNode
+}) {
   const [open, setOpen] = useState(false)
   const [busy, setBusy] = useState(false)
 
@@ -21,8 +38,12 @@ export function ResetPasswordDialog({ studentId, studentName, trigger }: { stude
     if (password !== confirm) { toast.error('Passwords do not match'); return }
     setBusy(true)
     try {
-      await api.resetStudentPassword(studentId, password)
-      toast.success(`Password updated for ${studentName}`)
+      if (adminMode) {
+        await api.adminResetPassword(userId, password)
+      } else {
+        await api.resetStudentPassword(userId, password)
+      }
+      toast.success(`Password updated for ${userName}`)
       setOpen(false)
     } catch (err: any) { toast.error(err.message) }
     finally { setBusy(false) }
@@ -41,7 +62,7 @@ export function ResetPasswordDialog({ studentId, studentName, trigger }: { stude
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2"><KeyRound className="w-4 h-4 text-teal-600" /> Reset Password</DialogTitle>
         </DialogHeader>
-        <p className="text-sm text-slate-500 -mt-1">Set a new password for <span className="font-semibold text-slate-700">{studentName}</span>. They will need to use this new password at their next sign-in.</p>
+        <p className="text-sm text-slate-500 -mt-1">Set a new password for <span className="font-semibold text-slate-700">{userName}</span>. They will need to use this new password at their next sign-in.</p>
         <form onSubmit={submit} className="space-y-3">
           <div>
             <Label htmlFor="password">New Password</Label>

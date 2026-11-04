@@ -134,7 +134,7 @@ function StudentsTab() {
                     <td className="px-4 py-3"><Badge variant={s.isActive ? 'default' : 'secondary'} className={s.isActive ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-100' : ''}>{s.isActive ? 'Active' : 'Inactive'}</Badge></td>
                     <td className="px-4 py-3 text-right whitespace-nowrap">
                       <Button size="sm" variant="ghost" onClick={() => toggleActive(s)} className="text-xs">{s.isActive ? 'Deactivate' : 'Activate'}</Button>
-                      <ResetPasswordDialog studentId={s.id} studentName={s.name} />
+                      <ResetPasswordDialog userId={s.id} userName={s.name} />
                     </td>
                   </tr>
                 ))}
@@ -334,6 +334,7 @@ function CounsellorsTab() {
               <div className="flex items-center justify-between mb-2"><p className="font-semibold text-slate-900">{c.name}</p><Badge variant={c.isActive ? 'default' : 'secondary'} className={c.isActive ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-100' : ''}>{c.isActive ? 'Active' : 'Inactive'}</Badge></div>
               <p className="text-xs text-slate-500">{c.email} &middot; {c.phone}</p>
               <p className="text-xs text-slate-400 mt-2">{c.counsellorStudents?.length || 0} student(s) assigned</p>
+              <div className="mt-3"><ResetPasswordDialog userId={c.id} userName={c.name} /></div>
             </CardContent>
           </Card>
         ))}

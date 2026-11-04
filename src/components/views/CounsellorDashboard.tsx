@@ -252,7 +252,7 @@ function StudentsTab() {
       <table className="w-full text-sm">
         <thead className="bg-slate-50 text-slate-600 text-xs uppercase"><tr><th className="text-left px-4 py-3 font-semibold">Name</th><th className="text-left px-4 py-3 font-semibold hidden sm:table-cell">Email</th><th className="text-left px-4 py-3 font-semibold hidden md:table-cell">Phone</th><th className="text-right px-4 py-3 font-semibold">Actions</th></tr></thead>
         <tbody className="divide-y divide-slate-100">
-          {students.map((s: any) => (<tr key={s.id} className="hover:bg-slate-50"><td className="px-4 py-3 font-medium text-slate-800">{s.name}</td><td className="px-4 py-3 text-slate-600 hidden sm:table-cell">{s.email}</td><td className="px-4 py-3 text-slate-600 hidden md:table-cell">{s.phone || '—'}</td><td className="px-4 py-3 text-right"><ResetPasswordDialog studentId={s.id} studentName={s.name} /></td></tr>))}
+          {students.map((s: any) => (<tr key={s.id} className="hover:bg-slate-50"><td className="px-4 py-3 font-medium text-slate-800">{s.name}</td><td className="px-4 py-3 text-slate-600 hidden sm:table-cell">{s.email}</td><td className="px-4 py-3 text-slate-600 hidden md:table-cell">{s.phone || '—'}</td><td className="px-4 py-3 text-right"><ResetPasswordDialog userId={s.id} userName={s.name} adminMode={false} /></td></tr>))}
         </tbody>
       </table>
     </div>
