@@ -170,15 +170,7 @@ export async function generateReportPdf(data: ReportPdfData, id: string): Promis
   // --- Recommendation ---
   if (data.score.recommendation) {
     heading('Key Recommendation')
-    const recLines = wrapText(data.score.recommendation, font, 11, contentW - 20)
-    const recH = recLines.length * 15 + 16
-    ensureSpace(recH)
-    page.drawRectangle({ x: MARGIN, y: y - recH, width: contentW, height: recH, color: C.EMERALD_BG })
-    page.drawRectangle({ x: MARGIN, y: y - recH, width: contentW, height: recH, borderColor: C.GREEN, borderWidth: 0.75 })
-    recLines.forEach((line, i) => {
-      page.drawText(line, { x: MARGIN + 10, y: y - 15 - i * 15, size: 11, font, color: C.NAVY })
-    })
-    y -= recH + 8
+    drawInfoBox('', data.score.recommendation, C.GREEN, C.EMERALD_BG)
     spacer(8)
   }
 
@@ -186,23 +178,22 @@ export async function generateReportPdf(data: ReportPdfData, id: string): Promis
   const dims = data.score.dimensions || []
   if (dims.length > 0) {
     heading('Dimension Profile')
-    const chartDims = dims.slice(0, 12)
-    const labelW = 150
-    const barAreaW = contentW - labelW - 45
-    const rowH = 20
-    ensureSpace(chartDims.length * rowH + 10)
-    chartDims.forEach((d, i) => {
-      const ry = y - i * rowH
-      const pct = d.pct || 0
-      const name = (d.name || d.code || '').slice(0, 30)
-      page.drawText(name, { x: MARGIN, y: ry - 10, size: 8, font, color: C.SLATE })
-      page.drawLine({ start: { x: MARGIN + labelW, y: ry - 2 }, end: { x: MARGIN + labelW + barAreaW, y: ry - 2 }, thickness: 0.5, color: hex('#E2E8F0') })
-      const barW = Math.max(1, barAreaW * pct / 100)
-      page.drawRectangle({ x: MARGIN + labelW, y: ry - 12, width: barW, height: 10, color: lvlColor(d.level || '') })
-      page.drawText(`${pct}%`, { x: MARGIN + labelW + barAreaW + 5, y: ry - 10, size: 8, font: fontBold, color: C.SLATE })
-    })
-    y -= chartDims.length * rowH + 10
-    spacer(8)
+    // Use radar chart for 3-12 dimensions, progress bars otherwise
+    if (dims.length >= 3 && dims.length <= 12) {
+      const radarR = 90
+      ensureSpace(radarR * 2 + 60)
+      const cx = MARGIN + contentW / 2
+      const cy = y - radarR - 20
+      drawRadarChart(dims.slice(0, 12), cx, cy, radarR)
+      y = cy - radarR - 30
+    } else {
+      // Progress bars for >12 dimensions
+      const chartDims = dims.slice(0, 16)
+      ensureSpace(chartDims.length * 14 + 10)
+      chartDims.forEach((d) => { drawProgressBar(d.name || d.code || '', d.pct || 0, d.level || '') })
+      spacer(8)
+    }
+    spacer(6)
   }
 
   // --- Domain breakdown ---
@@ -299,8 +290,99 @@ export async function generateReportPdf(data: ReportPdfData, id: string): Promis
     y -= boxH + 6
   }
 
+  // Radar/spider chart — visual element for dimension profiles
+  function drawRadarChart(chartDims: any[], cx: number, cy: number, radius: number) {
+    const n = chartDims.length
+    if (n < 3) return
+    // Grid: concentric polygons at 25%, 50%, 75%, 100%
+    for (const pct of [0.25, 0.5, 0.75, 1.0]) {
+      const gridColor = pct === 1.0 ? C.BORDER : hex('#E2E8F0')
+      for (let i = 0; i < n; i++) {
+        const a1 = (2 * Math.PI * i / n) - Math.PI / 2
+        const a2 = (2 * Math.PI * (i + 1) / n) - Math.PI / 2
+        const r = radius * pct
+        page.drawLine({
+          start: { x: cx + r * Math.cos(a1), y: cy + r * Math.sin(a1) },
+          end: { x: cx + r * Math.cos(a2), y: cy + r * Math.sin(a2) },
+          thickness: 0.5, color: gridColor,
+        })
+      }
+    }
+    // Spokes
+    for (let i = 0; i < n; i++) {
+      const a = (2 * Math.PI * i / n) - Math.PI / 2
+      page.drawLine({
+        start: { x: cx, y: cy },
+        end: { x: cx + radius * Math.cos(a), y: cy + radius * Math.sin(a) },
+        thickness: 0.4, color: hex('#E2E8F0'),
+      })
+    }
+    // Data polygon points
+    const pts = chartDims.map((d, i) => {
+      const a = (2 * Math.PI * i / n) - Math.PI / 2
+      const r = radius * Math.min(1, (d.pct || 0) / 100)
+      return { x: cx + r * Math.cos(a), y: cy + r * Math.sin(a) }
+    })
+    // Filled polygon — draw lines from center to each vertex to create a "filled" look
+    for (let i = 0; i < n; i++) {
+      page.drawLine({ start: { x: cx, y: cy }, end: pts[i], thickness: 1, color: hex('#0E7C66'), opacity: 0.2 })
+    }
+    // Outline (thicker)
+    for (let i = 0; i < n; i++) {
+      const p1 = pts[i], p2 = pts[(i + 1) % n]
+      page.drawLine({ start: p1, end: p2, thickness: 2, color: C.TEAL })
+    }
+    // Data points
+    pts.forEach((p) => { page.drawCircle({ x: p.x, y: p.y, size: 3, color: C.TEAL }) })
+    // Labels
+    chartDims.forEach((d, i) => {
+      const a = (2 * Math.PI * i / n) - Math.PI / 2
+      const lr = radius + 16
+      const lx = cx + lr * Math.cos(a), ly = cy + lr * Math.sin(a)
+      const name = sanitize((d.name || d.code || '').slice(0, 14))
+      const tw = font.widthOfTextAtSize(name, 7)
+      page.drawText(name, { x: lx - tw / 2, y: ly - 3, size: 7, font, color: C.SLATE })
+    })
+  }
+
+  // Progress bar — visual element for individual scores
+  function drawProgressBar(label: string, pct: number, lvl: string, w?: number) {
+    const barW = w || contentW
+    const labelW = 120
+    const barAreaW = barW - labelW - 40
+    ensureSpace(20)
+    const lc = lvlColor(lvl)
+    // Label
+    page.drawText(sanitize(label.slice(0, 18)), { x: MARGIN, y: y - 8, size: 8, font, color: C.SLATE })
+    // Background bar
+    page.drawRectangle({ x: MARGIN + labelW, y: y - 10, width: barAreaW, height: 8, color: C.LIGHT })
+    page.drawRectangle({ x: MARGIN + labelW, y: y - 10, width: barAreaW, height: 8, borderColor: C.BORDER, borderWidth: 0.25 })
+    // Filled bar
+    page.drawRectangle({ x: MARGIN + labelW, y: y - 10, width: Math.max(1, barAreaW * pct / 100), height: 8, color: lc })
+    // Percentage
+    page.drawText(`${pct}%`, { x: MARGIN + labelW + barAreaW + 5, y: y - 8, size: 8, font: fontBold, color: lc })
+    y -= 14
+  }
+
+  // Colored info callout box
+  function drawInfoBox(title: string, body: string, color = C.TEAL, bgColor = hex('#ECFDF5')) {
+    const lines = wrapText(body, font, 10, contentW - 24)
+    const boxH = lines.length * 14 + 20
+    ensureSpace(boxH + 4)
+    page.drawRectangle({ x: MARGIN, y: y - boxH, width: contentW, height: boxH, color: bgColor })
+    page.drawRectangle({ x: MARGIN, y: y - boxH, width: 4, height: boxH, color })
+    if (title) {
+      page.drawText(sanitize(title), { x: MARGIN + 12, y: y - 14, size: 10, font: fontBold, color })
+    }
+    lines.forEach((l, i) => {
+      page.drawText(l, { x: MARGIN + 12, y: y - (title ? 28 : 14) - i * 14, size: 10, font, color: C.SLATE })
+    })
+    y -= boxH + 6
+  }
+
   if (hasSpecificContent) {
-    newPage()
+    ensureSpace(40)
+    spacer(8)
 
     // === PERSONALITY ===
     if (slug === 'personality') {
@@ -326,7 +408,8 @@ export async function generateReportPdf(data: ReportPdfData, id: string): Promis
 
       // Personality profile
       if (td) {
-        newPage()
+        ensureSpace(60)
+        spacer(8)
         drawSectionTitle('Your Personality Profile')
         drawText(td.profile, { size: 10, lineHeight: 14 })
 
@@ -361,8 +444,9 @@ export async function generateReportPdf(data: ReportPdfData, id: string): Promis
         const info = intel[code]
         if (!info) continue
 
-        newPage()
-        // Title
+        ensureSpace(120)
+        spacer(6)
+        // Title bar
         page.drawRectangle({ x: MARGIN, y: y - 24, width: contentW, height: 26, color: lvlColor(d.level || '') })
         page.drawText(sanitize(info.name || d.name), { x: MARGIN + 8, y: y - 18, size: 12, font: fontBold, color: C.WHITE })
         page.drawText(`${d.pct || 0}% - ${d.level || ''}`, { x: MARGIN + contentW - 100, y: y - 18, size: 10, font: fontBold, color: C.WHITE })
@@ -414,7 +498,8 @@ export async function generateReportPdf(data: ReportPdfData, id: string): Promis
       for (let i = 0; i < br.length; i++) {
         const b = br[i]
         const sd = getStreamData(b.code)
-        newPage()
+        ensureSpace(100)
+        spacer(6)
         // Rank header
         const rankColor = i === 0 ? C.GREEN : C.MUTED
         page.drawRectangle({ x: MARGIN, y: y - 24, width: contentW, height: 26, color: rankColor })
