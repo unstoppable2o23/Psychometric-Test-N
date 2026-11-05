@@ -1,0 +1,41 @@
+{
+  "slug": "multi-dimensional-test-(one-test-for-all)",
+  "file": "Multi dimensional test (One test for all).html",
+  "sectionOptions": {
+    "Natural Abilities": [
+      "Not at all",
+      "Barely",
+      "Somewhat",
+      "Fairly well",
+      "Extremely easily"
+    ],
+    "Interests": [
+      "I hate it",
+      "I dislike it",
+      "I don't mind it",
+      "I like it",
+      "I absolutely love it"
+    ],
+    "Personality": [
+      "Not me at all",
+      "Rarely me",
+      "Sometimes me",
+      "Often me",
+      "Exactly me"
+    ],
+    "Career Motivators": [
+      "Not important",
+      "Slightly important",
+      "Moderately important",
+      "Very important",
+      "My top priority"
+    ],
+    "Learning Styles": [
+      "Never works",
+      "Rarely works",
+      "Sometimes works",
+      "Often works",
+      "Always works best"
+    ]
+  }
+}

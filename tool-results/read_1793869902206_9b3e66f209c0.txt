@@ -1,0 +1,1115 @@
+     1→{
+     2→  "slug": "stream-selector",
+     3→  "sourceFile": "stream selector test.html",
+     4→  "TEST_SECTIONS": [
+     5→    {
+     6→      "id": "sec1",
+     7→      "name": "SELF IDENTIFICATION",
+     8→      "milestoneTitle": "Your journey in the Stream Selector Test has begun.",
+     9→      "milestoneDesc": "Read each question carefully and pick the option that best describes you.",
+    10→      "questions": [
+    11→        {
+    12→          "id": 1,
+    13→          "text": "Do you enjoy doing community service or helping out as a volunteer?",
+    14→          "options": [
+    15→            "Yes",
+    16→            "No",
+    17→            "Not sure"
+    18→          ],
+    19→          "domain": "humanities",
+    20→          "type": "interest"
+    21→        },
+    22→        {
+    23→          "id": 2,
+    24→          "text": "Are you good at listening to others and making friends with all kinds of people?",
+    25→          "options": [
+    26→            "Yes",
+    27→            "No",
+    28→            "Not sure"
+    29→          ],
+    30→          "domain": "humanities",
+    31→          "type": "interest"
+    32→        },
+    33→        {
+    34→          "id": 3,
+    35→          "text": "Is working with large amounts of numbers and data easy for you?",
+    36→          "options": [
+    37→            "Yes",
+    38→            "No",
+    39→            "Not sure"
+    40→          ],
+    41→          "domain": "commerce",
+    42→          "type": "aptitude"
+    43→        },
+    44→        {
+    45→          "id": 4,
+    46→          "text": "Do you feel confident managing money or budgets for other people?",
+    47→          "options": [
+    48→            "Yes",
+    49→            "No",
+    50→            "Not sure"
+    51→          ],
+    52→          "domain": "commerce",
+    53→          "type": "aptitude"
+    54→        },
+    55→        {
+    56→          "id": 5,
+    57→          "text": "Do you enjoy reading technical guides and solving technical or mechanical problems?",
+    58→          "options": [
+    59→            "Yes",
+    60→            "No",
+    61→            "Not sure"
+    62→          ],
+    63→          "domain": "sci_math",
+    64→          "type": "aptitude"
+    65→        },
+    66→        {
+    67→          "id": 6,
+    68→          "text": "Do you enjoy working in a science laboratory and performing experiments?",
+    69→          "options": [
+    70→            "Yes",
+    71→            "No",
+    72→            "Not sure"
+    73→          ],
+    74→          "domain": "sci_bio",
+    75→          "type": "interest"
+    76→        },
+    77→        {
+    78→          "id": 7,
+    79→          "text": "Are you interested in studying how plants, animals, and living things grow?",
+    80→          "options": [
+    81→            "Yes",
+    82→            "No",
+    83→            "Not sure"
+    84→          ],
+    85→          "domain": "sci_bio",
+    86→          "type": "interest"
+    87→        },
+    88→        {
+    89→          "id": 8,
+    90→          "text": "Do you think working in a hospital or medical clinic is a bad career choice?",
+    91→          "options": [
+    92→            "Yes",
+    93→            "No",
+    94→            "Not sure"
+    95→          ],
+    96→          "domain": "sci_bio",
+    97→          "type": "interest_reverse"
+    98→        },
+    99→        {
+   100→          "id": 9,
+   101→          "text": "Can you analyze financial reports and explain them easily to others?",
+   102→          "options": [
+   103→            "Yes",
+   104→            "No",
+   105→            "Not sure"
+   106→          ],
+   107→          "domain": "commerce",
+   108→          "type": "aptitude"
+   109→        },
+   110→        {
+   111→          "id": 10,
+   112→          "text": "Does learning about new technologies and gadgets excite you?",
+   113→          "options": [
+   114→            "Yes",
+   115→            "No",
+   116→            "Not sure"
+   117→          ],
+   118→          "domain": "sci_math",
+   119→          "type": "interest"
+   120→        },
+   121→        {
+   122→          "id": 11,
+   123→          "text": "Do you enjoy spending time reading about world history, evolution, and human culture?",
+   124→          "options": [
+   125→            "Yes",
+   126→            "No",
+   127→            "Not sure"
+   128→          ],
+   129→          "domain": "humanities",
+   130→          "type": "interest"
+   131→        },
+   132→        {
+   133→          "id": 12,
+   134→          "text": "Do you find learning physics formulas and chemistry theories boring?",
+   135→          "options": [
+   136→            "Yes",
+   137→            "No",
+   138→            "Not sure"
+   139→          ],
+   140→          "domain": "sci_math",
+   141→          "type": "interest_reverse"
+   142→        },
+   143→        {
+   144→          "id": 13,
+   145→          "text": "Do you enjoy reading business news, stock updates, or economic reports?",
+   146→          "options": [
+   147→            "Yes",
+   148→            "No",
+   149→            "Not sure"
+   150→          ],
+   151→          "domain": "commerce",
+   152→          "type": "interest"
+   153→        },
+   154→        {
+   155→          "id": 14,
+   156→          "text": "Are you interested in how government laws, rules, and policies are created?",
+   157→          "options": [
+   158→            "Yes",
+   159→            "No",
+   160→            "Not sure"
+   161→          ],
+   162→          "domain": "humanities",
+   163→          "type": "interest"
+   164→        }
+   165→      ]
+   166→    },
+   167→    {
+   168→      "id": "sec2",
+   169→      "name": "WORK SITUATIONS",
+   170→      "milestoneTitle": "Great work! You have completed the first milestone.",
+   171→      "milestoneDesc": "Imagine yourself working in a future job. Choose 'Yes' if you would enjoy doing this work to earn your living.",
+   172→      "questions": [
+   173→        {
+   174→          "id": 15,
+   175→          "text": "Would you like a job where you: Discuss better ways to govern and run a country?",
+   176→          "options": [
+   177→            "Yes",
+   178→            "No",
+   179→            "Not sure"
+   180→          ],
+   181→          "domain": "humanities",
+   182→          "type": "interest"
+   183→        },
+   184→        {
+   185→          "id": 16,
+   186→          "text": "Would you like a job where you: Guide and counsel students about their studies and careers?",
+   187→          "options": [
+   188→            "Yes",
+   189→            "No",
+   190→            "Not sure"
+   191→          ],
+   192→          "domain": "humanities",
+   193→          "type": "interest"
+   194→        },
+   195→        {
+   196→          "id": 17,
+   197→          "text": "Would you like a job where you: Write theater plays or teach dance and performing arts?",
+   198→          "options": [
+   199→            "Yes",
+   200→            "No",
+   201→            "Not sure"
+   202→          ],
+   203→          "domain": "humanities",
+   204→          "type": "interest"
+   205→        },
+   206→        {
+   207→          "id": 18,
+   208→          "text": "Would you like a job where you: Write and handle official business communications and letters?",
+   209→          "options": [
+   210→            "Yes",
+   211→            "No",
+   212→            "Not sure"
+   213→          ],
+   214→          "domain": "commerce",
+   215→          "type": "interest"
+   216→        },
+   217→        {
+   218→          "id": 19,
+   219→          "text": "Would you like a job where you: Decide which company stocks and shares to invest money in?",
+   220→          "options": [
+   221→            "Yes",
+   222→            "No",
+   223→            "Not sure"
+   224→          ],
+   225→          "domain": "commerce",
+   226→          "type": "interest"
+   227→        },
+   228→        {
+   229→          "id": 20,
+   230→          "text": "Would you like a job where you: Write computer programs, logic, and software code?",
+   231→          "options": [
+   232→            "Yes",
+   233→            "No",
+   234→            "Not sure"
+   235→          ],
+   236→          "domain": "sci_math",
+   237→          "type": "interest"
+   238→        },
+   239→        {
+   240→          "id": 21,
+   241→          "text": "Would you like a job where you: Design electronic communication devices and smartphones?",
+   242→          "options": [
+   243→            "Yes",
+   244→            "No",
+   245→            "Not sure"
+   246→          ],
+   247→          "domain": "sci_math",
+   248→          "type": "interest"
+   249→        },
+   250→        {
+   251→          "id": 22,
+   252→          "text": "Would you like a job where you: Provide medical care and treatments to patients or animals?",
+   253→          "options": [
+   254→            "Yes",
+   255→            "No",
+   256→            "Not sure"
+   257→          ],
+   258→          "domain": "sci_bio",
+   259→          "type": "interest"
+   260→        },
+   261→        {
+   262→          "id": 23,
+   263→          "text": "Would you like a job where you: Protect wild animals and forests from illegal hunters?",
+   264→          "options": [
+   265→            "Yes",
+   266→            "No",
+   267→            "Not sure"
+   268→          ],
+   269→          "domain": "sci_bio",
+   270→          "type": "interest"
+   271→        },
+   272→        {
+   273→          "id": 24,
+   274→          "text": "Would you like a job where you: Give injections, prescribe medicine, or clean teeth at a clinic?",
+   275→          "options": [
+   276→            "Yes",
+   277→            "No",
+   278→            "Not sure"
+   279→          ],
+   280→          "domain": "sci_bio",
+   281→          "type": "interest"
+   282→        },
+   283→        {
+   284→          "id": 25,
+   285→          "text": "Would you like a job where you: Take care of newborn babies in a hospital care unit?",
+   286→          "options": [
+   287→            "Yes",
+   288→            "No",
+   289→            "Not sure"
+   290→          ],
+   291→          "domain": "sci_bio",
+   292→          "type": "interest"
+   293→        },
+   294→        {
+   295→          "id": 26,
+   296→          "text": "Would you like a job where you: Test different soils and fertilizers to grow better crops?",
+   297→          "options": [
+   298→            "Yes",
+   299→            "No",
+   300→            "Not sure"
+   301→          ],
+   302→          "domain": "sci_bio",
+   303→          "type": "interest"
+   304→        },
+   305→        {
+   306→          "id": 27,
+   307→          "text": "Would you like a job where you: Grow biological cell tissues in a lab and write research papers?",
+   308→          "options": [
+   309→            "Yes",
+   310→            "No",
+   311→            "Not sure"
+   312→          ],
+   313→          "domain": "sci_bio",
+   314→          "type": "interest"
+   315→        },
+   316→        {
+   317→          "id": 28,
+   318→          "text": "Would you like a job where you: Distribute vaccines and health treatments in government health centers?",
+   319→          "options": [
+   320→            "Yes",
+   321→            "No",
+   322→            "Not sure"
+   323→          ],
+   324→          "domain": "sci_bio",
+   325→          "type": "interest"
+   326→        },
+   327→        {
+   328→          "id": 29,
+   329→          "text": "Would you like a job where you: Organize public health awareness camps to fight diseases?",
+   330→          "options": [
+   331→            "Yes",
+   332→            "No",
+   333→            "Not sure"
+   334→          ],
+   335→          "domain": "humanities",
+   336→          "type": "interest"
+   337→        },
+   338→        {
+   339→          "id": 30,
+   340→          "text": "Would you like a job where you: Lead a team to complete business projects for corporate clients?",
+   341→          "options": [
+   342→            "Yes",
+   343→            "No",
+   344→            "Not sure"
+   345→          ],
+   346→          "domain": "commerce",
+   347→          "type": "interest"
+   348→        },
+   349→        {
+   350→          "id": 31,
+   351→          "text": "Would you like a job where you: Work on space rockets, satellites, and space research missions?",
+   352→          "options": [
+   353→            "Yes",
+   354→            "No",
+   355→            "Not sure"
+   356→          ],
+   357→          "domain": "sci_math",
+   358→          "type": "interest"
+   359→        },
+   360→        {
+   361→          "id": 32,
+   362→          "text": "Would you like a job where you: Use advanced math models and formulas to design new gadgets?",
+   363→          "options": [
+   364→            "Yes",
+   365→            "No",
+   366→            "Not sure"
+   367→          ],
+   368→          "domain": "sci_math",
+   369→          "type": "interest"
+   370→        },
+   371→        {
+   372→          "id": 33,
+   373→          "text": "Would you like a job where you: Perform lab experiments to prove scientific laws and theories?",
+   374→          "options": [
+   375→            "Yes",
+   376→            "No",
+   377→            "Not sure"
+   378→          ],
+   379→          "domain": "sci_math",
+   380→          "type": "interest"
+   381→        },
+   382→        {
+   383→          "id": 34,
+   384→          "text": "Would you like a job where you: Check electrical meters and instruments to measure power current?",
+   385→          "options": [
+   386→            "Yes",
+   387→            "No",
+   388→            "Not sure"
+   389→          ],
+   390→          "domain": "sci_math",
+   391→          "type": "interest"
+   392→        },
+   393→        {
+   394→          "id": 35,
+   395→          "text": "Would you like a job where you: Attend strategic business planning meetings with company executives?",
+   396→          "options": [
+   397→            "Yes",
+   398→            "No",
+   399→            "Not sure"
+   400→          ],
+   401→          "domain": "commerce",
+   402→          "type": "interest"
+   403→        },
+   404→        {
+   405→          "id": 36,
+   406→          "text": "Would you like a job where you: Manage corporate tax planning and company financial records?",
+   407→          "options": [
+   408→            "Yes",
+   409→            "No",
+   410→            "Not sure"
+   411→          ],
+   412→          "domain": "commerce",
+   413→          "type": "interest"
+   414→        }
+   415→      ]
+   416→    },
+   417→    {
+   418→      "id": "sec3",
+   419→      "name": "CODE MATCHING & LOGIC",
+   420→      "milestoneTitle": "Milestone 2 Completed!",
+   421→      "milestoneDesc": "Test your attention to detail and logical deduction skills. Read carefully and pick the correct option.",
+   422→      "questions": [
+   423→        {
+   424→          "id": 37,
+   425→          "text": "Which pair of codes below are EXACTLY IDENTICAL to each other?",
+   426→          "options": [
+   427→            "A7X9 & A7X9",
+   428→            "A7X9 & A7Y9",
+   429→            "A7X9 & A7X8",
+   430→            "A7X9 & A8X9"
+   431→          ],
+   432→          "domain": "sci_math",
+   433→          "type": "aptitude"
+   434→        },
+   435→        {
+   436→          "id": 38,
+   437→          "text": "Find the pair where both text codes match perfectly:",
+   438→          "options": [
+   439→            "K92P & K92P",
+   440→            "K92P & K92Q",
+   441→            "K92P & K91P",
+   442→            "K92P & L92P"
+   443→          ],
+   444→          "domain": "sci_math",
+   445→          "type": "aptitude"
+   446→        },
+   447→        {
+   448→          "id": 39,
+   449→          "text": "Which option contains two codes that are 100% identical?",
+   450→          "options": [
+   451→            "#R48T & #R48T",
+   452→            "#R48T & #R48S",
+   453→            "#R48T & #S48T",
+   454→            "#R48T & #R49T"
+   455→          ],
+   456→          "domain": "sci_math",
+   457→          "type": "aptitude"
+   458→        },
+   459→        {
+   460→          "id": 40,
+   461→          "text": "Logical Deduction: If all marketers are creative, and some creative people are artists, which statement MUST be true?",
+   462→          "options": [
+   463→            "Some creative people are marketers",
+   464→            "All marketers are artists",
+   465→            "All artists are marketers",
+   466→            "No marketers are creative"
+   467→          ],
+   468→          "domain": "commerce",
+   469→          "type": "aptitude"
+   470→        },
+   471→        {
+   472→          "id": 41,
+   473→          "text": "Three friends (Alok, Bhavan, Chandan) bought a Book, a Pen, and a Notebook. Alok did NOT buy the pen. Bhavan bought the notebook. Chandan did NOT buy the pen. What item did Alok buy?",
+   474→          "options": [
+   475→            "Book",
+   476→            "Pen",
+   477→            "Notebook",
+   478→            "None of the above"
+   479→          ],
+   480→          "domain": "sci_math",
+   481→          "type": "aptitude"
+   482→        },
+   483→        {
+   484→          "id": 42,
+   485→          "text": "A boy has $15 to buy a snack. He chooses a chocolate bar instead of a packet of chips. What is his opportunity cost (what is he giving up)?",
+   486→          "options": [
+   487→            "The packet of chips",
+   488→            "His money",
+   489→            "His appetite",
+   490→            "His time"
+   491→          ],
+   492→          "domain": "commerce",
+   493→          "type": "aptitude"
+   494→        },
+   495→        {
+   496→          "id": 43,
+   497→          "text": "What is the primary purpose of creating a business plan?",
+   498→          "options": [
+   499→            "To outline business goals and strategies to achieve them",
+   500→            "To decide daily employee duties",
+   501→            "To set daily sales prices",
+   502→            "To manage social media accounts"
+   503→          ],
+   504→          "domain": "commerce",
+   505→          "type": "aptitude"
+   506→        },
+   507→        {
+   508→          "id": 44,
+   509→          "text": "Which two code strings are EXACTLY IDENTICAL?",
+   510→          "options": [
+   511→            "8802-BA & 8802-BA",
+   512→            "8802-BA & 8802-PA",
+   513→            "8802-BA & 8803-BA",
+   514→            "8802-BA & 8802-BB"
+   515→          ],
+   516→          "domain": "sci_math",
+   517→          "type": "aptitude"
+   518→        },
+   519→        {
+   520→          "id": 45,
+   521→          "text": "Find the matching pair of codes from the options below:",
+   522→          "options": [
+   523→            "TX-909-Z & TX-909-Z",
+   524→            "TX-909-Z & TX-909-S",
+   525→            "TX-909-Z & TY-909-Z",
+   526→            "TX-909-Z & TX-910-Z"
+   527→          ],
+   528→          "domain": "sci_math",
+   529→          "type": "aptitude"
+   530→        },
+   531→        {
+   532→          "id": 46,
+   533→          "text": "Identify the pair where both codes are 100% identical:",
+   534→          "options": [
+   535→            "#5512-QX & #5512-QX",
+   536→            "#5512-QX & #5512-PX",
+   537→            "#5512-QX & #5513-QX",
+   538→            "#5512-QX & #5512-QY"
+   539→          ],
+   540→          "domain": "sci_math",
+   541→          "type": "aptitude"
+   542→        }
+   543→      ]
+   544→    },
+   545→    {
+   546→      "id": "sec4",
+   547→      "name": "DATA & PRACTICAL ANALYSIS",
+   548→      "milestoneTitle": "Get up and Shine!",
+   549→      "milestoneDesc": "Take a deep breath and solve these practical, numerical, and scientific problem-solving questions.",
+   550→      "questions": [
+   551→        {
+   552→          "id": 47,
+   553→          "text": "A publishing house printed a book with total costs of $50,000. Costs breakdown: Advertising = 40%, Author Earnings = 20%, Printing = 30%, Transport = 10%. How much money was spent on Advertising and Author Earnings respectively?",
+   554→          "options": [
+   555→            "$20,000 & $10,000",
+   556→            "$15,000 & $10,000",
+   557→            "$10,000 & $20,000",
+   558→            "$25,000 & $5,000"
+   559→          ],
+   560→          "domain": "commerce",
+   561→          "type": "aptitude"
+   562→        },
+   563→        {
+   564→          "id": 48,
+   565→          "text": "A college refund policy states: '1st year students get 100% refund; 2nd year get 50%; 3rd year get 0%'. Records show:\n2008: 1st yr got 100%\n2009: 2nd yr got 100%\n2010: 3rd yr got 0%\n2012: 2nd yr got 100%\nWhich TWO years broke the refund policy rules?",
+   566→          "options": [
+   567→            "2009 & 2012",
+   568→            "2008 & 2010",
+   569→            "2009 & 2011",
+   570→            "None of these"
+   571→          ],
+   572→          "domain": "commerce",
+   573→          "type": "aptitude"
+   574→        },
+   575→        {
+   576→          "id": 49,
+   577→          "text": "What is the name of the galaxy that contains our Solar System?",
+   578→          "options": [
+   579→            "Milky Way",
+   580→            "Andromeda",
+   581→            "Triangulum",
+   582→            "Whirlpool"
+   583→          ],
+   584→          "domain": "sci_bio",
+   585→          "type": "aptitude"
+   586→        },
+   587→        {
+   588→          "id": 50,
+   589→          "text": "Which of the following is an example of a chemical change?",
+   590→          "options": [
+   591→            "Burning wood",
+   592→            "Melting ice",
+   593→            "Tearing paper",
+   594→            "Dissolving sugar in water"
+   595→          ],
+   596→          "domain": "sci_bio",
+   597→          "type": "aptitude"
+   598→        },
+   599→        {
+   600→          "id": 51,
+   601→          "text": "Ajay wants to exchange a single $500 note into $10 notes at the bank. How many $10 notes will he receive?",
+   602→          "options": [
+   603→            "50",
+   604→            "10",
+   605→            "500",
+   606→            "20"
+   607→          ],
+   608→          "domain": "commerce",
+   609→          "type": "aptitude"
+   610→        },
+   611→        {
+   612→          "id": 52,
+   613→          "text": "Mechanical Reasoning: Two gears X and Y touch each other directly. Gear X is larger than Gear Y. If Gear X turns CLOCKWISE, how does Gear Y turn?",
+   614→          "options": [
+   615→            "Counter-clockwise faster",
+   616→            "Clockwise faster",
+   617→            "Counter-clockwise slower",
+   618→            "Clockwise slower"
+   619→          ],
+   620→          "domain": "sci_math",
+   621→          "type": "aptitude"
+   622→        },
+   623→        {
+   624→          "id": 53,
+   625→          "text": "What is 1/9 converted into a percentage?",
+   626→          "options": [
+   627→            "11.11%",
+   628→            "0.09%",
+   629→            "1.11%",
+   630→            "0.9%"
+   631→          ],
+   632→          "domain": "sci_math",
+   633→          "type": "aptitude"
+   634→        },
+   635→        {
+   636→          "id": 54,
+   637→          "text": "Physics Logic: On a standard seesaw lever, if side Y moves down at a speed of 10 cm/s, how does the opposite side X move upwards?",
+   638→          "options": [
+   639→            "At the same speed (10 cm/s)",
+   640→            "Faster",
+   641→            "Slower",
+   642→            "It does not move"
+   643→          ],
+   644→          "domain": "sci_math",
+   645→          "type": "aptitude"
+   646→        },
+   647→        {
+   648→          "id": 55,
+   649→          "text": "Circuit Logic: In a simple series electric circuit containing 3 open switches and 1 bulb, how many switches MUST be closed for the light bulb to turn on?",
+   650→          "options": [
+   651→            "All three switches",
+   652→            "Only one switch",
+   653→            "Only two switches",
+   654→            "None"
+   655→          ],
+   656→          "domain": "sci_math",
+   657→          "type": "aptitude"
+   658→        },
+   659→        {
+   660→          "id": 56,
+   661→          "text": "On Day 1, a shopkeeper sold 1 kg of rice for $40. On Day 2, he sold 1 kg of rice for $60. If he made a profit of $10 on both days, what was his buying cost (cost price) on Day 1 and Day 2 respectively?",
+   662→          "options": [
+   663→            "$30 and $50",
+   664→            "$30 and $25",
+   665→            "$35 and $30",
+   666→            "$30 and $30"
+   667→          ],
+   668→          "domain": "commerce",
+   669→          "type": "aptitude"
+   670→        }
+   671→      ]
+   672→    },
+   673→    {
+   674→      "id": "sec5",
+   675→      "name": "READING & VERBAL CONCEPTS",
+   676→      "milestoneTitle": "Great Going!",
+   677→      "milestoneDesc": "Read the passages below carefully and answer the questions that follow.",
+   678→      "passage1": "Asia is the Earth's largest continent, stretching from the Bering Sea in the east to Europe in the west. Following the end of colonial rule, Asian economies grew rapidly—first in Japan, Singapore, South Korea, and Taiwan, and later in China and India. Over two-thirds of the human population lives in Asia, which was also the birthplace of early civilizations. Asia has rich diversity in culture, languages, climates, and government systems.",
+   679→      "passage2": "Electromagnetic radiation is energy traveling through space in waves. Sunlight, X-rays, microwave energy, and heat from fires are all examples. Objects appear in different colors to our eyes because they absorb certain light wavelengths and reflect others back to us.",
+   680→      "questions": [
+   681→        {
+   682→          "id": 57,
+   683→          "text": "Human civilization first originated on the continent of Asia.",
+   684→          "options": [
+   685→            "TRUE",
+   686→            "FALSE",
+   687→            "Cannot tell"
+   688→          ],
+   689→          "domain": "humanities",
+   690→          "type": "aptitude",
+   691→          "passageId": 1
+   692→        },
+   693→        {
+   694→          "id": 58,
+   695→          "text": "The passage proves that colonial rule had a negative impact on Asia.",
+   696→          "options": [
+   697→            "TRUE",
+   698→            "FALSE",
+   699→            "Cannot tell"
+   700→          ],
+   701→          "domain": "humanities",
+   702→          "type": "aptitude",
+   703→          "passageId": 1
+   704→        },
+   705→        {
+   706→          "id": 59,
+   707→          "text": "Siberia is the coldest place in the entire world.",
+   708→          "options": [
+   709→            "TRUE",
+   710→            "FALSE",
+   711→            "Cannot tell"
+   712→          ],
+   713→          "domain": "humanities",
+   714→          "type": "aptitude",
+   715→          "passageId": 1
+   716→        },
+   717→        {
+   718→          "id": 60,
+   719→          "text": "Singapore was among the first Asian countries to experience economic growth after colonial rule.",
+   720→          "options": [
+   721→            "TRUE",
+   722→            "FALSE",
+   723→            "Cannot tell"
+   724→          ],
+   725→          "domain": "humanities",
+   726→          "type": "aptitude",
+   727→          "passageId": 1
+   728→        },
+   729→        {
+   730→          "id": 61,
+   731→          "text": "Asia exhibits the greatest cultural and climate diversity in the world.",
+   732→          "options": [
+   733→            "TRUE",
+   734→            "FALSE",
+   735→            "Cannot tell"
+   736→          ],
+   737→          "domain": "humanities",
+   738→          "type": "aptitude",
+   739→          "passageId": 1
+   740→        },
+   741→        {
+   742→          "id": 62,
+   743→          "text": "Light is called electromagnetic radiation because it carries energy through space in wave forms.",
+   744→          "options": [
+   745→            "TRUE",
+   746→            "FALSE",
+   747→            "Both"
+   748→          ],
+   749→          "domain": "sci_math",
+   750→          "type": "aptitude",
+   751→          "passageId": 2
+   752→        },
+   753→        {
+   754→          "id": 63,
+   755→          "text": "The color we see an object to be depends on which light wavelengths it absorbs or reflects.",
+   756→          "options": [
+   757→            "TRUE",
+   758→            "FALSE",
+   759→            "Both"
+   760→          ],
+   761→          "domain": "sci_math",
+   762→          "type": "aptitude",
+   763→          "passageId": 2
+   764→        },
+   765→        {
+   766→          "id": 64,
+   767→          "text": "Radio waves, X-rays, microwaves, and visible light are all examples of...",
+   768→          "options": [
+   769→            "Electromagnetic radiation",
+   770→            "Sound waves",
+   771→            "Physical particles"
+   772→          ],
+   773→          "domain": "sci_math",
+   774→          "type": "aptitude",
+   775→          "passageId": 2
+   776→        },
+   777→        {
+   778→          "id": 65,
+   779→          "text": "An object appears blue because it absorbs blue light and reflects all other colors.",
+   780→          "options": [
+   781→            "TRUE",
+   782→            "FALSE",
+   783→            "Both"
+   784→          ],
+   785→          "domain": "sci_math",
+   786→          "type": "aptitude",
+   787→          "passageId": 2
+   788→        },
+   789→        {
+   790→          "id": 66,
+   791→          "text": "A white object reflects more light than a dark object.",
+   792→          "options": [
+   793→            "TRUE",
+   794→            "FALSE",
+   795→            "Both"
+   796→          ],
+   797→          "domain": "sci_math",
+   798→          "type": "aptitude",
+   799→          "passageId": 2
+   800→        },
+   801→        {
+   802→          "id": 67,
+   803→          "text": "Which of the following words is a preposition?",
+   804→          "options": [
+   805→            "In",
+   806→            "Location",
+   807→            "No",
+   808→            "Position"
+   809→          ],
+   810→          "domain": "humanities",
+   811→          "type": "aptitude"
+   812→        },
+   813→        {
+   814→          "id": 68,
+   815→          "text": "Choose the word with the correct spelling:",
+   816→          "options": [
+   817→            "Permissible",
+   818→            "Permisible",
+   819→            "Permissable",
+   820→            "Permisable"
+   821→          ],
+   822→          "domain": "humanities",
+   823→          "type": "aptitude"
+   824→        },
+   825→        {
+   826→          "id": 69,
+   827→          "text": "Complete the relationship: Cat is to Fur as Fish is to...",
+   828→          "options": [
+   829→            "Scales",
+   830→            "Feathers",
+   831→            "Tail",
+   832→            "Fins"
+   833→          ],
+   834→          "domain": "sci_bio",
+   835→          "type": "aptitude"
+   836→        },
+   837→        {
+   838→          "id": 70,
+   839→          "text": "Complete the relationship: Dawn is to Noon as Dusk is to...",
+   840→          "options": [
+   841→            "Night",
+   842→            "Afternoon",
+   843→            "Midnight",
+   844→            "Dark"
+   845→          ],
+   846→          "domain": "humanities",
+   847→          "type": "aptitude"
+   848→        },
+   849→        {
+   850→          "id": 71,
+   851→          "text": "Complete the relationship: Cat is to Paw as Horse is to...",
+   852→          "options": [
+   853→            "Hoof",
+   854→            "Fur",
+   855→            "Hair",
+   856→            "Shoe"
+   857→          ],
+   858→          "domain": "sci_bio",
+   859→          "type": "aptitude"
+   860→        }
+   861→      ]
+   862→    },
+   863→    {
+   864→      "id": "sec6",
+   865→      "name": "PATTERNS & SEQUENCES",
+   866→      "milestoneTitle": "Final Step!",
+   867→      "milestoneDesc": "Very well done! Complete these last pattern and visual logic questions to view your complete report.",
+   868→      "questions": [
+   869→        {
+   870→          "id": 72,
+   871→          "text": "Shape Sequence: Square (4 sides) → Pentagon (5 sides) → Hexagon (6 sides) → ?. What shape comes next in the pattern?",
+   872→          "options": [
+   873→            "Heptagon (7 sides)",
+   874→            "Triangle (3 sides)",
+   875→            "Octagon (8 sides)",
+   876→            "Nonagon (9 sides)"
+   877→          ],
+   878→          "domain": "sci_math",
+   879→          "type": "aptitude"
+   880→        },
+   881→        {
+   882→          "id": 73,
+   883→          "text": "Pattern Logic: 1 Circle → 2 Triangles → 3 Squares → ?. What is the next logical group in this pattern?",
+   884→          "options": [
+   885→            "4 Pentagons",
+   886→            "3 Circles",
+   887→            "5 Hexagons",
+   888→            "2 Squares"
+   889→          ],
+   890→          "domain": "sci_math",
+   891→          "type": "aptitude"
+   892→        },
+   893→        {
+   894→          "id": 74,
+   895→          "text": "Direction Rotation: A pointer faces NORTH on Step 1, turns clockwise to EAST on Step 2, and SOUTH on Step 3. Which direction will it face on Step 4?",
+   896→          "options": [
+   897→            "WEST",
+   898→            "NORTH",
+   899→            "NORTHEAST",
+   900→            "SOUTHWEST"
+   901→          ],
+   902→          "domain": "sci_math",
+   903→          "type": "aptitude"
+   904→        },
+   905→        {
+   906→          "id": 75,
+   907→          "text": "Letter Sequence: A, D, G, J, ? (Notice skipping 2 letters each time: A..D..G..J..?). What is the next letter?",
+   908→          "options": [
+   909→            "M",
+   910→            "K",
+   911→            "L",
+   912→            "N"
+   913→          ],
+   914→          "domain": "sci_math",
+   915→          "type": "aptitude"
+   916→        },
+   917→        {
+   918→          "id": 76,
+   919→          "text": "Grid Pattern: Row 1 has 1 dot (1²), Row 2 has 4 dots (2²), Row 3 has 9 dots (3²). How many dots will Row 4 have (4²)?",
+   920→          "options": [
+   921→            "16 dots",
+   922→            "12 dots",
+   923→            "10 dots",
+   924→            "20 dots"
+   925→          ],
+   926→          "domain": "sci_math",
+   927→          "type": "aptitude"
+   928→        }
+   929→      ]
+   930→    }
+   931→  ],
+   932→  "STREAM_DATABASE": {
+   933→    "sci_math": {
+   934→      "id": "sci_math",
+   935→      "title": "Science (Maths)",
+   936→      "subtitle": "Physics, Chemistry & Mathematics (PCM)",
+   937→      "description": "This field entails a methodical examination and exploration, employing a range of techniques like observation and experimentation. The key subjects covered in this discipline encompass physics, chemistry, and mathematics.",
+   938→      "advantages": [
+   939→        "A strong grasp of the subject provides the potential to innovate and create new technologies.",
+   940→        "Enhances comprehension of the occurrence of natural processes and phenomena through hypothesis formulation and experimental investigations."
+   941→      ],
+   942→      "coursesTitle": "Top Graduate Level Courses after 12th for PCM Students",
+   943→      "courses": [
+   944→        {
+   945→          "name": "Engineering (B.Tech)",
+   946→          "duration": "4 yrs"
+   947→        },
+   948→        {
+   949→          "name": "B.Sc Science / Tech",
+   950→          "duration": "3 yrs"
+   951→        },
+   952→        {
+   953→          "name": "Architecture (B.Arch)",
+   954→          "duration": "5 yrs"
+   955→        },
+   956→        {
+   957→          "name": "Management (BBA/BBM)",
+   958→          "duration": "3 yrs"
+   959→        },
+   960→        {
+   961→          "name": "Computer App (BCA)",
+   962→          "duration": "3 yrs"
+   963→        },
+   964→        {
+   965→          "name": "Law (LLB)",
+   966→          "duration": "5 yrs"
+   967→        },
+   968→        {
+   969→          "name": "National Defense (NDA)",
+   970→          "duration": "3 yrs"
+   971→        },
+   972→        {
+   973→          "name": "Creative Careers (B.Des)",
+   974→          "duration": "3-4 yrs"
+   975→        }
+   976→      ]
+   977→    },
+   978→    "commerce": {
+   979→      "id": "commerce",
+   980→      "title": "Commerce",
+   981→      "subtitle": "Economics, Accountancy & Business Studies",
+   982→      "description": "Commerce, as a field of study, entails the examination of business operations and trade. The core subjects within this discipline encompass economics, accountancy, and business studies. Typically, research is not the predominant pursuit within this academic path.",
+   983→      "advantages": [
+   984→        "It fosters a comprehensive understanding of how business activities have a direct and indirect impact on society and the economy.",
+   985→        "It imparts the skills of recording, categorizing, and interpreting financial records and monetary transactions, essential for effective financial management."
+   986→      ],
+   987→      "coursesTitle": "Top Graduate Level Courses after 12th for Commerce Students",
+   988→      "courses": [
+   989→        {
+   990→          "name": "B.Com / Accounts",
+   991→          "duration": "3 yrs"
+   992→        },
+   993→        {
+   994→          "name": "Chartered Accountancy (CA)",
+   995→          "duration": "4 yrs"
+   996→        },
+   997→        {
+   998→          "name": "Company Secretary (CS)",
+   999→          "duration": "3 yrs"
+  1000→        },
+  1001→        {
+  1002→          "name": "Cost Accountant (CMA)",
+  1003→          "duration": "3 yrs"
+  1004→        },
+  1005→        {
+  1006→          "name": "Management (BBA/BBM/BMS)",
+  1007→          "duration": "3 yrs"
+  1008→        },
+  1009→        {
+  1010→          "name": "Law (LLB)",
+  1011→          "duration": "5 yrs"
+  1012→        },
+  1013→        {
+  1014→          "name": "Economics / Statistics",
+  1015→          "duration": "3 yrs"
+  1016→        },
+  1017→        {
+  1018→          "name": "Hotel & Tourism Mgmt",
+  1019→          "duration": "3 yrs"
+  1020→        }
+  1021→      ]
+  1022→    },
+  1023→    "sci_bio": {
+  1024→      "id": "sci_bio",
+  1025→      "title": "Science (Bio)",
+  1026→      "subtitle": "Physics, Chemistry & Biology (PCB)",
+  1027→      "description": "Biology is the scientific discipline focused on the examination of life and living organisms, encompassing their anatomy, physiology, development, and evolutionary processes. It elucidates the mechanisms underlying the survival of living entities.",
+  1028→      "advantages": [
+  1029→        "Providing insights and knowledge that can be applied to enhance healthcare systems and preventive strategies for diseases and health-related challenges.",
+  1030→        "Offering a vast realm for scientific research, actively encouraged by both government and private sectors, with significant opportunities for advancements."
+  1031→      ],
+  1032→      "coursesTitle": "Top Graduate Level Courses after 12th for PCB Students",
+  1033→      "courses": [
+  1034→        {
+  1035→          "name": "Medicine (MBBS)",
+  1036→          "duration": "5.5 yrs"
+  1037→        },
+  1038→        {
+  1039→          "name": "Dental (BDS)",
+  1040→          "duration": "5 yrs"
+  1041→        },
+  1042→        {
+  1043→          "name": "B.Sc Biology / Biotech",
+  1044→          "duration": "3 yrs"
+  1045→        },
+  1046→        {
+  1047→          "name": "Veterinary Science",
+  1048→          "duration": "5.5 yrs"
+  1049→        },
+  1050→        {
+  1051→          "name": "Ayurveda (BAMS) / Homeo",
+  1052→          "duration": "5.5 yrs"
+  1053→        },
+  1054→        {
+  1055→          "name": "Pharmacy (B.Pharm)",
+  1056→          "duration": "4 yrs"
+  1057→        },
+  1058→        {
+  1059→          "name": "Nursing (B.Sc)",
+  1060→          "duration": "4 yrs"
+  1061→        },
+  1062→        {
+  1063→          "name": "Agriculture & Forestry",
+  1064→          "duration": "4 yrs"
+  1065→        }
+  1066→      ]
+  1067→    },
+  1068→    "humanities": {
+  1069→      "id": "humanities",
+  1070→      "title": "Humanities",
+  1071→      "subtitle": "Arts, History, Psychology & Social Sciences",
+  1072→      "description": "Humanities, often referred to as the Arts, can be defined as the exploration of the 'Human Condition.' It enables a deeper understanding of human society, ideologies, beliefs, and how they manifest through artistic expressions, architecture, and religions.",
+  1073→      "advantages": [
+  1074→        "Enhancing analytical and expressive abilities.",
+  1075→        "Cultivating independence in one's work.",
+  1076→        "Providing ample research opportunities in fields like sociology and psychology."
+  1077→      ],
+  1078→      "coursesTitle": "Top Graduate Level Courses after 12th for Arts Students",
+  1079→      "courses": [
+  1080→        {
+  1081→          "name": "Bachelor of Arts (BA)",
+  1082→          "duration": "3 yrs"
+  1083→        },
+  1084→        {
+  1085→          "name": "Law (LLB)",
+  1086→          "duration": "5 yrs"
+  1087→        },
+  1088→        {
+  1089→          "name": "Management (BBA/BBM)",
+  1090→          "duration": "3 yrs"
+  1091→        },
+  1092→        {
+  1093→          "name": "Journalism & Media",
+  1094→          "duration": "3 yrs"
+  1095→        },
+  1096→        {
+  1097→          "name": "Fine Arts & Design (B.Des)",
+  1098→          "duration": "4 yrs"
+  1099→        },
+  1100→        {
+  1101→          "name": "Psychology & Sociology",
+  1102→          "duration": "3 yrs"
+  1103→        },
+  1104→        {
+  1105→          "name": "Hospitality & Tourism",
+  1106→          "duration": "3 yrs"
+  1107→        },
+  1108→        {
+  1109→          "name": "Teaching (B.Ed)",
+  1110→          "duration": "3-4 yrs"
+  1111→        }
+  1112→      ]
+  1113→    }
+  1114→  }
+  1115→}

@@ -1,0 +1,600 @@
+     1→{
+     2→  "slug": "multiple-intelligence",
+     3→  "sourceFile": "Multiple Intelligence Assessment.html",
+     4→  "QUESTIONS": [
+     5→    {
+     6→      "c": "linguistic",
+     7→      "t": "I enjoy reading books, articles, or other written material in my free time."
+     8→    },
+     9→    {
+    10→      "c": "linguistic",
+    11→      "t": "I can express my ideas clearly and effectively when I write or speak."
+    12→    },
+    13→    {
+    14→      "c": "linguistic",
+    15→      "t": "I have a rich vocabulary and enjoy learning new words and their meanings."
+    16→    },
+    17→    {
+    18→      "c": "linguistic",
+    19→      "t": "I find word games, crosswords, or language puzzles engaging."
+    20→    },
+    21→    {
+    22→      "c": "linguistic",
+    23→      "t": "I often think in words and tend to remember information through verbal cues or notes."
+    24→    },
+    25→    {
+    26→      "c": "linguistic",
+    27→      "t": "I can easily articulate my thoughts and persuade others using spoken or written language."
+    28→    },
+    29→    {
+    30→      "c": "logical",
+    31→      "t": "I enjoy solving mathematical problems, logic puzzles, or brain teasers."
+    32→    },
+    33→    {
+    34→      "c": "logical",
+    35→      "t": "I naturally look for patterns, sequences, and logical relationships in information."
+    36→    },
+    37→    {
+    38→      "c": "logical",
+    39→      "t": "I like to organize and classify information into categories or systems."
+    40→    },
+    41→    {
+    42→      "c": "logical",
+    43→      "t": "I approach decisions through careful analysis rather than gut feeling."
+    44→    },
+    45→    {
+    46→      "c": "logical",
+    47→      "t": "I enjoy strategy-based games that require planning and critical reasoning."
+    48→    },
+    49→    {
+    50→      "c": "logical",
+    51→      "t": "I easily grasp cause-and-effect relationships in complex systems."
+    52→    },
+    53→    {
+    54→      "c": "spatial",
+    55→      "t": "I can clearly visualize objects, spaces, or scenes in my mind's eye."
+    56→    },
+    57→    {
+    58→      "c": "spatial",
+    59→      "t": "I have a strong sense of direction and rarely get lost."
+    60→    },
+    61→    {
+    62→      "c": "spatial",
+    63→      "t": "I enjoy drawing, designing, or creating visual art in some form."
+    64→    },
+    65→    {
+    66→      "c": "spatial",
+    67→      "t": "I can easily interpret diagrams, maps, charts, and visual data."
+    68→    },
+    69→    {
+    70→      "c": "spatial",
+    71→      "t": "I notice and appreciate colors, shapes, and visual details that others overlook."
+    72→    },
+    73→    {
+    74→      "c": "spatial",
+    75→      "t": "I can mentally rotate objects and understand how they fit together in space."
+    76→    },
+    77→    {
+    78→      "c": "kinesthetic",
+    79→      "t": "I learn best through physical activity and hands-on experience rather than just reading."
+    80→    },
+    81→    {
+    82→      "c": "kinesthetic",
+    83→      "t": "I have good coordination and control of my body movements."
+    84→    },
+    85→    {
+    86→      "c": "kinesthetic",
+    87→      "t": "I regularly participate in sports, dancing, or other physical activities."
+    88→    },
+    89→    {
+    90→      "c": "kinesthetic",
+    91→      "t": "I use hand gestures and body language naturally when communicating."
+    92→    },
+    93→    {
+    94→      "c": "kinesthetic",
+    95→      "t": "I enjoy taking things apart and reassembling them or building with my hands."
+    96→    },
+    97→    {
+    98→      "c": "kinesthetic",
+    99→      "t": "I have excellent fine motor skills and work well with tools or delicate objects."
+   100→    },
+   101→    {
+   102→      "c": "musical",
+   103→      "t": "I have a good sense of rhythm and can keep time to music accurately."
+   104→    },
+   105→    {
+   106→      "c": "musical",
+   107→      "t": "I genuinely enjoy listening to music across various genres and styles."
+   108→    },
+   109→    {
+   110→      "c": "musical",
+   111→      "t": "I can easily remember melodies, lyrics, or tunes after hearing them once or twice."
+   112→    },
+   113→    {
+   114→      "c": "musical",
+   115→      "t": "I notice background music and environmental sounds that others tend to ignore."
+   116→    },
+   117→    {
+   118→      "c": "musical",
+   119→      "t": "I can sing in tune or play at least one musical instrument."
+   120→    },
+   121→    {
+   122→      "c": "musical",
+   123→      "t": "I am highly sensitive to the pitch, tone, and timbre of sounds."
+   124→    },
+   125→    {
+   126→      "c": "interpersonal",
+   127→      "t": "I can quickly sense and understand other people's moods and emotions."
+   128→    },
+   129→    {
+   130→      "c": "interpersonal",
+   131→      "t": "I enjoy working in groups and collaborating with others on tasks."
+   132→    },
+   133→    {
+   134→      "c": "interpersonal",
+   135→      "t": "People frequently seek my advice or come to me to talk through problems."
+   136→    },
+   137→    {
+   138→      "c": "interpersonal",
+   139→      "t": "I can read body language and social cues that reveal how people truly feel."
+   140→    },
+   141→    {
+   142→      "c": "interpersonal",
+   143→      "t": "I am skilled at mediating conflicts and helping people find common ground."
+   144→    },
+   145→    {
+   146→      "c": "interpersonal",
+   147→      "t": "I can easily adapt my behavior to suit different social situations."
+   148→    },
+   149→    {
+   150→      "c": "intrapersonal",
+   151→      "t": "I am keenly aware of my own strengths and areas for improvement."
+   152→    },
+   153→    {
+   154→      "c": "intrapersonal",
+   155→      "t": "I enjoy spending quiet time alone to reflect on my thoughts and feelings."
+   156→    },
+   157→    {
+   158→      "c": "intrapersonal",
+   159→      "t": "I have a clear understanding of what motivates me and what doesn't."
+   160→    },
+   161→    {
+   162→      "c": "intrapersonal",
+   163→      "t": "I set personal goals and work steadily toward achieving them."
+   164→    },
+   165→    {
+   166→      "c": "intrapersonal",
+   167→      "t": "I honestly examine my mistakes and use them as opportunities to grow."
+   168→    },
+   169→    {
+   170→      "c": "intrapersonal",
+   171→      "t": "I am comfortable with my own company and do not rely on others to keep me entertained."
+   172→    },
+   173→    {
+   174→      "c": "naturalist",
+   175→      "t": "I feel energized and at peace when I spend time outdoors in nature."
+   176→    },
+   177→    {
+   178→      "c": "naturalist",
+   179→      "t": "I can identify various plants, animals, birds, or natural phenomena around me."
+   180→    },
+   181→    {
+   182→      "c": "naturalist",
+   183→      "t": "I am attentive to changes in weather, seasons, and natural cycles."
+   184→    },
+   185→    {
+   186→      "c": "naturalist",
+   187→      "t": "I care deeply about environmental and conservation issues."
+   188→    },
+   189→    {
+   190→      "c": "naturalist",
+   191→      "t": "I prefer natural or outdoor settings over busy urban environments."
+   192→    },
+   193→    {
+   194→      "c": "naturalist",
+   195→      "t": "I easily categorize and classify objects in my surroundings based on their features."
+   196→    },
+   197→    {
+   198→      "c": "existential",
+   199→      "t": "I often find myself thinking about the deeper meaning of life and human existence."
+   200→    },
+   201→    {
+   202→      "c": "existential",
+   203→      "t": "I enjoy discussing philosophical, moral, or ethical questions with others."
+   204→    },
+   205→    {
+   206→      "c": "existential",
+   207→      "t": "I am comfortable with ambiguity and questions that do not have clear, definitive answers."
+   208→    },
+   209→    {
+   210→      "c": "existential",
+   211→      "t": "I can easily see how different concepts from unrelated fields connect on a larger scale."
+   212→    },
+   213→    {
+   214→      "c": "existential",
+   215→      "t": "I frequently ponder the vastness of the universe and our place within it."
+   216→    },
+   217→    {
+   218→      "c": "existential",
+   219→      "t": "I prefer looking at the 'big picture' rather than getting bogged down in details."
+   220→    }
+   221→  ],
+   222→  "INTEL": {
+   223→    "linguistic": {
+   224→      "name": "Linguistic Intelligence",
+   225→      "short": "Linguistic",
+   226→      "desc": "Linguistic intelligence helps you to understand and use language properly in reading, writing, speaking, including sign language and Braille. It also affects vocabulary and the ability to understand and use humor, create pictures using words, notice language patterns, and recognize relationships between words. Linguistic intelligence is one of the main intelligences linked with succeeding in school.",
+   227→      "strengths": [
+   228→        "Know how to use vocabulary, sentence structure, grammar and spelling for clear communication",
+   229→        "Easily remember word-based information",
+   230→        "Good at learning new languages and other symbol systems, such as computer code",
+   231→        "Use language creatively for storytelling, writing, using humor and composing poetry",
+   232→        "Can tailor communication style depending on topic, audience and purpose"
+   233→      ],
+   234→      "challenges": [
+   235→        "Have difficulty with grammar, vocabulary, reading, writing, new languages and word-based puzzles",
+   236→        "Struggle with communication, creativity and memory for general facts",
+   237→        "Avoid activities that involve reading, writing and speaking, especially with challenging material",
+   238→        "Don't pick up on subtle forms of humor, such as irony, sarcasm and satire",
+   239→        "Have trouble remembering things that are read or heard"
+   240→      ],
+   241→      "famous": [
+   242→        "Ta-Nehisi Coates (writer, journalist)",
+   243→        "Barack Obama (lawyer, U.S. president)",
+   244→        "Amanda Gorman (poet, activist)",
+   245→        "Noam Chomsky (linguist, philosopher)"
+   246→      ],
+   247→      "careers": [
+   248→        "Interpreters and Translators",
+   249→        "Technical Writers",
+   250→        "Lawyers",
+   251→        "Political Scientists",
+   252→        "Speech-Language Pathologists",
+   253→        "Editors",
+   254→        "Poets, Lyricists and Creative Writers",
+   255→        "English Language and Literature Teachers"
+   256→      ],
+   257→      "advice": "Underline, highlight, or write down any new or unfamiliar words you come across in your reading. Look up these words as soon as you can. Take elective classes like creative writing, speech and debate, drama, or foreign languages. Read aloud to improve your flow, pronunciation and confidence. Get involved with the school paper or media club."
+   258→    },
+   259→    "logical": {
+   260→      "name": "Logical Intelligence",
+   261→      "short": "Logical-Math",
+   262→      "desc": "This intelligence includes the ability to reason inductively (make conclusions based on observations) and deductively (make conclusions based on hypotheses). It also involves finding relationships between abstract ideas, recognizing logical sequences and patterns, recognizing problems and solving them. This intelligence is closely linked with being successful in school.",
+   263→      "strengths": [
+   264→        "Easily recognize number patterns and can make quick, accurate calculations",
+   265→        "Understand the relationship between cause and effect",
+   266→        "Can identify all the parts in a system and how they interact",
+   267→        "Analyze information to determine what is important versus what is not",
+   268→        "Able to work with abstract concepts and use symbols to represent concrete ideas"
+   269→      ],
+   270→      "challenges": [
+   271→        "Struggle with abstract mathematical and logical concepts",
+   272→        "Poor problem-solving ability — don't know how to develop approaches for reaching the best solution",
+   273→        "Dislike activities involving puzzles, strategy, calculations or formulas",
+   274→        "Find it hard to categorize and organize things in a logical manner",
+   275→        "Not inclined to experiment or form theories to explain things"
+   276→      ],
+   277→      "famous": [
+   278→        "Temple Grandin (inventor, scientist)",
+   279→        "Albert Einstein (physicist, humanitarian)",
+   280→        "Katalin Karikó (pioneer of mRNA technology)",
+   281→        "Neil deGrasse Tyson (astrophysicist)",
+   282→        "Katherine Johnson (mathematician, NASA scientist)"
+   283→      ],
+   284→      "careers": [
+   285→        "Statisticians",
+   286→        "Actuaries",
+   287→        "Operations Research Analysts",
+   288→        "Bioengineers and Biomedical Engineers",
+   289→        "Environmental Engineers",
+   290→        "Mathematicians",
+   291→        "Biostatisticians",
+   292→        "Physicists"
+   293→      ],
+   294→      "advice": "Use and create information that can be represented in multiple ways — for example, data placed in a chart or graph. To improve critical thinking, learn about the 'fallacies of logic' (incorrect arguments). Ask others to help you spot flaws in your problem solving. Look for patterns and ways to organize information to make it easier to remember."
+   295→    },
+   296→    "spatial": {
+   297→      "name": "Spatial Intelligence",
+   298→      "short": "Spatial",
+   299→      "desc": "Spatial intelligence includes the ability to identify objects accurately, change and recreate images, and recognize how shapes and objects relate to each other. While this intelligence is typically applied through visual means, spatial intelligence does not only rely on vision — it can also be used through touch and sometimes even hearing.",
+   300→      "strengths": [
+   301→        "Able to visualize images — both real and imagined — with great clarity",
+   302→        "Notice and remember visual details; tend to evaluate the design, symmetry or beauty of things",
+   303→        "Can work with shape, size, position and location to solve problems and design, arrange or build things",
+   304→        "Have a good sense of direction and can easily navigate different environments",
+   305→        "Can accurately visualize and estimate distances and measurements"
+   306→      ],
+   307→      "challenges": [
+   308→        "Difficulty learning information that is visual or tactile",
+   309→        "Poor memory for visual details such as locations and what things look like; may forget faces",
+   310→        "Dislike puzzles, mazes, building models and other activities that require fitting pieces together",
+   311→        "Easily lose sense of direction and have trouble following maps, charts and diagrams",
+   312→        "Struggle to estimate distances and measurements"
+   313→      ],
+   314→      "famous": [
+   315→        "Javier Senosiain (architect)",
+   316→        "Michelangelo (artist, engineer)",
+   317→        "Kathryn Bigelow (director, producer)",
+   318→        "Vera Wang (fashion designer)",
+   319→        "Matthew Henson (Arctic explorer, navigator)"
+   320→      ],
+   321→      "careers": [
+   322→        "Architectural and Civil Drafters",
+   323→        "Computer Hardware Engineers",
+   324→        "Commercial and Industrial Designers",
+   325→        "Bioengineers and Biomedical Engineers",
+   326→        "Commercial Pilots",
+   327→        "Architects, Except Landscape and Naval"
+   328→      ],
+   329→      "advice": "When taking notes or studying, use mind maps, charts, diagrams or pictures to visualize the topics you are learning about. Imagine different ways of seeing things. Take elective courses like art, marketing and advertising, dance, animation, video production, woodworking or design. Incorporate visual representations into your assignments and projects."
+   330→    },
+   331→    "kinesthetic": {
+   332→      "name": "Kinesthetic Intelligence",
+   333→      "short": "Bodily-Kin",
+   334→      "desc": "This intelligence provides the mind and body coordination needed to move your body and other objects. It influences small movements, such as using your fingers to play a musical instrument, and large movements, such as running and catching a ball. Kinesthetic intelligence also affects certain mental abilities such as visualizing and remembering complex movements.",
+   335→      "strengths": [
+   336→        "Have good balance and coordination when moving or being physically active",
+   337→        "Good at hands-on activities, such as using tools and objects to build, create and repair",
+   338→        "Can analyze complex movements and the steps involved to identify problems and solutions",
+   339→        "Use movement to express feelings and ideas — gestures, body language, acting or dance",
+   340→        "Have good reflexes — react quickly and instinctively"
+   341→      ],
+   342→      "challenges": [
+   343→        "Avoid activities that require good coordination or complex movements",
+   344→        "Not interested in playing competitive sports",
+   345→        "Do not use movement or physical precision for self-expression",
+   346→        "Lack confidence when using tools and other physical objects",
+   347→        "Unaware of own body language and may miss non-verbal cues from others"
+   348→      ],
+   349→      "famous": [
+   350→        "Naomi Osaka (tennis player)",
+   351→        "Bruce Lee (martial artist)",
+   352→        "Paula Abdul (dancer, choreographer)",
+   353→        "Dorothy Dietrich (magician, stunt performer)",
+   354→        "Jim Carrey (actor, comedian)"
+   355→      ],
+   356→      "careers": [
+   357→        "Dancers",
+   358→        "Athletes and Sports Competitors",
+   359→        "Exercise Trainers and Group Fitness Instructors",
+   360→        "Machine Tool Setters, Operators, and Tenders",
+   361→        "Cutting and Slicing Machine Setters",
+   362→        "Fallers"
+   363→      ],
+   364→      "advice": "Actively use your body and your five senses to 'learn by doing'. Use hands-on activities, such as manipulating objects or conducting experiments, to learn new concepts. Try to remain active when you're concentrating on learning something. Take short breaks to get up and move around or stretch during class time. Complete assignments by acting out skits or building models."
+   365→    },
+   366→    "musical": {
+   367→      "name": "Musical Intelligence",
+   368→      "short": "Musical",
+   369→      "desc": "This intelligence includes the ability to play an instrument or sing, as well as a number of other skills such as: recognizing tones, patterns, rhythms, beats and sounds; enjoying and analyzing music; understanding musical structures; and creating melodies and rhythms.",
+   370→      "strengths": [
+   371→        "Enjoy a wide range of different types of music",
+   372→        "Use music to influence mood, build motivation and boost productivity",
+   373→        "Easily pick up on the beat or chords in music and recognize different instruments by their sounds",
+   374→        "Notice and use different tones in speech to impart emotion, emphasis or meaning",
+   375→        "Sing well, can play one or more instruments and could easily learn another",
+   376→        "Readily recall tunes and lyrics, and can use music, rhythms and patterns to remember things"
+   377→      ],
+   378→      "challenges": [
+   379→        "Enjoy only a few types of music",
+   380→        "Music has little effect on mood, motivation and emotions",
+   381→        "Difficulty identifying sounds of different musical instruments",
+   382→        "Not likely to notice or use tone that imparts meaning in speech",
+   383→        "Do not sing well and would have trouble learning to play an instrument",
+   384→        "Do not remember melodies and lyrics of songs"
+   385→      ],
+   386→      "famous": [
+   387→        "Jack White (singer, songwriter, producer)",
+   388→        "The Weeknd (singer, songwriter, record producer)",
+   389→        "Beyoncé Knowles (singer, songwriter and actress)",
+   390→        "will.i.am (musician and producer)",
+   391→        "Adele Adkins (singer-songwriter)"
+   392→      ],
+   393→      "careers": [
+   394→        "Music Directors and Composers",
+   395→        "Musical Instrument Repairers and Tuners",
+   396→        "Art, Drama, and Music Teachers",
+   397→        "Music Therapists",
+   398→        "Musicians and Singers",
+   399→        "Sound Engineering Technicians",
+   400→        "Choreographers"
+   401→      ],
+   402→      "advice": "Take any kind of music, singing or dance class. Take speech and debate, poetry or creative writing classes. Pay attention to the rhythm and patterns in speech and writing. When working on assignments or playing sports, try to move and work with a rhythm that suits the activity. Include music in your presentations or projects, selecting music that complements the assignment."
+   403→    },
+   404→    "interpersonal": {
+   405→      "name": "Interpersonal Intelligence",
+   406→      "short": "Interpersonal",
+   407→      "desc": "This intelligence includes understanding and working with people, building relationships, seeing the world from others' points of view, communicating well verbally and non-verbally, cooperating in a group, having influence, and responding to the mood, personality and goals of others.",
+   408→      "strengths": [
+   409→        "Relate well to others",
+   410→        "Notice and understand people's needs, perspectives, emotions and motivations",
+   411→        "Connect and interact with people quickly and easily",
+   412→        "Form and maintain lasting relationships",
+   413→        "Able to lead, influence and inspire others"
+   414→      ],
+   415→      "challenges": [
+   416→        "Difficulty building and maintaining social relationships",
+   417→        "Do not notice or respond appropriately to others' feelings, motivations or behaviors",
+   418→        "Not good at collaborative work",
+   419→        "Uncomfortable interacting with people whose experiences, views and beliefs differ from own",
+   420→        "Don't see the humor in things that others find funny"
+   421→      ],
+   422→      "famous": [
+   423→        "Martin Luther King, Jr. (clergyman, civil rights activist)",
+   424→        "Mother Teresa (nun, humanitarian)",
+   425→        "Oprah Winfrey (talk-show host, philanthropist)",
+   426→        "Mary Ainsworth (developmental psychologist)",
+   427→        "Joseph Roberts (motivational speaker, advocate)"
+   428→      ],
+   429→      "careers": [
+   430→        "School Psychologists",
+   431→        "Legislators",
+   432→        "Educational, Guidance, and Career Counselors",
+   433→        "Arbitrators, Mediators, and Conciliators",
+   434→        "Psychiatrists",
+   435→        "Public Relations Specialists",
+   436→        "Patient Representatives",
+   437→        "Flight Attendants"
+   438→      ],
+   439→      "advice": "Learn how to be a good listener. Practice 'active listening' and use every conversation as an opportunity to better understand other people's points of view. Talk to other students, teachers or experts to learn more. Ask your teacher about working in pairs or groups. Get involved in a social cause or volunteer to mentor other students. Take part in role playing, presentations, debates and group activities."
+   440→    },
+   441→    "intrapersonal": {
+   442→      "name": "Intrapersonal Intelligence",
+   443→      "short": "Intrapersonal",
+   444→      "desc": "Intrapersonal intelligence includes the ability to understand oneself — emotions, fears, motivations, strengths and weaknesses. This intelligence allows you to reflect upon your own thinking and behavior, learn from that reflection, find ways for self-improvement, and build self-confidence.",
+   445→      "strengths": [
+   446→        "Well aware of personal abilities, challenges, feelings and attitudes",
+   447→        "Set realistic goals, able to focus and stay on track",
+   448→        "In control of emotions, good at handling high-stress situations",
+   449→        "Make decisions thoughtfully and carefully",
+   450→        "Ethical and objective, aware of how personal viewpoints can be biased or unfair"
+   451→      ],
+   452→      "challenges": [
+   453→        "Give little thought to personal goals and abilities when making decisions",
+   454→        "Unaware of how mood, attitude and tone of voice can affect other people",
+   455→        "Allow personal opinions to negatively affect decisions and interactions with others",
+   456→        "Set unrealistic goals and make limited progress, often giving up",
+   457→        "Don't understand how to recognize and manage own emotions"
+   458→      ],
+   459→      "famous": [
+   460→        "Confucius (philosopher, teacher)",
+   461→        "Mamie Phipps Clark (social psychologist)",
+   462→        "Mohandas Gandhi (lawyer, ideological leader)",
+   463→        "Helen Keller (speaker, author)",
+   464→        "Kwame Anthony Appiah (philosopher, cultural theorist)"
+   465→      ],
+   466→      "careers": [
+   467→        "Judges, Magistrate Judges, and Magistrates",
+   468→        "Marriage and Family Therapists",
+   469→        "Chief Executives",
+   470→        "Special Education Teachers",
+   471→        "Psychiatrists",
+   472→        "Sales Managers",
+   473→        "Producers and Directors"
+   474→      ],
+   475→      "advice": "Learn about and practice good decision making and setting realistic goals. Check your progress regularly. Build awareness of your feelings, attitudes and behavior. Keep a journal or blog and record your thoughts about your experiences. When receiving corrective criticism, remind yourself that feedback is intended to help you improve your skills. Monitor and manage negative emotions."
+   476→    },
+   477→    "naturalist": {
+   478→      "name": "Naturalist Intelligence",
+   479→      "short": "Naturalistic",
+   480→      "desc": "Naturalist intelligence involves being able to recognize, appreciate and group different things in the environment: plants, animals, people, structures, weather patterns, landscapes and so on. It also allows one to see the connections between different parts of the environment, to easily recognize when environmental changes happen, and to understand what impacts those changes might have. People with a strong naturalist intelligence are typically viewed as being 'in tune' with nature.",
+   481→      "strengths": [
+   482→        "Sensitive to nature — feel a concern for and connection to living things and the natural environment",
+   483→        "Observe similarities and differences in plants, animals and natural formations",
+   484→        "Organize and group things according to their traits",
+   485→        "Enjoy growing plants, taking care of animals or learning about the natural environment",
+   486→        "Aware of subtle changes in the weather, climate and seasons",
+   487→        "Have an interest in conservation and recycling"
+   488→      ],
+   489→      "challenges": [
+   490→        "Difficulty identifying or grouping plants, animals and objects in the natural environment",
+   491→        "Don't notice similarities between seemingly different objects",
+   492→        "Unable to identify the sights and sounds of nature",
+   493→        "Feel uncomfortable in a natural environment — may fear wild animals, dislike insects, sand and dirt",
+   494→        "Unaware of gradual shifts in the weather",
+   495→        "Not concerned about environmental protection, pollution controls or water quality"
+   496→      ],
+   497→      "famous": [
+   498→        "Charles Darwin (geologist, naturalist)",
+   499→        "Jane Goodall (biologist, conservationist)",
+   500→        "Dara McAnulty (naturalist, writer)",
+   501→        "Chico Mendes (human rights activist, environmentalist)",
+   502→        "John Francis (environmentalist, author)"
+   503→      ],
+   504→      "careers": [
+   505→        "Animal Breeders",
+   506→        "Park Naturalists",
+   507→        "Sustainability Specialists",
+   508→        "Environmental Science Teachers",
+   509→        "Veterinarians",
+   510→        "Forest and Conservation Workers",
+   511→        "Zoologists and Wildlife Biologists",
+   512→        "Range Managers"
+   513→      ],
+   514→      "advice": "Work on assignments in a natural environment that helps you focus — in your backyard, for example, or at a park or beach. Take part in school field trips to science museums, art galleries and other environments where you can use your senses to identify and classify objects. Join or start an environmental project. In class, look for ways to incorporate nature and the environment into your assignments."
+   515→    },
+   516→    "existential": {
+   517→      "name": "Existential Intelligence",
+   518→      "short": "Existential",
+   519→      "desc": "Existential intelligence involves the ability to contemplate and understand profound, overarching questions about human existence, the universe, and the meaning of life. It allows individuals to think deeply about moral, philosophical, and spiritual issues, recognizing the connections between seemingly disparate concepts and seeing the 'big picture' beyond immediate, tangible realities.",
+   520→      "strengths": [
+   521→        "Ability to contemplate deep philosophical questions about life, death, and purpose",
+   522→        "Seeing connections between disparate ideas and synthesizing them into a larger worldview",
+   523→        "Strong capacity for moral and ethical reasoning",
+   524→        "Comfortable with ambiguity and questions that have no clear answers",
+   525→        "Ability to step back and see the 'big picture' in complex situations"
+   526→      ],
+   527→      "challenges": [
+   528→        "Difficulty understanding abstract philosophical concepts",
+   529→        "Preference for strict, concrete rules rather than ambiguity",
+   530→        "Discomfort with questions that lack definitive answers",
+   531→        "Tendency to focus solely on immediate, practical details rather than the larger context",
+   532→        "Lack of interest in moral, ethical, or spiritual discussions"
+   533→      ],
+   534→      "famous": [
+   535→        "Søren Kierkegaard (philosopher)",
+   536→        "Carl Sagan (astronomer, science communicator)",
+   537→        "Simone de Beauvoir (existentialist philosopher)",
+   538→        "The Dalai Lama (spiritual leader)",
+   539→        "Viktor Frankl (psychiatrist, Holocaust survivor)"
+   540→      ],
+   541→      "careers": [
+   542→        "Philosophy and Religion Teachers",
+   543→        "Clergy",
+   544→        "Sociologists",
+   545→        "Art Therapists",
+   546→        "Judges",
+   547→        "Clinical Psychologists",
+   548→        "Social Workers",
+   549→        "Authors"
+   550→      ],
+   551→      "advice": "When learning something new, think about how the topic fits into the greater scheme of things. What role does it play? Why is it important? Look for ways to connect new concepts to what you already know. Ask yourself what other subjects or ideas are similar to this one. Think about multiple points of view and how they fit into a larger theme. Engage in deep discussions with others who enjoy exploring philosophical questions."
+   552→    }
+   553→  },
+   554→  "CLUSTER_MAP": {
+   555→    "linguistic": "Education/Training",
+   556→    "logical": "STEM",
+   557→    "spatial": "Architecture/Design",
+   558→    "kinesthetic": "Sports/Trades",
+   559→    "musical": "Arts/Audio",
+   560→    "interpersonal": "Human Services",
+   561→    "intrapersonal": "Management/Law",
+   562→    "naturalist": "Agriculture/Science",
+   563→    "existential": "Philosophy/Social Sciences"
+   564→  },
+   565→  "SALARY_MAP": {
+   566→    "linguistic": "$65,000",
+   567→    "logical": "$95,000",
+   568→    "spatial": "$80,000",
+   569→    "kinesthetic": "$50,000",
+   570→    "musical": "$55,000",
+   571→    "interpersonal": "$70,000",
+   572→    "intrapersonal": "$110,000",
+   573→    "naturalist": "$75,000",
+   574→    "existential": "$85,000"
+   575→  },
+   576→  "SCALE": [
+   577→    "Strongly Disagree",
+   578→    "Disagree",
+   579→    "Slightly Disagree",
+   580→    "Neutral",
+   581→    "Slightly Agree",
+   582→    "Agree",
+   583→    "Strongly Agree"
+   584→  ],
+   585→  "eiTraits": [
+   586→    "Adaptable: able to deal with new and changing conditions",
+   587→    "Empathic: intensely aware of needs and feelings",
+   588→    "Composed: think carefully before reacting",
+   589→    "Optimistic: have a positive outlook on life",
+   590→    "Expressive: can communicate emotions in a healthy way",
+   591→    "Resilient: can deal with pressure and stress"
+   592→  ],
+   593→  "eiRecs": [
+   594→    "Develop a sense of humor and try to make people laugh without putting others down.",
+   595→    "Write out your thoughts and create a plan for self-improvement — a list of goals from easy to difficult.",
+   596→    "Volunteer to help others, especially interacting directly with those you are helping.",
+   597→    "Practice being grateful — once a week, write down what makes you thankful.",
+   598→    "Move outside your own perspective. Practice listening more than speaking."
+   599→  ]
+   600→}

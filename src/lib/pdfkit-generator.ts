@@ -2,6 +2,7 @@
 // runs safely in the Next.js/Turbopack runtime. No Python, no zlib crashes.
 import { PDFDocument, StandardFonts, rgb, PDFFont, PDFPage } from 'pdf-lib'
 import fs from 'fs'
+import { getPersonalityTypeData, getDichotomies, getIntelData, getAllIntel, getStreamData, getLearningStyleDescs } from '@/lib/assessments/report-content'
 
 const PAGE_W = 595.28
 const PAGE_H = 841.89
@@ -259,8 +260,225 @@ export async function generateReportPdf(data: ReportPdfData, id: string): Promis
     spacer(8)
   }
 
-  // --- Detailed dimension analysis ---
-  if (dims.length > 0) {
+  // --- Assessment-specific rich content (matches original reference reports) ---
+  const slug = (data.assessment as any).slug || ''
+  const hasSpecificContent = ['personality', 'multiple-intelligence', 'stream-selector', 'learning-style'].includes(slug)
+
+  // Inner helpers for assessment-specific sections
+  function drawBullet(text: string, indent = 10) {
+    drawText(`* ${text}`, { size: 9.5, maxW: contentW - indent, lineHeight: 12 })
+  }
+  function drawSectionTitle(text: string) {
+    spacer(6); ensureSpace(20)
+    page.drawRectangle({ x: MARGIN, y: y - 16, width: contentW, height: 18, color: C.NAVY })
+    page.drawText(sanitize(text), { x: MARGIN + 6, y: y - 12, size: 10, font: fontBold, color: C.WHITE })
+    y -= 22
+  }
+  function drawTwoColBox(leftTitle: string, leftPts: string[], rightTitle: string, rightPts: string[]) {
+    const colW2 = (contentW - 8) / 2
+    const maxPts = Math.max(leftPts.length, rightPts.length)
+    const boxH = 20 + maxPts * 14 + 8
+    ensureSpace(boxH + 4)
+    // Left box
+    page.drawRectangle({ x: MARGIN, y: y - boxH, width: colW2, height: boxH, color: C.LIGHT })
+    page.drawRectangle({ x: MARGIN, y: y - boxH, width: colW2, height: boxH, borderColor: C.BORDER, borderWidth: 0.5 })
+    page.drawText(sanitize(leftTitle), { x: MARGIN + 6, y: y - 14, size: 9, font: fontBold, color: C.SLATE })
+    leftPts.forEach((pt, i) => {
+      const lines = wrapText(pt, font, 8.5, colW2 - 12)
+      lines.forEach((l, j) => { page.drawText(l, { x: MARGIN + 6, y: y - 28 - i * 14 - j * 10, size: 8.5, font, color: C.SLATE }) })
+    })
+    // Right box
+    const rx = MARGIN + colW2 + 8
+    page.drawRectangle({ x: rx, y: y - boxH, width: colW2, height: boxH, color: C.LIGHT })
+    page.drawRectangle({ x: rx, y: y - boxH, width: colW2, height: boxH, borderColor: C.BORDER, borderWidth: 0.5 })
+    page.drawText(sanitize(rightTitle), { x: rx + 6, y: y - 14, size: 9, font: fontBold, color: C.SLATE })
+    rightPts.forEach((pt, i) => {
+      const lines = wrapText(pt, font, 8.5, colW2 - 12)
+      lines.forEach((l, j) => { page.drawText(l, { x: rx + 6, y: y - 28 - i * 14 - j * 10, size: 8.5, font, color: C.SLATE }) })
+    })
+    y -= boxH + 6
+  }
+
+  if (hasSpecificContent) {
+    newPage()
+
+    // === PERSONALITY ===
+    if (slug === 'personality') {
+      // Extract 4-letter type from recommendation
+      const typeMatch = (data.score.recommendation || '').match(/\b([EI][NS][TF][JP])\b/)
+      const typeCode = typeMatch ? typeMatch[1] : ''
+      const td = getPersonalityTypeData(typeCode)
+
+      heading('Your Personality', 16, C.NAVY)
+      if (td) {
+        page.drawText(`Your personality type is ${typeCode}: ${sanitize(td.nick)}`, { x: MARGIN, y: y - 12, size: 13, font: fontBold, color: C.TEAL })
+        y -= 20
+      }
+
+      // Dichotomy tables
+      for (const dich of getDichotomies()) {
+        ensureSpace(30)
+        heading(dich.name, 11, C.NAVY)
+        drawText(dich.desc, { size: 9, color: C.MUTED })
+        drawTwoColBox(dich.left, dich.leftPts, dich.right, dich.rightPts)
+        spacer(4)
+      }
+
+      // Personality profile
+      if (td) {
+        newPage()
+        drawSectionTitle('Your Personality Profile')
+        drawText(td.profile, { size: 10, lineHeight: 14 })
+
+        // Strengths & Challenges
+        spacer(8)
+        drawSectionTitle('Strengths & Challenges')
+        drawTwoColBox('Strengths', td.strengths || [], 'Challenges', td.challenges || [])
+
+        // Recommendations
+        spacer(8)
+        drawSectionTitle('Recommendations')
+        for (const rec of (td.recs || [])) { drawBullet(rec) }
+
+        // Careers
+        spacer(8)
+        drawSectionTitle('Recommended Careers')
+        for (const career of (td.careers || [])) {
+          const arr = Array.isArray(career) ? career : [career]
+          drawText(`* ${arr[0]} (${arr[1] || ''})${arr[2] ? ' - ' + arr[2] : ''}`, { size: 9.5, maxW: contentW - 10, lineHeight: 12 })
+        }
+      }
+    }
+
+    // === MULTIPLE INTELLIGENCE ===
+    else if (slug === 'multiple-intelligence') {
+      const intel = getAllIntel()
+      // Sort dimensions by score descending
+      const sortedDims = [...dims].sort((a, b) => (b.pct || 0) - (a.pct || 0))
+
+      for (const d of sortedDims) {
+        const code = d.code
+        const info = intel[code]
+        if (!info) continue
+
+        newPage()
+        // Title
+        page.drawRectangle({ x: MARGIN, y: y - 24, width: contentW, height: 26, color: lvlColor(d.level || '') })
+        page.drawText(sanitize(info.name || d.name), { x: MARGIN + 8, y: y - 18, size: 12, font: fontBold, color: C.WHITE })
+        page.drawText(`${d.pct || 0}% - ${d.level || ''}`, { x: MARGIN + contentW - 100, y: y - 18, size: 10, font: fontBold, color: C.WHITE })
+        y -= 32
+
+        // Description
+        drawText(info.desc || d.dimensionDescription || '', { size: 9.5, lineHeight: 13 })
+        spacer(6)
+
+        // Strengths
+        if (info.strengths?.length) {
+          drawSectionTitle('Strengths')
+          for (const s of info.strengths) { drawBullet(s) }
+        }
+        // Challenges
+        if (info.challenges?.length) {
+          spacer(6)
+          drawSectionTitle('Challenges')
+          for (const s of info.challenges) { drawBullet(s) }
+        }
+        // Famous people
+        if (info.famous?.length) {
+          spacer(6)
+          drawSectionTitle('Famous People with This Intelligence')
+          for (const f of info.famous) { drawBullet(f) }
+        }
+        // Careers
+        if (info.careers?.length) {
+          spacer(6)
+          drawSectionTitle('Top Careers')
+          for (const c of info.careers) { drawBullet(c) }
+        }
+        // Advice
+        if (info.advice) {
+          spacer(6)
+          drawSectionTitle('Development Advice')
+          drawText(info.advice, { size: 9.5, lineHeight: 13 })
+        }
+      }
+    }
+
+    // === STREAM SELECTOR ===
+    else if (slug === 'stream-selector') {
+      const br = data.score.domainBreakdown || []
+      heading('Stream Preference Analysis', 16, C.NAVY)
+      drawText('The most critical decision you will make early in your career is selecting the field of study you want to pursue. Your preferred streams are ranked below.', { size: 10 })
+      spacer(8)
+
+      for (let i = 0; i < br.length; i++) {
+        const b = br[i]
+        const sd = getStreamData(b.code)
+        newPage()
+        // Rank header
+        const rankColor = i === 0 ? C.GREEN : C.MUTED
+        page.drawRectangle({ x: MARGIN, y: y - 24, width: contentW, height: 26, color: rankColor })
+        page.drawText(`Rank ${i + 1}: ${sanitize(b.title)}`, { x: MARGIN + 8, y: y - 18, size: 12, font: fontBold, color: C.WHITE })
+        page.drawText(`Composite: ${b.composite}/100`, { x: MARGIN + contentW - 120, y: y - 18, size: 10, font: fontBold, color: C.WHITE })
+        y -= 32
+
+        if (i === 0) {
+          page.drawText('Recommended Choice', { x: MARGIN, y: y - 10, size: 10, font: fontBold, color: C.GREEN })
+          y -= 14
+        }
+
+        // Scores
+        drawText(`Aptitude: ${b.aptitude}/100  |  Interest: ${b.interest}/100  |  Composite: ${b.composite}/100`, { size: 10, color: C.MUTED })
+        spacer(6)
+
+        if (sd) {
+          drawText(sd.description || '', { size: 9.5, lineHeight: 13 })
+          if (sd.advantages?.length) {
+            spacer(6)
+            drawSectionTitle('Advantages')
+            for (const a of sd.advantages) { drawBullet(a) }
+          }
+          if (sd.courses?.length) {
+            spacer(6)
+            drawSectionTitle('Key Courses / Subjects')
+            for (const c of sd.courses) { drawBullet(c) }
+          }
+        }
+      }
+    }
+
+    // === LEARNING STYLE ===
+    else if (slug === 'learning-style') {
+      const descs = getLearningStyleDescs()
+      const sortedDims = [...dims].sort((a, b) => (b.pct || 0) - (a.pct || 0))
+
+      heading('Your Learning Style Profile', 16, C.NAVY)
+      drawText('Everyone has a unique learning style. Understanding your preferences can help you study more effectively and choose complementary learning strategies.', { size: 10 })
+      spacer(8)
+
+      for (const d of sortedDims) {
+        const desc = descs[d.name || d.code]
+        const lc = lvlColor(d.level || '')
+        ensureSpace(40)
+        // Header bar
+        page.drawRectangle({ x: MARGIN, y: y - 20, width: contentW, height: 22, color: lc })
+        page.drawText(sanitize(d.name || d.code), { x: MARGIN + 8, y: y - 14, size: 10, font: fontBold, color: C.WHITE })
+        page.drawText(`${d.pct || 0}% - ${d.level || ''}`, { x: MARGIN + contentW - 80, y: y - 14, size: 9, font: fontBold, color: C.WHITE })
+        y -= 26
+
+        if (desc) {
+          drawText(desc, { size: 9.5, lineHeight: 13 })
+        }
+        if (d.strengths?.length) {
+          for (const s of d.strengths.slice(0, 3)) { drawBullet(s) }
+        }
+        spacer(4)
+      }
+    }
+  }
+
+  // --- Generic detailed dimension analysis (only if no specific content) ---
+  if (dims.length > 0 && !hasSpecificContent) {
     newPage()
     heading('Detailed Dimension Analysis', 14, C.TEAL)
     drawText('This section provides an in-depth analysis of each measured dimension, including the score, interpretation level, key strengths and recommended development areas.')

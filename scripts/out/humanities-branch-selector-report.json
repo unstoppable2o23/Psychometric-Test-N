@@ -1,0 +1,70 @@
+{
+  "slug": "humanities-branch-selector",
+  "file": "Humanities branch Selector.html",
+  "CATS": [
+    {
+      "n": "Auditory",
+      "type": "Sensory"
+    },
+    {
+      "n": "Kinesthetic",
+      "type": "Sensory"
+    },
+    {
+      "n": "Tactile",
+      "type": "Sensory"
+    },
+    {
+      "n": "Visual",
+      "type": "Sensory"
+    },
+    {
+      "n": "Intake",
+      "type": "Environmental"
+    },
+    {
+      "n": "Light",
+      "type": "Environmental"
+    },
+    {
+      "n": "Temperature",
+      "type": "Environmental"
+    },
+    {
+      "n": "Mobility",
+      "type": "Environmental"
+    },
+    {
+      "n": "Sound",
+      "type": "Environmental"
+    },
+    {
+      "n": "Physical Setting",
+      "type": "Environmental"
+    },
+    {
+      "n": "Time of Day",
+      "type": "Mindset"
+    },
+    {
+      "n": "Teacher Motivation",
+      "type": "Mindset"
+    },
+    {
+      "n": "Collaborative",
+      "type": "Mindset"
+    },
+    {
+      "n": "Structure",
+      "type": "Mindset"
+    },
+    {
+      "n": "Focus",
+      "type": "Mindset"
+    },
+    {
+      "n": "Self-Motivation",
+      "type": "Mindset"
+    }
+  ]
+}
