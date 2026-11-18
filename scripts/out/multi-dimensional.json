@@ -1,0 +1,1214 @@
+{
+  "slug": "multi-dimensional",
+  "sourceFile": "Multi dimensional test (One test for all).html",
+  "questionBank": {
+    "Class 8 - 10": [
+      {
+        "sec": "Natural Abilities",
+        "t": "Calculate percentages or discounts in my head while shopping.",
+        "c": "Logical/Mathematical"
+      },
+      {
+        "sec": "Natural Abilities",
+        "t": "Visualize how a 3D origami model will look before folding it.",
+        "c": "Spatial/Visual"
+      },
+      {
+        "sec": "Natural Abilities",
+        "t": "Memorize history dates and definitions for a school test.",
+        "c": "Verbal/Linguistic"
+      },
+      {
+        "sec": "Natural Abilities",
+        "t": "Fix a broken toy or bicycle chain using basic tools.",
+        "c": "Mechanical/Kinesthetic"
+      },
+      {
+        "sec": "Natural Abilities",
+        "t": "Find the next number in a math puzzle or sequence.",
+        "c": "Logical/Mathematical"
+      },
+      {
+        "sec": "Natural Abilities",
+        "t": "Write a creative story or essay using advanced vocabulary.",
+        "c": "Verbal/Linguistic"
+      },
+      {
+        "sec": "Natural Abilities",
+        "t": "Read a school map or blueprint of a building easily.",
+        "c": "Spatial/Visual"
+      },
+      {
+        "sec": "Natural Abilities",
+        "t": "Assemble a Lego set or IKEA furniture without instructions.",
+        "c": "Mechanical/Kinesthetic"
+      },
+      {
+        "sec": "Natural Abilities",
+        "t": "Accurately estimate the height of a tree or building.",
+        "c": "Spatial/Visual"
+      },
+      {
+        "sec": "Natural Abilities",
+        "t": "Structure a logical argument to win a school debate.",
+        "c": "Logical/Mathematical"
+      },
+      {
+        "sec": "Natural Abilities",
+        "t": "Explain a science chapter to a classmate who didn't understand it.",
+        "c": "Verbal/Linguistic"
+      },
+      {
+        "sec": "Natural Abilities",
+        "t": "Learn a new sport or dance move faster than my friends.",
+        "c": "Mechanical/Kinesthetic"
+      },
+      {
+        "sec": "Interests",
+        "t": "Doing science experiments in the school lab.",
+        "c": "Investigative"
+      },
+      {
+        "sec": "Interests",
+        "t": "Drawing, painting, or playing a musical instrument.",
+        "c": "Artistic"
+      },
+      {
+        "sec": "Interests",
+        "t": "Acting as a class monitor or student council leader.",
+        "c": "Enterprising"
+      },
+      {
+        "sec": "Interests",
+        "t": "Helping friends with their homework or volunteering.",
+        "c": "Social"
+      },
+      {
+        "sec": "Interests",
+        "t": "Organizing my notes, folders, and study desk perfectly.",
+        "c": "Conventional"
+      },
+      {
+        "sec": "Interests",
+        "t": "Playing outdoor sports, gardening, or building models.",
+        "c": "Realistic"
+      },
+      {
+        "sec": "Interests",
+        "t": "Watching documentaries about space, biology, or nature.",
+        "c": "Investigative"
+      },
+      {
+        "sec": "Interests",
+        "t": "Participating in school drama, elocution, or art competitions.",
+        "c": "Artistic"
+      },
+      {
+        "sec": "Interests",
+        "t": "Selling tickets for school events or organizing fairs.",
+        "c": "Enterprising"
+      },
+      {
+        "sec": "Interests",
+        "t": "Making spreadsheets for my pocket money or collection.",
+        "c": "Conventional"
+      },
+      {
+        "sec": "Interests",
+        "t": "Working on a farm or doing mechanical DIY projects.",
+        "c": "Realistic"
+      },
+      {
+        "sec": "Interests",
+        "t": "Helping teachers manage the classroom or events.",
+        "c": "Social"
+      },
+      {
+        "sec": "Personality",
+        "t": "I am the life of the party and energize the room when I enter.",
+        "c": "Extroversion"
+      },
+      {
+        "sec": "Personality",
+        "t": "I retreat to my room to recharge after a long social event.",
+        "c": "Introversion"
+      },
+      {
+        "sec": "Personality",
+        "t": "I base my decisions on logic and facts, ignoring emotions.",
+        "c": "Thinking"
+      },
+      {
+        "sec": "Personality",
+        "t": "I prioritize group harmony over cold, hard logic.",
+        "c": "Feeling"
+      },
+      {
+        "sec": "Personality",
+        "t": "I make detailed to-do lists for my homework and strictly follow them.",
+        "c": "Judging"
+      },
+      {
+        "sec": "Personality",
+        "t": "I like to keep my schedule flexible and spontaneous.",
+        "c": "Perceiving"
+      },
+      {
+        "sec": "Personality",
+        "t": "I actively seek to be the center of attention in new groups.",
+        "c": "Extroversion"
+      },
+      {
+        "sec": "Personality",
+        "t": "I think deeply before I speak, preferring to listen to others.",
+        "c": "Introversion"
+      },
+      {
+        "sec": "Personality",
+        "t": "I get highly uncomfortable if school rules are broken.",
+        "c": "Judging"
+      },
+      {
+        "sec": "Personality",
+        "t": "I easily adapt when my parents change plans at the last minute.",
+        "c": "Perceiving"
+      },
+      {
+        "sec": "Personality",
+        "t": "I try to ensure no one's feelings are hurt during conflicts.",
+        "c": "Feeling"
+      },
+      {
+        "sec": "Personality",
+        "t": "I debate based on facts, even if it upsets someone emotionally.",
+        "c": "Thinking"
+      },
+      {
+        "sec": "Career Motivators",
+        "t": "Earning a high salary in my future career is...",
+        "c": "Status & Wealth"
+      },
+      {
+        "sec": "Career Motivators",
+        "t": "Making a positive social impact through my work is...",
+        "c": "Altruism & Impact"
+      },
+      {
+        "sec": "Career Motivators",
+        "t": "Having a stable, safe job like a government employee is...",
+        "c": "Security & Stability"
+      },
+      {
+        "sec": "Career Motivators",
+        "t": "Having the freedom to create and innovate is...",
+        "c": "Autonomy & Creativity"
+      },
+      {
+        "sec": "Career Motivators",
+        "t": "Becoming a boss or manager with authority is...",
+        "c": "Status & Wealth"
+      },
+      {
+        "sec": "Career Motivators",
+        "t": "Directly helping people in my job is...",
+        "c": "Altruism & Impact"
+      },
+      {
+        "sec": "Career Motivators",
+        "t": "Having a routine 9-to-5 job over a risky startup is...",
+        "c": "Security & Stability"
+      },
+      {
+        "sec": "Career Motivators",
+        "t": "Being my own boss rather than working for someone else is...",
+        "c": "Autonomy & Creativity"
+      },
+      {
+        "sec": "Career Motivators",
+        "t": "Having a career that constantly challenges me to learn is...",
+        "c": "Autonomy & Creativity"
+      },
+      {
+        "sec": "Career Motivators",
+        "t": "Winning awards and public recognition is...",
+        "c": "Status & Wealth"
+      },
+      {
+        "sec": "Career Motivators",
+        "t": "Seeing a direct positive change in someone's life is...",
+        "c": "Altruism & Impact"
+      },
+      {
+        "sec": "Career Motivators",
+        "t": "Having a job that is safe from economic recessions is...",
+        "c": "Security & Stability"
+      },
+      {
+        "sec": "Learning Styles",
+        "t": "Grasping concepts when the teacher lectures verbally in class.",
+        "c": "Auditory"
+      },
+      {
+        "sec": "Learning Styles",
+        "t": "Using infographics and charts to understand science topics.",
+        "c": "Visual"
+      },
+      {
+        "sec": "Learning Styles",
+        "t": "Physically performing a lab experiment myself to understand it.",
+        "c": "Kinesthetic"
+      },
+      {
+        "sec": "Learning Styles",
+        "t": "Reading the textbook and writing my own summaries.",
+        "c": "Reading/Writing"
+      },
+      {
+        "sec": "Learning Styles",
+        "t": "Recalling a podcast's content better than a written article.",
+        "c": "Auditory"
+      },
+      {
+        "sec": "Learning Styles",
+        "t": "Color-coding my notes with highlighters to retain information.",
+        "c": "Visual"
+      },
+      {
+        "sec": "Learning Styles",
+        "t": "Sitting still during long theoretical lectures without fidgeting.",
+        "c": "Kinesthetic"
+      },
+      {
+        "sec": "Learning Styles",
+        "t": "Taking written exams over giving oral presentations.",
+        "c": "Reading/Writing"
+      },
+      {
+        "sec": "Learning Styles",
+        "t": "Reading my notes out loud to memorize them effectively.",
+        "c": "Auditory"
+      },
+      {
+        "sec": "Learning Styles",
+        "t": "Following complex written instruction manuals easily.",
+        "c": "Reading/Writing"
+      },
+      {
+        "sec": "Learning Styles",
+        "t": "Drawing diagrams in the margins of my notebook while studying.",
+        "c": "Visual"
+      },
+      {
+        "sec": "Learning Styles",
+        "t": "Taking things apart and putting them back together to understand them.",
+        "c": "Kinesthetic"
+      }
+    ],
+    "Class 11 - 12": [
+      {
+        "sec": "Natural Abilities",
+        "t": "Solve complex calculus, algebra, or physics numericals.",
+        "c": "Logical/Mathematical"
+      },
+      {
+        "sec": "Natural Abilities",
+        "t": "Visualize organic chemistry structures or 3D geometry shapes.",
+        "c": "Spatial/Visual"
+      },
+      {
+        "sec": "Natural Abilities",
+        "t": "Write long, structured answers for humanities or English exams.",
+        "c": "Verbal/Linguistic"
+      },
+      {
+        "sec": "Natural Abilities",
+        "t": "Understand the mechanics of engines or electronic circuits.",
+        "c": "Mechanical/Kinesthetic"
+      },
+      {
+        "sec": "Natural Abilities",
+        "t": "Analyze complex data sets or economic trends.",
+        "c": "Logical/Mathematical"
+      },
+      {
+        "sec": "Natural Abilities",
+        "t": "Memorize lengthy historical timelines or legal case studies.",
+        "c": "Verbal/Linguistic"
+      },
+      {
+        "sec": "Natural Abilities",
+        "t": "Read complex engineering or architectural blueprints.",
+        "c": "Spatial/Visual"
+      },
+      {
+        "sec": "Natural Abilities",
+        "t": "Conduct precise biological dissections or lab titrations.",
+        "c": "Mechanical/Kinesthetic"
+      },
+      {
+        "sec": "Natural Abilities",
+        "t": "Grasp advanced abstract mathematical theorems.",
+        "c": "Logical/Mathematical"
+      },
+      {
+        "sec": "Natural Abilities",
+        "t": "Debate complex socio-political topics fluently.",
+        "c": "Verbal/Linguistic"
+      },
+      {
+        "sec": "Natural Abilities",
+        "t": "Build working physics or robotics models.",
+        "c": "Mechanical/Kinesthetic"
+      },
+      {
+        "sec": "Natural Abilities",
+        "t": "Visualize how a complex molecule looks from different angles.",
+        "c": "Spatial/Visual"
+      },
+      {
+        "sec": "Interests",
+        "t": "Participating in advanced science fairs or coding hackathons.",
+        "c": "Investigative"
+      },
+      {
+        "sec": "Interests",
+        "t": "Creating digital art, animation, or writing a blog.",
+        "c": "Artistic"
+      },
+      {
+        "sec": "Interests",
+        "t": "Leading the student council or organizing school festivals.",
+        "c": "Enterprising"
+      },
+      {
+        "sec": "Interests",
+        "t": "Volunteering at local NGOs or tutoring juniors.",
+        "c": "Social"
+      },
+      {
+        "sec": "Interests",
+        "t": "Balancing accounts or managing club budgets.",
+        "c": "Conventional"
+      },
+      {
+        "sec": "Interests",
+        "t": "Building tech projects, drones, or repairing electronics.",
+        "c": "Realistic"
+      },
+      {
+        "sec": "Interests",
+        "t": "Researching deep scientific or psychological topics online.",
+        "c": "Investigative"
+      },
+      {
+        "sec": "Interests",
+        "t": "Designing school magazines, posters, or sets for plays.",
+        "c": "Artistic"
+      },
+      {
+        "sec": "Interests",
+        "t": "Pitching startup ideas or participating in MUNs.",
+        "c": "Enterprising"
+      },
+      {
+        "sec": "Interests",
+        "t": "Organizing structured files, data, and schedules for events.",
+        "c": "Conventional"
+      },
+      {
+        "sec": "Interests",
+        "t": "Working on agricultural projects or outdoor environmental drives.",
+        "c": "Realistic"
+      },
+      {
+        "sec": "Interests",
+        "t": "Counseling peers or organizing community help drives.",
+        "c": "Social"
+      },
+      {
+        "sec": "Personality",
+        "t": "I am highly sociable and energize my study group.",
+        "c": "Extroversion"
+      },
+      {
+        "sec": "Personality",
+        "t": "I prefer studying alone in a quiet library over group study.",
+        "c": "Introversion"
+      },
+      {
+        "sec": "Personality",
+        "t": "I choose my subjects/career path purely based on ROI and logic.",
+        "c": "Thinking"
+      },
+      {
+        "sec": "Personality",
+        "t": "I choose my subjects/career path based on passion and impact.",
+        "c": "Feeling"
+      },
+      {
+        "sec": "Personality",
+        "t": "I stick to a rigid competitive exam prep schedule.",
+        "c": "Judging"
+      },
+      {
+        "sec": "Personality",
+        "t": "I adapt my study routine based on my mood and upcoming tests.",
+        "c": "Perceiving"
+      },
+      {
+        "sec": "Personality",
+        "t": "I actively network with seniors and teachers.",
+        "c": "Extroversion"
+      },
+      {
+        "sec": "Personality",
+        "t": "I deeply analyze my test mistakes before moving forward.",
+        "c": "Introversion"
+      },
+      {
+        "sec": "Personality",
+        "t": "I get stressed if my study timetable is disrupted.",
+        "c": "Judging"
+      },
+      {
+        "sec": "Personality",
+        "t": "I handle sudden syllabus changes or surprise tests easily.",
+        "c": "Perceiving"
+      },
+      {
+        "sec": "Personality",
+        "t": "I try to maintain harmony in my friend circle during fights.",
+        "c": "Feeling"
+      },
+      {
+        "sec": "Personality",
+        "t": "I prioritize truth and logic over emotions in arguments.",
+        "c": "Thinking"
+      },
+      {
+        "sec": "Career Motivators",
+        "t": "Getting a high-salary corporate or tech job is...",
+        "c": "Status & Wealth"
+      },
+      {
+        "sec": "Career Motivators",
+        "t": "Choosing a career that lets me serve society (e.g., Doctor/Teacher) is...",
+        "c": "Altruism & Impact"
+      },
+      {
+        "sec": "Career Motivators",
+        "t": "Getting a secure government job (UPSC/Bank/SSC) is...",
+        "c": "Security & Stability"
+      },
+      {
+        "sec": "Career Motivators",
+        "t": "Becoming an entrepreneur or freelancer is...",
+        "c": "Autonomy & Creativity"
+      },
+      {
+        "sec": "Career Motivators",
+        "t": "Holding a managerial position with authority is...",
+        "c": "Status & Wealth"
+      },
+      {
+        "sec": "Career Motivators",
+        "t": "Working for an NGO or social impact startup is...",
+        "c": "Altruism & Impact"
+      },
+      {
+        "sec": "Career Motivators",
+        "t": "Having a stable 9-to-5 job over the uncertainty of a startup is...",
+        "c": "Security & Stability"
+      },
+      {
+        "sec": "Career Motivators",
+        "t": "Having creative freedom in my profession is...",
+        "c": "Autonomy & Creativity"
+      },
+      {
+        "sec": "Career Motivators",
+        "t": "Constantly learning and tackling new challenges in college is...",
+        "c": "Autonomy & Creativity"
+      },
+      {
+        "sec": "Career Motivators",
+        "t": "Getting into a top-tier IIT/IIM for public recognition is...",
+        "c": "Status & Wealth"
+      },
+      {
+        "sec": "Career Motivators",
+        "t": "Mentally stimulating work that helps others grow is...",
+        "c": "Altruism & Impact"
+      },
+      {
+        "sec": "Career Motivators",
+        "t": "Having a career immune to AI and market crashes is...",
+        "c": "Security & Stability"
+      },
+      {
+        "sec": "Learning Styles",
+        "t": "Grasping concepts when the coaching teacher lectures verbally.",
+        "c": "Auditory"
+      },
+      {
+        "sec": "Learning Styles",
+        "t": "Using YouTube animations and infographics for complex topics.",
+        "c": "Visual"
+      },
+      {
+        "sec": "Learning Styles",
+        "t": "Performing lab experiments to understand theory.",
+        "c": "Kinesthetic"
+      },
+      {
+        "sec": "Learning Styles",
+        "t": "Reading NCERT/RD Sharma and making written notes.",
+        "c": "Reading/Writing"
+      },
+      {
+        "sec": "Learning Styles",
+        "t": "Listening to educational podcasts or recorded lectures.",
+        "c": "Auditory"
+      },
+      {
+        "sec": "Learning Styles",
+        "t": "Making mind maps and color-coded formulas.",
+        "c": "Visual"
+      },
+      {
+        "sec": "Learning Styles",
+        "t": "Pacing around the room while reciting formulas.",
+        "c": "Kinesthetic"
+      },
+      {
+        "sec": "Learning Styles",
+        "t": "Solving mock test papers by writing them out.",
+        "c": "Reading/Writing"
+      },
+      {
+        "sec": "Learning Styles",
+        "t": "Discussing difficult problems aloud with peers.",
+        "c": "Auditory"
+      },
+      {
+        "sec": "Learning Styles",
+        "t": "Reading reference books like HC Verma or Morrison Boyd.",
+        "c": "Reading/Writing"
+      },
+      {
+        "sec": "Learning Styles",
+        "t": "Drawing flowcharts for biological processes.",
+        "c": "Visual"
+      },
+      {
+        "sec": "Learning Styles",
+        "t": "Using physical models for chemistry or geography.",
+        "c": "Kinesthetic"
+      }
+    ],
+    "Undergraduate": [
+      {
+        "sec": "Natural Abilities",
+        "t": "Analyze large data sets using statistics or programming.",
+        "c": "Logical/Mathematical"
+      },
+      {
+        "sec": "Natural Abilities",
+        "t": "Design UI/UX layouts or architectural 3D models.",
+        "c": "Spatial/Visual"
+      },
+      {
+        "sec": "Natural Abilities",
+        "t": "Write lengthy research papers or thesis documents.",
+        "c": "Verbal/Linguistic"
+      },
+      {
+        "sec": "Natural Abilities",
+        "t": "Build physical prototypes or work with hardware tools.",
+        "c": "Mechanical/Kinesthetic"
+      },
+      {
+        "sec": "Natural Abilities",
+        "t": "Debug complex code or logical algorithms.",
+        "c": "Logical/Mathematical"
+      },
+      {
+        "sec": "Natural Abilities",
+        "t": "Deliver persuasive presentations or pitch ideas.",
+        "c": "Verbal/Linguistic"
+      },
+      {
+        "sec": "Natural Abilities",
+        "t": "Visualize structural integrity or design blueprints.",
+        "c": "Spatial/Visual"
+      },
+      {
+        "sec": "Natural Abilities",
+        "t": "Conduct precise lab operations or medical procedures.",
+        "c": "Mechanical/Kinesthetic"
+      },
+      {
+        "sec": "Natural Abilities",
+        "t": "Build financial models or economic forecasts.",
+        "c": "Logical/Mathematical"
+      },
+      {
+        "sec": "Natural Abilities",
+        "t": "Debate legal cases or complex philosophical theories.",
+        "c": "Verbal/Linguistic"
+      },
+      {
+        "sec": "Natural Abilities",
+        "t": "Operate complex machinery or technical equipment.",
+        "c": "Mechanical/Kinesthetic"
+      },
+      {
+        "sec": "Natural Abilities",
+        "t": "Translate complex concepts into simple visual presentations.",
+        "c": "Spatial/Visual"
+      },
+      {
+        "sec": "Interests",
+        "t": "Doing academic research or working in an R&D lab.",
+        "c": "Investigative"
+      },
+      {
+        "sec": "Interests",
+        "t": "Working on graphic design, film, or creative writing projects.",
+        "c": "Artistic"
+      },
+      {
+        "sec": "Interests",
+        "t": "Leading college clubs, E-cells, or managing events.",
+        "c": "Enterprising"
+      },
+      {
+        "sec": "Interests",
+        "t": "Volunteering for NSS, social work, or counseling.",
+        "c": "Social"
+      },
+      {
+        "sec": "Interests",
+        "t": "Managing college accounts, logistics, or operations.",
+        "c": "Conventional"
+      },
+      {
+        "sec": "Interests",
+        "t": "Working on engineering prototypes, robotics, or field projects.",
+        "c": "Realistic"
+      },
+      {
+        "sec": "Interests",
+        "t": "Analyzing market trends or psychological case studies.",
+        "c": "Investigative"
+      },
+      {
+        "sec": "Interests",
+        "t": "Directing college plays or designing fest merchandise.",
+        "c": "Artistic"
+      },
+      {
+        "sec": "Interests",
+        "t": "Participating in case study competitions or MUNs.",
+        "c": "Enterprising"
+      },
+      {
+        "sec": "Interests",
+        "t": "Organizing academic databases or club inventories.",
+        "c": "Conventional"
+      },
+      {
+        "sec": "Interests",
+        "t": "Interning at a manufacturing plant or outdoor survey site.",
+        "c": "Realistic"
+      },
+      {
+        "sec": "Interests",
+        "t": "Organizing campus drives or teaching underprivileged kids.",
+        "c": "Social"
+      },
+      {
+        "sec": "Personality",
+        "t": "I am the go-to person for networking and socializing in college.",
+        "c": "Extroversion"
+      },
+      {
+        "sec": "Personality",
+        "t": "I prefer deep, solitary work in the library over group projects.",
+        "c": "Introversion"
+      },
+      {
+        "sec": "Personality",
+        "t": "I choose electives based on career ROI and employability.",
+        "c": "Thinking"
+      },
+      {
+        "sec": "Personality",
+        "t": "I choose electives based on passion and professor's teaching style.",
+        "c": "Feeling"
+      },
+      {
+        "sec": "Personality",
+        "t": "I maintain a strict study and assignment schedule.",
+        "c": "Judging"
+      },
+      {
+        "sec": "Personality",
+        "t": "I thrive on the adrenaline of last-minute submissions.",
+        "c": "Perceiving"
+      },
+      {
+        "sec": "Personality",
+        "t": "I actively network with alumni and industry professionals.",
+        "c": "Extroversion"
+      },
+      {
+        "sec": "Personality",
+        "t": "I deeply reflect on my career choices before acting.",
+        "c": "Introversion"
+      },
+      {
+        "sec": "Personality",
+        "t": "I get stressed if project deadlines are moved or rubrics change.",
+        "c": "Judging"
+      },
+      {
+        "sec": "Personality",
+        "t": "I adapt easily to sudden syllabus or schedule changes.",
+        "c": "Perceiving"
+      },
+      {
+        "sec": "Personality",
+        "t": "I ensure team harmony during stressful group assignments.",
+        "c": "Feeling"
+      },
+      {
+        "sec": "Personality",
+        "t": "I take charge of group projects to ensure logical execution.",
+        "c": "Thinking"
+      },
+      {
+        "sec": "Career Motivators",
+        "t": "Landing a high-paying MNC or FAANG job is...",
+        "c": "Status & Wealth"
+      },
+      {
+        "sec": "Career Motivators",
+        "t": "Working for a social impact startup or NGO is...",
+        "c": "Altruism & Impact"
+      },
+      {
+        "sec": "Career Motivators",
+        "t": "Getting a secure government or banking job is...",
+        "c": "Security & Stability"
+      },
+      {
+        "sec": "Career Motivators",
+        "t": "Building my own startup or freelancing is...",
+        "c": "Autonomy & Creativity"
+      },
+      {
+        "sec": "Career Motivators",
+        "t": "Climbing the corporate ladder to C-suite is...",
+        "c": "Status & Wealth"
+      },
+      {
+        "sec": "Career Motivators",
+        "t": "Working in healthcare or education sectors is...",
+        "c": "Altruism & Impact"
+      },
+      {
+        "sec": "Career Motivators",
+        "t": "Having work-life balance and job security is...",
+        "c": "Security & Stability"
+      },
+      {
+        "sec": "Career Motivators",
+        "t": "Having creative freedom over my projects is...",
+        "c": "Autonomy & Creativity"
+      },
+      {
+        "sec": "Career Motivators",
+        "t": "Getting into a top global university for Masters is...",
+        "c": "Status & Wealth"
+      },
+      {
+        "sec": "Career Motivators",
+        "t": "Mentoring juniors and leading community projects is...",
+        "c": "Altruism & Impact"
+      },
+      {
+        "sec": "Career Motivators",
+        "t": "Having a career that is safe from AI automation is...",
+        "c": "Security & Stability"
+      },
+      {
+        "sec": "Career Motivators",
+        "t": "Working remotely and setting my own hours is...",
+        "c": "Autonomy & Creativity"
+      },
+      {
+        "sec": "Learning Styles",
+        "t": "Attending professor's lectures and audio recordings.",
+        "c": "Auditory"
+      },
+      {
+        "sec": "Learning Styles",
+        "t": "Watching YouTube tutorials and visual diagrams.",
+        "c": "Visual"
+      },
+      {
+        "sec": "Learning Styles",
+        "t": "Doing internships and hands-on lab work.",
+        "c": "Kinesthetic"
+      },
+      {
+        "sec": "Learning Styles",
+        "t": "Reading research papers and writing thesis drafts.",
+        "c": "Reading/Writing"
+      },
+      {
+        "sec": "Learning Styles",
+        "t": "Discussing case studies in group audio calls.",
+        "c": "Auditory"
+      },
+      {
+        "sec": "Learning Styles",
+        "t": "Creating Canva presentations and infographics.",
+        "c": "Visual"
+      },
+      {
+        "sec": "Learning Styles",
+        "t": "Taking walks while listening to audiobooks.",
+        "c": "Kinesthetic"
+      },
+      {
+        "sec": "Learning Styles",
+        "t": "Writing detailed structured notes from slides.",
+        "c": "Reading/Writing"
+      },
+      {
+        "sec": "Learning Styles",
+        "t": "Explaining complex topics to peers aloud.",
+        "c": "Auditory"
+      },
+      {
+        "sec": "Learning Styles",
+        "t": "Reading standard textbooks and reference materials.",
+        "c": "Reading/Writing"
+      },
+      {
+        "sec": "Learning Styles",
+        "t": "Drawing flowcharts for business or coding logic.",
+        "c": "Visual"
+      },
+      {
+        "sec": "Learning Styles",
+        "t": "Building physical models or role-playing scenarios.",
+        "c": "Kinesthetic"
+      }
+    ],
+    "Postgraduate": [
+      {
+        "sec": "Natural Abilities",
+        "t": "Analyze industry trends and strategic business models.",
+        "c": "Logical/Mathematical"
+      },
+      {
+        "sec": "Natural Abilities",
+        "t": "Design advanced architectural or engineering systems.",
+        "c": "Spatial/Visual"
+      },
+      {
+        "sec": "Natural Abilities",
+        "t": "Draft complex legal documents or corporate communications.",
+        "c": "Verbal/Linguistic"
+      },
+      {
+        "sec": "Natural Abilities",
+        "t": "Operate advanced medical or industrial machinery.",
+        "c": "Mechanical/Kinesthetic"
+      },
+      {
+        "sec": "Natural Abilities",
+        "t": "Build predictive algorithms or financial forecasts.",
+        "c": "Logical/Mathematical"
+      },
+      {
+        "sec": "Natural Abilities",
+        "t": "Publish research papers or author industry articles.",
+        "c": "Verbal/Linguistic"
+      },
+      {
+        "sec": "Natural Abilities",
+        "t": "Visualize data architecture or network topologies.",
+        "c": "Spatial/Visual"
+      },
+      {
+        "sec": "Natural Abilities",
+        "t": "Perform complex surgeries or lead technical operations.",
+        "c": "Mechanical/Kinesthetic"
+      },
+      {
+        "sec": "Natural Abilities",
+        "t": "Optimize supply chain or operational logistics mathematically.",
+        "c": "Logical/Mathematical"
+      },
+      {
+        "sec": "Natural Abilities",
+        "t": "Negotiate high-stakes deals or mediate conflicts.",
+        "c": "Verbal/Linguistic"
+      },
+      {
+        "sec": "Natural Abilities",
+        "t": "Prototype physical products in a workshop.",
+        "c": "Mechanical/Kinesthetic"
+      },
+      {
+        "sec": "Natural Abilities",
+        "t": "Design intuitive user experiences or brand identities.",
+        "c": "Spatial/Visual"
+      },
+      {
+        "sec": "Interests",
+        "t": "Conducting advanced R&D or publishing academic papers.",
+        "c": "Investigative"
+      },
+      {
+        "sec": "Interests",
+        "t": "Leading creative direction or brand strategy.",
+        "c": "Artistic"
+      },
+      {
+        "sec": "Interests",
+        "t": "Pitching to venture capitalists or leading M&A.",
+        "c": "Enterprising"
+      },
+      {
+        "sec": "Interests",
+        "t": "Mentoring junior team members or coaching executives.",
+        "c": "Social"
+      },
+      {
+        "sec": "Interests",
+        "t": "Auditing financial reports or ensuring legal compliance.",
+        "c": "Conventional"
+      },
+      {
+        "sec": "Interests",
+        "t": "Overseeing manufacturing floors or large-scale field operations.",
+        "c": "Realistic"
+      },
+      {
+        "sec": "Interests",
+        "t": "Analyzing complex data to find market gaps.",
+        "c": "Investigative"
+      },
+      {
+        "sec": "Interests",
+        "t": "Designing innovative product features or marketing campaigns.",
+        "c": "Artistic"
+      },
+      {
+        "sec": "Interests",
+        "t": "Scaling a business unit or launching a new division.",
+        "c": "Enterprising"
+      },
+      {
+        "sec": "Interests",
+        "t": "Managing corporate governance and structured policies.",
+        "c": "Conventional"
+      },
+      {
+        "sec": "Interests",
+        "t": "Working on industrial IoT or smart city projects.",
+        "c": "Realistic"
+      },
+      {
+        "sec": "Interests",
+        "t": "Building CSR initiatives or community health programs.",
+        "c": "Social"
+      },
+      {
+        "sec": "Personality",
+        "t": "I am the networking hub of my professional circle.",
+        "c": "Extroversion"
+      },
+      {
+        "sec": "Personality",
+        "t": "I prefer deep, solitary strategic work over meetings.",
+        "c": "Introversion"
+      },
+      {
+        "sec": "Personality",
+        "t": "I make hiring/firing and business decisions purely on data.",
+        "c": "Thinking"
+      },
+      {
+        "sec": "Personality",
+        "t": "I prioritize company culture and employee morale over pure profit.",
+        "c": "Feeling"
+      },
+      {
+        "sec": "Personality",
+        "t": "I enforce strict timelines and operational processes.",
+        "c": "Judging"
+      },
+      {
+        "sec": "Personality",
+        "t": "I thrive in dynamic startups with shifting priorities.",
+        "c": "Perceiving"
+      },
+      {
+        "sec": "Personality",
+        "t": "I actively seek public speaking and industry panel opportunities.",
+        "c": "Extroversion"
+      },
+      {
+        "sec": "Personality",
+        "t": "I meticulously analyze data before presenting to the board.",
+        "c": "Introversion"
+      },
+      {
+        "sec": "Personality",
+        "t": "I get highly uncomfortable if corporate governance rules are bypassed.",
+        "c": "Judging"
+      },
+      {
+        "sec": "Personality",
+        "t": "I easily pivot strategies during market disruptions.",
+        "c": "Perceiving"
+      },
+      {
+        "sec": "Personality",
+        "t": "I ensure team harmony during stressful product launches.",
+        "c": "Feeling"
+      },
+      {
+        "sec": "Personality",
+        "t": "I prioritize rational business logic over emotional responses.",
+        "c": "Thinking"
+      },
+      {
+        "sec": "Career Motivators",
+        "t": "Achieving a C-suite role (CEO/CFO/CTO) is...",
+        "c": "Status & Wealth"
+      },
+      {
+        "sec": "Career Motivators",
+        "t": "Disrupting industries for social good is...",
+        "c": "Altruism & Impact"
+      },
+      {
+        "sec": "Career Motivators",
+        "t": "Achieving tenure or a permanent senior partnership is...",
+        "c": "Security & Stability"
+      },
+      {
+        "sec": "Career Motivators",
+        "t": "Being an independent consultant or thought leader is...",
+        "c": "Autonomy & Creativity"
+      },
+      {
+        "sec": "Career Motivators",
+        "t": "Building a massive personal net worth is...",
+        "c": "Status & Wealth"
+      },
+      {
+        "sec": "Career Motivators",
+        "t": "Creating systemic change in healthcare/education is...",
+        "c": "Altruism & Impact"
+      },
+      {
+        "sec": "Career Motivators",
+        "t": "Having a stable, long-term corporate job is...",
+        "c": "Security & Stability"
+      },
+      {
+        "sec": "Career Motivators",
+        "t": "Having the freedom to pursue multiple consulting ventures is...",
+        "c": "Autonomy & Creativity"
+      },
+      {
+        "sec": "Career Motivators",
+        "t": "Being recognized as an industry expert is...",
+        "c": "Status & Wealth"
+      },
+      {
+        "sec": "Career Motivators",
+        "t": "Mentoring the next generation of leaders is...",
+        "c": "Altruism & Impact"
+      },
+      {
+        "sec": "Career Motivators",
+        "t": "Job security during economic downturns is...",
+        "c": "Security & Stability"
+      },
+      {
+        "sec": "Career Motivators",
+        "t": "Innovating without bureaucratic red tape is...",
+        "c": "Autonomy & Creativity"
+      },
+      {
+        "sec": "Learning Styles",
+        "t": "Listening to industry podcasts and expert interviews.",
+        "c": "Auditory"
+      },
+      {
+        "sec": "Learning Styles",
+        "t": "Analyzing visual data dashboards and infographics.",
+        "c": "Visual"
+      },
+      {
+        "sec": "Learning Styles",
+        "t": "Running pilot projects and field tests.",
+        "c": "Kinesthetic"
+      },
+      {
+        "sec": "Learning Styles",
+        "t": "Reading industry whitepapers and journals.",
+        "c": "Reading/Writing"
+      },
+      {
+        "sec": "Learning Styles",
+        "t": "Engaging in group debates and mastermind sessions.",
+        "c": "Auditory"
+      },
+      {
+        "sec": "Learning Styles",
+        "t": "Creating visual mind maps of complex business strategies.",
+        "c": "Visual"
+      },
+      {
+        "sec": "Learning Styles",
+        "t": "Role-playing negotiations and site visits.",
+        "c": "Kinesthetic"
+      },
+      {
+        "sec": "Learning Styles",
+        "t": "Drafting comprehensive strategy documents.",
+        "c": "Reading/Writing"
+      },
+      {
+        "sec": "Learning Styles",
+        "t": "Discussing case studies aloud with peers.",
+        "c": "Auditory"
+      },
+      {
+        "sec": "Learning Styles",
+        "t": "Reviewing structured standard operating procedures (SOPs).",
+        "c": "Reading/Writing"
+      },
+      {
+        "sec": "Learning Styles",
+        "t": "Designing architectural or workflow diagrams.",
+        "c": "Visual"
+      },
+      {
+        "sec": "Learning Styles",
+        "t": "Prototyping products in a maker space or lab.",
+        "c": "Kinesthetic"
+      }
+    ]
+  }
+}

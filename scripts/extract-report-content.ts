@@ -63,9 +63,9 @@ sandbox.window.document = fakeDoc; sandbox.self = sandbox; sandbox.globalThis = 
 
 // Files and their report-content variables
 const targets = [
-  { file: 'Personality.html', slug: 'personality', vars: ['typeData'] },
-  { file: 'Learning Style.html', slug: 'learning-style', vars: ['DESCS', 'RECS'] },
-  { file: 'Multiple Intelligence Assessment.html', slug: 'multiple-intelligence', vars: ['INTEL', 'CLUSTER_MAP', 'SALARY_MAP'] },
+  { file: 'Personality Test.html', slug: 'personality', vars: ['typeData'] },
+  { file: 'Learning Styles.html', slug: 'learning-style', vars: ['DESCS', 'RECS'] },
+  { file: 'Multiple Intelligence Test.html', slug: 'multiple-intelligence', vars: ['INTEL', 'CLUSTER_MAP', 'SALARY_MAP'] },
   { file: 'stream selector test.html', slug: 'stream-selector', vars: ['STREAM_DATABASE', 'TEST_SECTIONS'] },
 ]
 

@@ -15,14 +15,14 @@ const OUT_DIR = '/home/z/my-project/scripts/out'
 mkdirSync(OUT_DIR, { recursive: true })
 
 const TARGETS: { file: string; vars: string[]; slug: string }[] = [
-  { file: 'Learning Style.html', slug: 'learning-style', vars: ['QUESTIONS', 'CATS', 'LIKERT'] },
-  { file: 'Personality.html', slug: 'personality', vars: ['QUESTIONS', 'CATS', 'LIKERT'] },
-  { file: 'Multiple Intelligence Assessment.html', slug: 'multiple-intelligence', vars: ['QUESTIONS', 'INTEL', 'CLUSTER_MAP', 'SALARY_MAP', 'SCALE', 'eiTraits', 'eiRecs'] },
+  { file: 'Learning Styles.html', slug: 'learning-style', vars: ['QUESTIONS', 'CATS', 'LIKERT'] },
+  { file: 'Personality Test.html', slug: 'personality', vars: ['QUESTIONS', 'CATS', 'LIKERT'] },
+  { file: 'Multiple Intelligence Test.html', slug: 'multiple-intelligence', vars: ['QUESTIONS', 'INTEL', 'CLUSTER_MAP', 'SALARY_MAP', 'SCALE', 'eiTraits', 'eiRecs'] },
   { file: 'Humanities branch Selector.html', slug: 'humanities-branch', vars: ['QUESTIONS', 'CATS', 'LIKERT'] },
   { file: 'Engineering Branch Selector.html', slug: 'engineering-branch', vars: ['QUESTIONS', 'CATS', 'LIKERT'] },
-  { file: 'Commerce Branch Selector.html', slug: 'commerce-branch', vars: ['QUESTIONS', 'CATS', 'LIKERT', 'FIN'] },
+  { file: 'Commerce Career Selector test.html', slug: 'commerce-branch', vars: ['QUESTIONS', 'CATS', 'LIKERT', 'FIN'] },
   { file: 'stream selector test.html', slug: 'stream-selector', vars: ['TEST_SECTIONS', 'STREAM_DATABASE'] },
-  { file: 'ideal career new.html', slug: 'ideal-career', vars: ['sections', 'questionBank', 'RIASEC', 'BIGFIVE', 'MOTIVATORS'] },
+  { file: 'ideal career.html', slug: 'ideal-career', vars: ['sections', 'questionBank', 'RIASEC', 'BIGFIVE', 'MOTIVATORS'] },
   { file: 'Multi dimensional test (One test for all).html', slug: 'multi-dimensional', vars: ['questionBank', 'DIMS', 'SECTIONS'] },
 ]
 
