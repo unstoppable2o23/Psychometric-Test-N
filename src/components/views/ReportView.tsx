@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
-import { ArrowLeft, Download, FileText, Lock } from 'lucide-react'
+import { ArrowLeft, Download, FileText, Lock, Sparkles } from 'lucide-react'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts'
 import { toast } from 'sonner'
 
@@ -15,13 +15,24 @@ const LEVEL_COLORS: Record<string, string> = { High: '#15803D', Dominant: '#1580
 export function ReportView() {
   const reportId = useApp((s) => s.reportId)!
   const setView = useApp((s) => s.setView)
+  const user = useApp((s) => s.user)
   const [report, setReport] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [interpretation, setInterpretation] = useState<string | null>(null)
+  const [showInterpretation, setShowInterpretation] = useState(false)
 
   useEffect(() => {
     api.report(reportId).then((r) => setReport(r.report)).catch((e) => setError(e.message)).finally(() => setLoading(false))
   }, [reportId])
+
+  const loadInterpretation = async () => {
+    try {
+      setShowInterpretation(true)
+      const r = await api.reportInterpretation(reportId)
+      setInterpretation(r.interpretation)
+    } catch (e: any) { toast.error(e.message) }
+  }
 
   if (loading) return <div className="max-w-4xl mx-auto px-4 py-10"><Skeleton className="h-96 rounded-xl" /></div>
   if (error) return (
@@ -35,7 +46,6 @@ export function ReportView() {
   const score = report.score
   const dims = score.dimensions || []
   const chartData = dims.map((d: any) => ({ name: d.name?.length > 18 ? d.name.slice(0, 16) + '…' : d.name, pct: d.pct, level: d.level, full: d.name }))
-  const user = useApp.getState().user
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
@@ -54,6 +64,9 @@ export function ReportView() {
               <a href={api.reportDownloadUrl(report.id)} target="_blank" rel="noreferrer">
                 <Button size="sm" className="bg-teal-600 hover:bg-teal-700"><Download className="w-4 h-4" /> Download A4 PDF</Button>
               </a>
+              {user?.role !== 'STUDENT' && (
+                <Button size="sm" variant="outline" onClick={loadInterpretation}><Sparkles className="w-4 h-4 text-teal-600" /> Smart Interpretation</Button>
+              )}
             </div>
           </div>
         </CardHeader>
@@ -146,6 +159,26 @@ export function ReportView() {
                     )}
                   </div>
                 ))}
+              </div>
+            </div>
+          )}
+
+          {/* Smart Interpreter section (counsellors & admins only) */}
+          {showInterpretation && user?.role !== 'STUDENT' && (
+            <div className="rounded-xl border border-teal-200 overflow-hidden">
+              <div className="bg-navy px-4 py-3 flex items-center gap-2" style={{ background: '#0F2A43' }}>
+                <Sparkles className="w-4 h-4 text-teal-400" />
+                <p className="text-sm font-bold text-white">Counselor's Deep-Dive Interpretation</p>
+              </div>
+              <div className="p-4 bg-slate-50">
+                {interpretation ? (
+                  <div className="prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: interpretation }} />
+                ) : (
+                  <div className="flex items-center gap-2 text-sm text-slate-500">
+                    <div className="w-4 h-4 border-2 border-teal-200 border-t-teal-600 rounded-full animate-spin" />
+                    Generating interpretation...
+                  </div>
+                )}
               </div>
             </div>
           )}

@@ -3,6 +3,7 @@
 import { PDFDocument, StandardFonts, rgb, PDFFont, PDFPage } from 'pdf-lib'
 import fs from 'fs'
 import { getPersonalityTypeData, getDichotomies, getIntelData, getAllIntel, getStreamData, getLearningStyleDescs } from '@/lib/assessments/report-content'
+import { parseInterpretation } from '@/lib/smart-interpreter'
 
 const PAGE_W = 595.28
 const PAGE_H = 841.89
@@ -74,6 +75,7 @@ export interface ReportPdfData {
     topDimensions?: string[]
     domainBreakdown?: any[]
   }
+  interpretation?: string
 }
 
 export async function generateReportPdf(data: ReportPdfData, id: string): Promise<string> {
@@ -674,6 +676,40 @@ export async function generateReportPdf(data: ReportPdfData, id: string): Promis
       }
       y -= bodyH + 8
       spacer(6)
+    }
+  }
+
+  // --- Smart Interpreter: Counsellor's Deep-Dive Interpretation (page 10) ---
+  if (data.interpretation) {
+    const parsed = parseInterpretation(data.interpretation)
+    newPage()
+    // Section header
+    page.drawRectangle({ x: MARGIN, y: y - 20, width: contentW, height: 24, color: C.NAVY })
+    page.drawText("Counselor's Deep-Dive Interpretation", { x: MARGIN + 8, y: y - 15, size: 11, font: fontBold, color: C.WHITE })
+    y -= 30
+    spacer(6)
+    // Executive Synthesis
+    if (parsed.executiveSynthesis) {
+      heading('Executive Synthesis', 11, C.TEAL)
+      drawText(parsed.executiveSynthesis, { size: 10, lineHeight: 14 })
+      spacer(8)
+    }
+    // Career Synergies
+    if (parsed.careerSynergies) {
+      heading('Career Synergies', 11, C.TEAL)
+      drawText(parsed.careerSynergies, { size: 10, lineHeight: 14 })
+      spacer(8)
+    }
+    // Action Plan
+    if (parsed.actionPlan?.length) {
+      heading('Your Customized Execution Plan', 11, C.TEAL)
+      drawText('The following action items are tailored to the student assessment results:', { size: 10, color: C.MUTED })
+      spacer(4)
+      for (const item of parsed.actionPlan) {
+        ensureSpace(30)
+        drawInfoBox('', item, C.TEAL, hex('#F0FDFA'))
+        spacer(4)
+      }
     }
   }
 

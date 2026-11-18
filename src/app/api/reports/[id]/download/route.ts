@@ -5,6 +5,7 @@ import { apiHandler, json, error } from '@/lib/api'
 import { getAssessment } from '@/lib/assessments/loader'
 import { scoreAttempt } from '@/lib/scoring'
 import { generateReportPdfFile } from '@/lib/pdf'
+import { generateUniversalSmartInterpretation, extractInterpretationData, getTestType } from '@/lib/smart-interpreter'
 import fs from 'fs/promises'
 
 // GET /api/reports/[id]/download — role-checked PDF download (A4, vector).
@@ -69,6 +70,12 @@ export const GET = apiHandler(async (req: NextRequest, { params }: { params: Pro
         }
       }),
     },
+    // Smart Interpreter narrative (counsellor-grade, zero-cost, no LLM)
+    interpretation: generateUniversalSmartInterpretation(
+      getTestType(report.assessment.slug),
+      report.student.name,
+      extractInterpretationData(report.assessment.slug, result.dimensions, result.domainBreakdown, result.recommendation || undefined),
+    ),
   }
 
   const pdfPath = await generateReportPdfFile(pdfData, report.id)

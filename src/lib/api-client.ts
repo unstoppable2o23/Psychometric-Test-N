@@ -85,6 +85,7 @@ export const api = {
 
   // reports
   report: (id: string) => req<{ report: any }>(`/api/reports/${id}`),
+  reportInterpretation: (id: string) => req<{ interpretation: string; testType: string; studentName: string }>(`/api/reports/${id}/interpretation`),
   reportDownloadUrl: (id: string) => `/api/reports/${id}/download`,
   manualDownloadUrl: (assessmentId: string) => `/api/manuals/${assessmentId}/download`,
 
