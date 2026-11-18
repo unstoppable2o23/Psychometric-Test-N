@@ -397,38 +397,96 @@ export async function generateReportPdf(data: ReportPdfData, id: string): Promis
         y -= 20
       }
 
-      // Dichotomy tables
+      // Score breakdown with progress bars
+      drawSectionTitle('Your Preference Scores')
+      for (const d of dims.slice(0, 8)) {
+        drawProgressBar(d.name || d.code || '', d.pct || 0, d.level || '')
+      }
+      spacer(6)
+
+      // Dichotomy tables — each on its own page for professional layout
       for (const dich of getDichotomies()) {
-        ensureSpace(30)
-        heading(dich.name, 11, C.NAVY)
-        drawText(dich.desc, { size: 9, color: C.MUTED })
+        newPage()
+        heading(dich.name, 13, C.NAVY)
+        drawText(dich.desc, { size: 10, color: C.MUTED })
+        spacer(10)
         drawTwoColBox(dich.left, dich.leftPts, dich.right, dich.rightPts)
-        spacer(4)
+        // Visual comparison bar
+        spacer(8)
+        const pairDim = dims.find((d: any) => d.code === dich.pair)
+        const vsDim = dims.find((d: any) => d.code === dich.vs)
+        if (pairDim && vsDim) {
+          ensureSpace(30)
+          page.drawText(sanitize(`${dich.left}: ${pairDim.pct}%  |  ${dich.right}: ${vsDim.pct}%`), { x: MARGIN, y: y - 10, size: 10, font: fontBold, color: C.SLATE })
+          y -= 16
+          // Visual bar showing the split
+          const barW = contentW
+          const leftPct = pairDim.pct || 50
+          page.drawRectangle({ x: MARGIN, y: y - 8, width: barW * leftPct / 100, height: 8, color: C.TEAL })
+          page.drawRectangle({ x: MARGIN + barW * leftPct / 100, y: y - 8, width: barW * (100 - leftPct) / 100, height: 8, color: C.AMBER })
+          y -= 14
+        }
       }
 
-      // Personality profile
+      // Personality profile — new page
       if (td) {
-        ensureSpace(60)
-        spacer(8)
+        newPage()
         drawSectionTitle('Your Personality Profile')
-        drawText(td.profile, { size: 10, lineHeight: 14 })
+        drawText(td.profile, { size: 11, lineHeight: 16 })
+        spacer(10)
+        drawInfoBox('About Your Type', `Your four-letter type code ${typeCode} (${sanitize(td.nick)}) reflects your natural preferences across four key dimensions of personality. This profile is based on your responses and represents your inherent tendencies.`, C.TEAL, hex('#ECFDF5'))
+      }
 
-        // Strengths & Challenges
-        spacer(8)
+      // Strengths & Challenges — new page
+      if (td) {
+        newPage()
         drawSectionTitle('Strengths & Challenges')
+        drawText('Every personality type comes with inherent strengths and potential challenges. Understanding both helps you leverage your natural abilities while being mindful of areas for growth.', { size: 10, color: C.MUTED })
+        spacer(8)
         drawTwoColBox('Strengths', td.strengths || [], 'Challenges', td.challenges || [])
+      }
 
-        // Recommendations
+      // Recommendations — new page
+      if (td) {
+        newPage()
+        drawSectionTitle('Recommendations for Growth')
+        drawText('The following recommendations are tailored to your personality type. Consider each carefully and implement the ones that resonate most with your personal and academic goals.', { size: 10, color: C.MUTED })
         spacer(8)
-        drawSectionTitle('Recommendations')
-        for (const rec of (td.recs || [])) { drawBullet(rec) }
+        for (const rec of (td.recs || [])) {
+          ensureSpace(40)
+          drawInfoBox('', rec, C.TEAL, hex('#F0FDFA'))
+          spacer(4)
+        }
+      }
 
-        // Careers
-        spacer(8)
+      // Careers — new page
+      if (td) {
+        newPage()
         drawSectionTitle('Recommended Careers')
+        drawText('Based on your personality type, these career paths align well with your natural preferences and strengths.', { size: 10, color: C.MUTED })
+        spacer(10)
+        // Career table
+        const cColW = [contentW * 0.35, contentW * 0.25, contentW * 0.2, contentW * 0.2]
+        const cHeaders = ['Career Title', 'Cluster', 'Salary', 'Rating']
+        ensureSpace(24)
+        page.drawRectangle({ x: MARGIN, y: y - 18, width: contentW, height: 20, color: C.NAVY })
+        let cx2 = MARGIN
+        cHeaders.forEach((h, i) => {
+          page.drawText(h, { x: cx2 + 5, y: y - 13, size: 9, font: fontBold, color: C.WHITE })
+          cx2 += cColW[i]
+        })
+        y -= 20
         for (const career of (td.careers || [])) {
           const arr = Array.isArray(career) ? career : [career]
-          drawText(`* ${arr[0]} (${arr[1] || ''})${arr[2] ? ' - ' + arr[2] : ''}`, { size: 9.5, maxW: contentW - 10, lineHeight: 12 })
+          ensureSpace(22)
+          page.drawRectangle({ x: MARGIN, y: y - 18, width: contentW, height: 20, color: C.LIGHT })
+          cx2 = MARGIN
+          const cells = [sanitize(arr[0] || ''), sanitize(arr[1] || ''), sanitize(arr[2] || ''), '*****']
+          cells.forEach((c, i) => {
+            page.drawText(c, { x: cx2 + 5, y: y - 13, size: 9, font: i === 0 ? fontBold : font, color: C.SLATE })
+            cx2 += cColW[i]
+          })
+          y -= 20
         }
       }
     }

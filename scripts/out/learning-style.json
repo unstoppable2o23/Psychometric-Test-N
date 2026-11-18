@@ -1,0 +1,347 @@
+{
+  "slug": "learning-style",
+  "sourceFile": "Learning Style.html",
+  "QUESTIONS": [
+    {
+      "t": "I remember information best when I hear it in a lecture or discussion.",
+      "c": "Auditory"
+    },
+    {
+      "t": "I read my notes out loud or talk to myself when studying.",
+      "c": "Auditory"
+    },
+    {
+      "t": "I prefer verbal instructions over written ones.",
+      "c": "Auditory"
+    },
+    {
+      "t": "I use rhymes or sound patterns to memorize facts.",
+      "c": "Auditory"
+    },
+    {
+      "t": "I learn best when I can move around rather than sitting still.",
+      "c": "Kinesthetic"
+    },
+    {
+      "t": "I find it difficult to learn new sports or physical activities.",
+      "c": "Kinesthetic",
+      "rev": true
+    },
+    {
+      "t": "Role-playing or acting helps me understand complex ideas.",
+      "c": "Kinesthetic"
+    },
+    {
+      "t": "I tap my foot, pace, or use a stress ball to help me concentrate.",
+      "c": "Kinesthetic"
+    },
+    {
+      "t": "I need to physically touch objects or build models to understand a topic.",
+      "c": "Tactile"
+    },
+    {
+      "t": "Hands-on experiments and labs are the best way for me to learn.",
+      "c": "Tactile"
+    },
+    {
+      "t": "Highlighting key ideas and writing summaries helps me remember.",
+      "c": "Tactile"
+    },
+    {
+      "t": "Taking notes by hand is essential to my learning process.",
+      "c": "Tactile"
+    },
+    {
+      "t": "I remember information best by reading textbooks or handouts.",
+      "c": "Visual"
+    },
+    {
+      "t": "I grasp concepts faster when presented in charts, graphs, or diagrams.",
+      "c": "Visual"
+    },
+    {
+      "t": "I prefer watching a demonstration or video over listening to an explanation.",
+      "c": "Visual"
+    },
+    {
+      "t": "Color-coding my notes and using visual aids helps me memorize.",
+      "c": "Visual"
+    },
+    {
+      "t": "I concentrate better when I can eat snacks or chew gum while studying.",
+      "c": "Intake"
+    },
+    {
+      "t": "Having water or drinks available helps me maintain focus.",
+      "c": "Intake"
+    },
+    {
+      "t": "I feel distracted if I cannot eat or drink during long study sessions.",
+      "c": "Intake"
+    },
+    {
+      "t": "Sugary treats or caffeine negatively affect my study productivity.",
+      "c": "Intake",
+      "rev": true
+    },
+    {
+      "t": "I need bright lighting to read and concentrate effectively.",
+      "c": "Light"
+    },
+    {
+      "t": "I feel sleepy or unmotivated when a room is dimly lit.",
+      "c": "Light"
+    },
+    {
+      "t": "I prefer studying in low light or away from direct sunlight.",
+      "c": "Light",
+      "rev": true
+    },
+    {
+      "t": "Poor lighting quickly strains my eyes and ruins my concentration.",
+      "c": "Light"
+    },
+    {
+      "t": "I cannot focus if the room is too warm; I need it to be cool.",
+      "c": "Temperature"
+    },
+    {
+      "t": "I often feel cold when studying and need extra layers.",
+      "c": "Temperature",
+      "rev": true
+    },
+    {
+      "t": "Fluctuations in room temperature easily distract me.",
+      "c": "Temperature"
+    },
+    {
+      "t": "I am highly sensitive to whether a space is too hot or too cold.",
+      "c": "Temperature"
+    },
+    {
+      "t": "I find it difficult to sit in one place for a long time when learning.",
+      "c": "Mobility"
+    },
+    {
+      "t": "I need to take physical breaks and walk around to maintain concentration.",
+      "c": "Mobility"
+    },
+    {
+      "t": "I can concentrate perfectly well sitting still for long periods.",
+      "c": "Mobility",
+      "rev": true
+    },
+    {
+      "t": "Moving around helps clear my head and process information.",
+      "c": "Mobility"
+    },
+    {
+      "t": "I study best when there is background noise, like music or people talking.",
+      "c": "Sound"
+    },
+    {
+      "t": "Silence distracts me more than it helps me when I am trying to study.",
+      "c": "Sound"
+    },
+    {
+      "t": "I require a completely quiet environment to work and learn effectively.",
+      "c": "Sound",
+      "rev": true
+    },
+    {
+      "t": "Background music (especially instrumental) helps me focus on tasks.",
+      "c": "Sound"
+    },
+    {
+      "t": "I prefer studying while sitting in a soft chair or lying on the bed.",
+      "c": "Physical Setting"
+    },
+    {
+      "t": "Formal desks and rigid chairs make it hard for me to concentrate.",
+      "c": "Physical Setting"
+    },
+    {
+      "t": "I think best when I am relaxed informally rather than sitting up straight.",
+      "c": "Physical Setting"
+    },
+    {
+      "t": "I prefer to sprawl out on the floor or a couch when doing assignments.",
+      "c": "Physical Setting"
+    },
+    {
+      "t": "I am most alert and do my best work in the late afternoon or evening.",
+      "c": "Time of Day"
+    },
+    {
+      "t": "I find it very difficult to concentrate early in the morning.",
+      "c": "Time of Day"
+    },
+    {
+      "t": "I feel sluggish when forced to study before midday.",
+      "c": "Time of Day"
+    },
+    {
+      "t": "I am highly productive during the early morning hours.",
+      "c": "Time of Day",
+      "rev": true
+    },
+    {
+      "t": "I work harder when I know my teacher wants me to succeed.",
+      "c": "Teacher Motivation"
+    },
+    {
+      "t": "I am motivated when I can ask teachers questions and get regular feedback.",
+      "c": "Teacher Motivation"
+    },
+    {
+      "t": "I work better on assignments when my teacher is close by to help.",
+      "c": "Teacher Motivation"
+    },
+    {
+      "t": "I rarely ask teachers for help and prefer to figure things out myself.",
+      "c": "Teacher Motivation",
+      "rev": true
+    },
+    {
+      "t": "I learn more and work harder when in a group of peers.",
+      "c": "Collaborative"
+    },
+    {
+      "t": "I find it distracting to work with others and prefer doing it alone.",
+      "c": "Collaborative",
+      "rev": true
+    },
+    {
+      "t": "Group brainstorming sessions help me process complex information.",
+      "c": "Collaborative"
+    },
+    {
+      "t": "I feel energized when working with a team rather than working independently.",
+      "c": "Collaborative"
+    },
+    {
+      "t": "I work best when given strict, detailed, step-by-step instructions.",
+      "c": "Structure"
+    },
+    {
+      "t": "I prefer precise rubrics and examples of what the final work should look like.",
+      "c": "Structure"
+    },
+    {
+      "t": "I feel anxious if an assignment is too open-ended or lacks clear rules.",
+      "c": "Structure"
+    },
+    {
+      "t": "I like to make my own choices about what steps to take and resources to use.",
+      "c": "Structure",
+      "rev": true
+    },
+    {
+      "t": "I like to complete one task fully before moving on to the next.",
+      "c": "Focus"
+    },
+    {
+      "t": "I don't like leaving things unfinished once I start them.",
+      "c": "Focus"
+    },
+    {
+      "t": "I tend to work on multiple tasks at the same time.",
+      "c": "Focus",
+      "rev": true
+    },
+    {
+      "t": "I rarely get distracted and procrastinate on important assignments.",
+      "c": "Focus"
+    },
+    {
+      "t": "I look for and find interesting things in my studies naturally.",
+      "c": "Self-Motivation"
+    },
+    {
+      "t": "I do not need rewards or other people to motivate me to study.",
+      "c": "Self-Motivation"
+    },
+    {
+      "t": "I find it easy to spend the necessary time to learn new material.",
+      "c": "Self-Motivation"
+    },
+    {
+      "t": "I usually need external pressure or deadlines to get my work done.",
+      "c": "Self-Motivation",
+      "rev": true
+    }
+  ],
+  "CATS": [
+    {
+      "n": "Auditory",
+      "type": "Sensory"
+    },
+    {
+      "n": "Kinesthetic",
+      "type": "Sensory"
+    },
+    {
+      "n": "Tactile",
+      "type": "Sensory"
+    },
+    {
+      "n": "Visual",
+      "type": "Sensory"
+    },
+    {
+      "n": "Intake",
+      "type": "Environmental"
+    },
+    {
+      "n": "Light",
+      "type": "Environmental"
+    },
+    {
+      "n": "Temperature",
+      "type": "Environmental"
+    },
+    {
+      "n": "Mobility",
+      "type": "Environmental"
+    },
+    {
+      "n": "Sound",
+      "type": "Environmental"
+    },
+    {
+      "n": "Physical Setting",
+      "type": "Environmental"
+    },
+    {
+      "n": "Time of Day",
+      "type": "Mindset"
+    },
+    {
+      "n": "Teacher Motivation",
+      "type": "Mindset"
+    },
+    {
+      "n": "Collaborative",
+      "type": "Mindset"
+    },
+    {
+      "n": "Structure",
+      "type": "Mindset"
+    },
+    {
+      "n": "Focus",
+      "type": "Mindset"
+    },
+    {
+      "n": "Self-Motivation",
+      "type": "Mindset"
+    }
+  ],
+  "LIKERT": [
+    "Strongly Disagree",
+    "Disagree",
+    "Neutral",
+    "Agree",
+    "Strongly Agree"
+  ]
+}

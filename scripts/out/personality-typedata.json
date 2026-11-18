@@ -1,0 +1,722 @@
+{
+  "INTJ": {
+    "nick": "The Architect",
+    "profile": "Imaginative and strategic thinkers, with a plan for everything. You are highly analytical and value logic, competence, and innovation. You are independent and determined, often focusing intensely on your own internal vision of how things could be improved. While you may seem reserved, your mind is constantly exploring complex theories and future possibilities.",
+    "strengths": [
+      "Strategic and visionary",
+      "Logical and objective",
+      "Independent and determined",
+      "Highly analytical",
+      "Decisive"
+    ],
+    "challenges": [
+      "Can be overly critical",
+      "May struggle with emotional nuances",
+      "Dislike routine or highly structured environments",
+      "Can be dismissive of input that lacks logic"
+    ],
+    "recs": [
+      "Learn to appreciate emotional perspectives in decision-making.",
+      "Break down grand visions into actionable, daily steps.",
+      "Practice patience with those who process information differently.",
+      "Delegate routine tasks to avoid burnout."
+    ],
+    "careers": [
+      [
+        "Software Engineer",
+        "Technology",
+        "$110,000"
+      ],
+      [
+        "Financial Analyst",
+        "Business",
+        "$85,000"
+      ],
+      [
+        "Scientific Researcher",
+        "Science",
+        "$90,000"
+      ],
+      [
+        "Architect",
+        "Design",
+        "$80,000"
+      ]
+    ]
+  },
+  "INTP": {
+    "nick": "The Logician",
+    "profile": "Innovative inventors with an unquenchable thirst for knowledge. You love to analyze how things work and understand the underlying principles of the universe. You are highly logical, objective, and creative, often seeing connections that others miss. You value intellectual competence and independence above all else.",
+    "strengths": [
+      "Analytical and logical",
+      "Innovative and creative",
+      "Objective and open-minded",
+      "Independent learner",
+      "Excellent problem solver"
+    ],
+    "challenges": [
+      "May neglect practical details",
+      "Can be disorganized",
+      "Dislike rigid schedules and rules",
+      "May struggle to communicate emotions"
+    ],
+    "recs": [
+      "Set concrete deadlines to avoid getting lost in theory.",
+      "Practice organizing your physical workspace to help manage tasks.",
+      "Work on expressing your thoughts in a way others can easily understand.",
+      "Balance your intellectual pursuits with physical and social activities."
+    ],
+    "careers": [
+      [
+        "Data Scientist",
+        "Technology",
+        "$100,000"
+      ],
+      [
+        "Software Developer",
+        "Technology",
+        "$105,000"
+      ],
+      [
+        "Mathematician",
+        "Science",
+        "$90,000"
+      ],
+      [
+        "Research Scientist",
+        "Science",
+        "$85,000"
+      ]
+    ]
+  },
+  "ENTJ": {
+    "nick": "The Commander",
+    "profile": "Bold, imaginative, and strong-willed leaders. You are a natural-born leader who finds a way to make things happen. You are highly logical, strategic, and driven by a desire to organize and improve systems. You value competence, efficiency, and direct communication.",
+    "strengths": [
+      "Natural leadership",
+      "Strategic and efficient",
+      "Decisive and confident",
+      "Logical and objective",
+      "Goal-oriented"
+    ],
+    "challenges": [
+      "Can be perceived as bossy or controlling",
+      "May struggle with patience",
+      "Can be overly critical of inefficiency",
+      "May neglect emotional needs"
+    ],
+    "recs": [
+      "Practice empathy and active listening in team settings.",
+      "Allow others to contribute ideas before making a final decision.",
+      "Work on giving feedback tactfully rather than bluntly.",
+      "Remember that not everyone operates at your rapid pace."
+    ],
+    "careers": [
+      [
+        "Chief Executive Officer",
+        "Business",
+        "$180,000"
+      ],
+      [
+        "Operations Manager",
+        "Business",
+        "$95,000"
+      ],
+      [
+        "Corporate Lawyer",
+        "Legal",
+        "$120,000"
+      ],
+      [
+        "Management Consultant",
+        "Business",
+        "$95,000"
+      ]
+    ]
+  },
+  "ENTP": {
+    "nick": "The Debater",
+    "profile": "Smart and curious thinkers who cannot resist an intellectual challenge. You are energetic, innovative, and love to debate ideas. You see possibilities everywhere and enjoy brainstorming new solutions. You are highly adaptable and dislike routine, preferring a life of intellectual exploration.",
+    "strengths": [
+      "Innovative and creative",
+      "Quick-witted and adaptable",
+      "Excellent debater",
+      "Energetic and enthusiastic",
+      "Strategic thinker"
+    ],
+    "challenges": [
+      "Can be argumentative",
+      "May struggle with follow-through",
+      "Dislike routine tasks",
+      "Can become easily bored"
+    ],
+    "recs": [
+      "Focus on executing ideas rather than just brainstorming them.",
+      "Develop systems to manage routine tasks effectively.",
+      "Practice diplomacy when challenging others' ideas.",
+      "Learn to appreciate the value of structure and consistency."
+    ],
+    "careers": [
+      [
+        "Entrepreneur",
+        "Business",
+        "$100,000"
+      ],
+      [
+        "Marketing Director",
+        "Marketing",
+        "$130,000"
+      ],
+      [
+        "Product Manager",
+        "Technology",
+        "$110,000"
+      ],
+      [
+        "Lawyer",
+        "Legal",
+        "$120,000"
+      ]
+    ]
+  },
+  "INFJ": {
+    "nick": "The Advocate",
+    "profile": "Quiet and mystical, yet inspiring and tireless idealists. You have a deep, intuitive understanding of human motivations and a strong desire to help others. You are insightful, creative, and driven by your core values. You seek meaning and connection in everything you do.",
+    "strengths": [
+      "Insightful and intuitive",
+      "Empathetic and compassionate",
+      "Creative and visionary",
+      "Dedicated to values",
+      "Deeply principled"
+    ],
+    "challenges": [
+      "Can be overly idealistic",
+      "May burn out from caring too much",
+      "Dislike conflict",
+      "Can be overly private and reserved"
+    ],
+    "recs": [
+      "Set healthy emotional boundaries to avoid burnout.",
+      "Learn to address conflict constructively rather than avoiding it.",
+      "Share your insights more openly with trusted colleagues.",
+      "Balance your idealism with practical, actionable steps."
+    ],
+    "careers": [
+      [
+        "Counselor/Therapist",
+        "Human Services",
+        "$50,000"
+      ],
+      [
+        "Writer/Author",
+        "Arts",
+        "$65,000"
+      ],
+      [
+        "Social Worker",
+        "Human Services",
+        "$50,000"
+      ],
+      [
+        "Human Resources Manager",
+        "Business",
+        "$110,000"
+      ]
+    ]
+  },
+  "INFP": {
+    "nick": "The Mediator",
+    "profile": "Sensitive and idealistic, you strive for inner harmony. You are a loyal and empathetic friend, devoted to the people and issues you care about. While you may appear cool or detached at times, you have very strong and passionate feelings. You trust your personal reactions and perceptions and use your values to guide your life.",
+    "strengths": [
+      "Creative and imaginative",
+      "Empathetic and compassionate",
+      "Loyal and devoted",
+      "Adaptable and flexible",
+      "Values-driven"
+    ],
+    "challenges": [
+      "Can be overly idealistic",
+      "May take criticism personally",
+      "Dislike conflict and tension",
+      "Can be impractical or unfocused"
+    ],
+    "recs": [
+      "Break large projects into manageable steps to avoid feeling overwhelmed.",
+      "Learn to separate your self-worth from constructive feedback.",
+      "Practice speaking up about your needs and values in group settings.",
+      "Develop organizational systems to manage daily tasks."
+    ],
+    "careers": [
+      [
+        "Writer/Author",
+        "Arts",
+        "$65,000"
+      ],
+      [
+        "Marriage and Family Therapist",
+        "Human Services",
+        "$50,000"
+      ],
+      [
+        "Graphic Designer",
+        "Arts",
+        "$50,000"
+      ],
+      [
+        "Human Resources Specialist",
+        "Business",
+        "$60,000"
+      ]
+    ]
+  },
+  "ENFJ": {
+    "nick": "The Protagonist",
+    "profile": "Charismatic and inspiring leaders, able to mesmerize listeners. You are a natural mentor who is highly attuned to the emotions and needs of others. You are empathetic, organized, and driven by a desire to bring out the best in people. You value harmony and cooperation.",
+    "strengths": [
+      "Charismatic and inspiring",
+      "Empathetic and supportive",
+      "Organized and decisive",
+      "Excellent communicator",
+      "Values-driven leader"
+    ],
+    "challenges": [
+      "Can be overly idealistic",
+      "May neglect own needs for others",
+      "Dislike conflict intensely",
+      "Can be sensitive to criticism"
+    ],
+    "recs": [
+      "Set boundaries to ensure you don't burn out from helping others.",
+      "Practice making objective decisions that may not please everyone.",
+      "Allow yourself time to recharge away from group dynamics.",
+      "Learn to accept constructive criticism without taking it personally."
+    ],
+    "careers": [
+      [
+        "Teacher/Educator",
+        "Education",
+        "$60,000"
+      ],
+      [
+        "HR Manager",
+        "Business",
+        "$110,000"
+      ],
+      [
+        "Non-Profit Director",
+        "Human Services",
+        "$70,000"
+      ],
+      [
+        "Public Relations Manager",
+        "Marketing",
+        "$100,000"
+      ]
+    ]
+  },
+  "ENFP": {
+    "nick": "The Campaigner",
+    "profile": "Enthusiastic, creative, and sociable free spirits. You are energetic, imaginative, and see life as full of exciting possibilities. You make connections between events and people very quickly, and you are driven by a desire to understand and inspire others. You value authenticity and freedom.",
+    "strengths": [
+      "Enthusiastic and imaginative",
+      "Sociable and empathetic",
+      "Creative and innovative",
+      "Adaptable and spontaneous",
+      "Excellent communicator"
+    ],
+    "challenges": [
+      "Can be easily distracted",
+      "May struggle with routine",
+      "Can be overly idealistic",
+      "May have trouble following through"
+    ],
+    "recs": [
+      "Develop time management skills to balance your many interests.",
+      "Set concrete deadlines to ensure ideas become reality.",
+      "Practice focusing on one project at a time before starting a new one.",
+      "Learn to appreciate the value of structure and routine."
+    ],
+    "careers": [
+      [
+        "Marketing Specialist",
+        "Marketing",
+        "$65,000"
+      ],
+      [
+        "Event Planner",
+        "Business",
+        "$50,000"
+      ],
+      [
+        "Journalist",
+        "Media",
+        "$50,000"
+      ],
+      [
+        "Counselor",
+        "Human Services",
+        "$50,000"
+      ]
+    ]
+  },
+  "ISTJ": {
+    "nick": "The Logistician",
+    "profile": "Practical and fact-minded, reliable and responsible. You are highly organized, logical, and value tradition and order. You are dedicated to your duties and responsibilities, approaching tasks with a methodical and reliable mindset. You trust facts and past experience over abstract theories.",
+    "strengths": [
+      "Reliable and responsible",
+      "Detail-oriented",
+      "Logical and practical",
+      "Organized and structured",
+      "Dedicated and hardworking"
+    ],
+    "challenges": [
+      "Can be resistant to change",
+      "May struggle with empathy",
+      "Dislike unstructured environments",
+      "Can be overly critical of inefficiency"
+    ],
+    "recs": [
+      "Try to be more open to new ideas and spontaneous changes.",
+      "Practice empathy when dealing with others' emotional needs.",
+      "Communicate your expectations clearly to avoid misunderstandings.",
+      "Balance your dedication to work with time for personal relaxation."
+    ],
+    "careers": [
+      [
+        "Accountant",
+        "Business",
+        "$70,000"
+      ],
+      [
+        "Project Manager",
+        "Business",
+        "$90,000"
+      ],
+      [
+        "Engineer",
+        "Technology",
+        "$90,000"
+      ],
+      [
+        "Auditor",
+        "Business",
+        "$75,000"
+      ]
+    ]
+  },
+  "ISFJ": {
+    "nick": "The Defender",
+    "profile": "Very dedicated and warm protectors, always ready to defend loved ones. You are highly observant, empathetic, and reliable. You value harmony, cooperation, and tradition. You are deeply committed to your responsibilities and the well-being of those around you.",
+    "strengths": [
+      "Supportive and empathetic",
+      "Reliable and hardworking",
+      "Detail-oriented",
+      "Loyal and committed",
+      "Practical and grounded"
+    ],
+    "challenges": [
+      "Can be overly selfless",
+      "May resist change",
+      "Dislike conflict",
+      "May internalize others' stress"
+    ],
+    "recs": [
+      "Learn to say no to avoid overcommitting yourself.",
+      "Set emotional boundaries to protect your own well-being.",
+      "Practice addressing conflict constructively rather than avoiding it.",
+      "Be open to new ways of doing things, even if the old way works."
+    ],
+    "careers": [
+      [
+        "Nurse",
+        "Healthcare",
+        "$75,000"
+      ],
+      [
+        "Social Worker",
+        "Human Services",
+        "$50,000"
+      ],
+      [
+        "Teacher",
+        "Education",
+        "$60,000"
+      ],
+      [
+        "Office Manager",
+        "Business",
+        "$55,000"
+      ]
+    ]
+  },
+  "ESTJ": {
+    "nick": "The Executive",
+    "profile": "Excellent administrators, unsurpassed at managing things or people. You are highly organized, practical, and logical. You value tradition, order, and structure, and you are dedicated to upholding rules and standards. You are a natural leader who is direct and decisive.",
+    "strengths": [
+      "Organized and efficient",
+      "Logical and practical",
+      "Decisive and direct",
+      "Reliable and responsible",
+      "Strong leader"
+    ],
+    "challenges": [
+      "Can be inflexible",
+      "May struggle with empathy",
+      "Can be overly critical",
+      "Dislike unstructured environments"
+    ],
+    "recs": [
+      "Practice empathy and patience when dealing with others' emotions.",
+      "Be open to new ideas and unconventional approaches.",
+      "Work on giving feedback tactfully rather than bluntly.",
+      "Learn to adapt when plans change unexpectedly."
+    ],
+    "careers": [
+      [
+        "Operations Manager",
+        "Business",
+        "$95,000"
+      ],
+      [
+        "Financial Advisor",
+        "Business",
+        "$90,000"
+      ],
+      [
+        "Judge",
+        "Legal",
+        "$130,000"
+      ],
+      [
+        "School Principal",
+        "Education",
+        "$100,000"
+      ]
+    ]
+  },
+  "ESFJ": {
+    "nick": "The Consul",
+    "profile": "Extraordinarily caring, social, and popular people, always eager to help. You are highly empathetic, organized, and cooperative. You value harmony, tradition, and the well-being of others. You are a dedicated team player who brings people together.",
+    "strengths": [
+      "Empathetic and supportive",
+      "Sociable and friendly",
+      "Organized and reliable",
+      "Loyal and dedicated",
+      "Practical helper"
+    ],
+    "challenges": [
+      "Can be overly sensitive to criticism",
+      "May struggle with change",
+      "Can be overly selfless",
+      "Dislike conflict"
+    ],
+    "recs": [
+      "Set boundaries to ensure you don't neglect your own needs.",
+      "Learn to address conflict constructively rather than avoiding it.",
+      "Be open to new ways of doing things, even if the old way works.",
+      "Practice making objective decisions that may not please everyone."
+    ],
+    "careers": [
+      [
+        "Nurse",
+        "Healthcare",
+        "$75,000"
+      ],
+      [
+        "Event Planner",
+        "Business",
+        "$50,000"
+      ],
+      [
+        "HR Specialist",
+        "Business",
+        "$60,000"
+      ],
+      [
+        "Teacher",
+        "Education",
+        "$60,000"
+      ]
+    ]
+  },
+  "ISTP": {
+    "nick": "The Virtuoso",
+    "profile": "Bold and practical experimenters, masters of all kinds of tools. You are highly observant, logical, and adaptable. You enjoy taking things apart to see how they work and using tools to solve problems. You are independent and thrive in hands-on, dynamic environments.",
+    "strengths": [
+      "Practical and observant",
+      "Logical and analytical",
+      "Adaptable and flexible",
+      "Excellent with tools/technology",
+      "Calm under pressure"
+    ],
+    "challenges": [
+      "Can be overly private",
+      "May struggle with commitment",
+      "Dislike rules and routines",
+      "Can be insensitive to others' feelings"
+    ],
+    "recs": [
+      "Work on communicating your thoughts and feelings more openly.",
+      "Practice following through on commitments even when bored.",
+      "Develop patience for long-term planning and routine tasks.",
+      "Be mindful of others' emotions when making decisions."
+    ],
+    "careers": [
+      [
+        "Mechanical Engineer",
+        "Engineering",
+        "$90,000"
+      ],
+      [
+        "Pilot",
+        "Transportation",
+        "$130,000"
+      ],
+      [
+        "Detective",
+        "Law Enforcement",
+        "$80,000"
+      ],
+      [
+        "Software Developer",
+        "Technology",
+        "$105,000"
+      ]
+    ]
+  },
+  "ISFP": {
+    "nick": "The Adventurer",
+    "profile": "Flexible and charming artists, always ready to explore new things. You are highly observant, empathetic, and creative. You value freedom, aesthetics, and living in the present moment. You are deeply in tune with your surroundings and the feelings of others.",
+    "strengths": [
+      "Creative and artistic",
+      "Empathetic and supportive",
+      "Adaptable and flexible",
+      "Observant and grounded",
+      "Kind and gentle"
+    ],
+    "challenges": [
+      "Can be overly sensitive",
+      "May struggle with long-term planning",
+      "Dislike conflict",
+      "Can be fiercely independent"
+    ],
+    "recs": [
+      "Develop long-term goals and break them into actionable steps.",
+      "Learn to address conflict constructively rather than avoiding it.",
+      "Set boundaries to protect your emotional well-being.",
+      "Practice communicating your needs more directly."
+    ],
+    "careers": [
+      [
+        "Graphic Designer",
+        "Arts",
+        "$50,000"
+      ],
+      [
+        "Veterinarian",
+        "Healthcare",
+        "$95,000"
+      ],
+      [
+        "Physical Therapist",
+        "Healthcare",
+        "$90,000"
+      ],
+      [
+        "Chef",
+        "Hospitality",
+        "$55,000"
+      ]
+    ]
+  },
+  "ESTP": {
+    "nick": "The Entrepreneur",
+    "profile": "Smart, energetic, and very perceptive people who truly enjoy living on the edge. You are highly observant, logical, and adaptable. You thrive on action, excitement, and solving problems in the moment. You are direct, practical, and highly attuned to your physical environment.",
+    "strengths": [
+      "Energetic and action-oriented",
+      "Adaptable and practical",
+      "Observant and perceptive",
+      "Excellent problem solver",
+      "Direct and confident"
+    ],
+    "challenges": [
+      "Can be impulsive",
+      "May struggle with long-term planning",
+      "Dislike rules and routines",
+      "Can be insensitive to others' feelings"
+    ],
+    "recs": [
+      "Develop long-term goals and stick to them.",
+      "Practice patience with routine tasks and schedules.",
+      "Be mindful of others' emotions when making decisions.",
+      "Work on communicating more tactfully to avoid hurting feelings."
+    ],
+    "careers": [
+      [
+        "Sales Manager",
+        "Business",
+        "$130,000"
+      ],
+      [
+        "Paramedic",
+        "Healthcare",
+        "$45,000"
+      ],
+      [
+        "Entrepreneur",
+        "Business",
+        "$100,000"
+      ],
+      [
+        "Police Officer",
+        "Law Enforcement",
+        "$65,000"
+      ]
+    ]
+  },
+  "ESFP": {
+    "nick": "The Entertainer",
+    "profile": "Spontaneous, energetic, and enthusiastic entertainers. You are highly observant, empathetic, and adaptable. You thrive on social interaction, excitement, and living in the present moment. You are warm, practical, and love bringing joy to others.",
+    "strengths": [
+      "Sociable and enthusiastic",
+      "Adaptable and practical",
+      "Empathetic and supportive",
+      "Observant and grounded",
+      "Creative and energetic"
+    ],
+    "challenges": [
+      "Can be impulsive",
+      "May struggle with long-term planning",
+      "Dislike conflict",
+      "Can be easily bored"
+    ],
+    "recs": [
+      "Develop long-term goals and break them into actionable steps.",
+      "Practice patience with routine tasks and schedules.",
+      "Learn to address conflict constructively rather than avoiding it.",
+      "Set boundaries to protect your emotional well-being."
+    ],
+    "careers": [
+      [
+        "Event Planner",
+        "Business",
+        "$50,000"
+      ],
+      [
+        "Actor/Performer",
+        "Arts",
+        "$45,000"
+      ],
+      [
+        "Tour Guide",
+        "Hospitality",
+        "$35,000"
+      ],
+      [
+        "Childcare Worker",
+        "Human Services",
+        "$30,000"
+      ]
+    ]
+  }
+}

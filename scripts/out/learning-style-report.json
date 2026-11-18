@@ -1,0 +1,248 @@
+{
+  "slug": "learning-style",
+  "file": "Learning Style.html",
+  "DESCS": {
+    "Auditory": "Auditory learning refers to what you can hear.",
+    "Kinesthetic": "Kinesthetic learning involves movement and physical activity.",
+    "Tactile": "Tactile learning involves touching and handling objects related to what you are learning.",
+    "Visual": "Visual learning involves seeing what you are learning — reading text, viewing pictures and diagrams.",
+    "Intake": "Intake refers to eating and drinking while learning or working.",
+    "Light": "The amount of light in your learning environment can affect your achievement.",
+    "Temperature": "Research has shown that people work differently in warm or cool environments.",
+    "Mobility": "People with a preference for mobility need to move around to learn most effectively.",
+    "Sound": "Some people find silence distracting and concentrate better with background sound.",
+    "Physical Setting": "The physical setting of your learning environment has a direct effect on achievement.",
+    "Time of Day": "Success in learning can be affected by the time of day in which you study.",
+    "Teacher Motivation": "How much you are motivated by teachers, counselors and other educators.",
+    "Collaborative": "Being collaborative means working well with others; being independent means working well alone.",
+    "Structure": "Students who prefer structure like step-by-step instructions for completing tasks.",
+    "Focus": "Whether a person tends to complete all tasks before doing other things.",
+    "Self-Motivation": "Self-motivation is important for doing well in school and in your career."
+  },
+  "RECS": {
+    "Auditory": {
+      "instruction": [
+        "Underline or highlight new words while reading; look them up immediately.",
+        "Take elective classes like creative writing, speech and debate, drama or foreign languages."
+      ],
+      "assignments": [
+        "Take notes and re-read them soon after class.",
+        "Read important points and your own writing aloud to yourself."
+      ],
+      "tests": [
+        "For videos, turn on closed captioning or find transcripts of the audio.",
+        "Use memory devices such as rhymes or repeating things aloud."
+      ]
+    },
+    "Kinesthetic": {
+      "instruction": [
+        "View demonstrations or videos of the skill in addition to trying it yourself.",
+        "Ask others skilled in the activity for advice."
+      ],
+      "assignments": [
+        "Divide a difficult skill into smaller steps; practice one part until comfortable.",
+        "Work with another person who has a high kinesthetic preference and exchange feedback."
+      ],
+      "tests": [
+        "Practice presentations with someone you trust for feedback on posture, voice and eye contact.",
+        "Use a mirror or take video of yourself practicing."
+      ]
+    },
+    "Tactile": {
+      "instruction": [
+        "Take notes in class — the physical act of writing helps memory.",
+        "Look for opportunities to 'do' things: experiments, writing, using math objects."
+      ],
+      "assignments": [
+        "Highlight key ideas while reading, then write a summary — engage your hands in the process.",
+        "Use real objects to learn (e.g., a simple lever for physics)."
+      ],
+      "tests": [
+        "Keep your desk clear of distracting objects.",
+        "Review notes from labs and activities that involved tactile learning."
+      ]
+    },
+    "Visual": {
+      "instruction": [
+        "Take notes as mind maps, sketches and diagrams; use color to highlight key points.",
+        "Ask for written instructions and outlines whenever possible."
+      ],
+      "assignments": [
+        "Preview upcoming topics; ask for pictures, diagrams or visual aids when ideas are hard to visualize.",
+        "Organize your work area to avoid visual distractions."
+      ],
+      "tests": [
+        "Choose visual assignments when possible — posters or slide presentations.",
+        "Rewrite and review notes; create flash cards to prepare for tests."
+      ]
+    },
+    "Intake": {
+      "instruction": [
+        "Bring small snacks or chew gum in class, if allowed.",
+        "If not allowed, eat just before class so hunger doesn't distract you."
+      ],
+      "assignments": [
+        "Have water and nutritious snacks available while working.",
+        "Avoid sugary treats or too much caffeine, which hurt productivity."
+      ],
+      "tests": [
+        "If you need to eat or drink while studying, take a break and return when finished.",
+        "Eat a healthy meal or snack just before a test."
+      ]
+    },
+    "Light": {
+      "instruction": [
+        "Sit away from windows and direct sunlight (if low preference).",
+        "If too bright, try lightly tinted sunglasses, if permitted."
+      ],
+      "assignments": [
+        "Ensure shades or blinds are drawn in your study area.",
+        "Turn off harsh overhead lights and use table lamps instead."
+      ],
+      "tests": [
+        "Optimize your study environment for your light preference before preparing for tests.",
+        "In a bright test room, focus on your paper to avoid visual fatigue."
+      ]
+    },
+    "Temperature": {
+      "instruction": [
+        "Wear clothing in layers so you can remove one if too warm.",
+        "Don't be afraid to ask for the heating to be turned down."
+      ],
+      "assignments": [
+        "Sit near an open window if outside is cooler than inside.",
+        "Ensure air conditioning or fans are available if it gets too warm."
+      ],
+      "tests": [
+        "Dress in layers on test days to adjust to room temperature.",
+        "Arrive early to secure a seat in a comfortable part of the room."
+      ]
+    },
+    "Mobility": {
+      "instruction": [
+        "Sit where you're less likely to be disrupted — away from aisles and entrances.",
+        "Avoid sitting near people who tend to be active or fidgety."
+      ],
+      "assignments": [
+        "Do your most challenging work when you can remain seated, undisturbed, for longer periods.",
+        "If interrupted, switch to repetitive tasks until you feel settled again."
+      ],
+      "tests": [
+        "Learn to meditate — sitting still can concentrate the mind.",
+        "Take short movement breaks during long study sessions to release energy before the test."
+      ]
+    },
+    "Sound": {
+      "instruction": [
+        "Beware of visual distractions; keep your eyes on the instructor and materials.",
+        "Set your phone to silent and avoid the urge to look at it."
+      ],
+      "assignments": [
+        "If you work better with music, compile a personalized instrumental soundtrack.",
+        "Use noise-canceling headphones or earplugs if you require silence."
+      ],
+      "tests": [
+        "Simulate the testing environment at home to get used to the sound levels.",
+        "If silence distracts you, ask about using earbuds with instrumental music during independent study."
+      ]
+    },
+    "Physical Setting": {
+      "instruction": [
+        "If you can't avoid formal seating, sit on the floor leaning against a wall.",
+        "Use a laptop or mobile device instead of a desktop to allow flexible seating."
+      ],
+      "assignments": [
+        "Sit on comfortable, soft seating or read while reclining on a bed or cushions.",
+        "Avoid straight-backed chairs and desks if they cause discomfort."
+      ],
+      "tests": [
+        "Find a comfortable study spot at home that mimics a relaxed environment for reviewing.",
+        "Bring a cushion for testing environments when possible."
+      ]
+    },
+    "Time of Day": {
+      "instruction": [
+        "Schedule difficult learning and creative tasks for later in the day (if evening preference).",
+        "Do routine tasks earlier in the day."
+      ],
+      "assignments": [
+        "Use afternoons and evenings for homework on days off.",
+        "Break study sessions into chunks aligned with your peak energy times."
+      ],
+      "tests": [
+        "Review difficult materials during your peak alertness hours.",
+        "Get adequate sleep so your preferred time of day is fully productive."
+      ]
+    },
+    "Teacher Motivation": {
+      "instruction": [
+        "Write down questions and ask teachers after class.",
+        "When feedback sounds critical, calmly ask what to do next time — it's meant to help."
+      ],
+      "assignments": [
+        "Write assignment plans in point form and show the teacher well before the due date.",
+        "Pick a challenging class and discuss with a teacher why it's hard versus ones you do well in."
+      ],
+      "tests": [
+        "If you prefer independence, rely on study groups or peers for test-prep motivation.",
+        "If you prefer high teacher motivation, attend review sessions and ask for specific test tips."
+      ]
+    },
+    "Collaborative": {
+      "instruction": [
+        "If you prefer independence, sit where others are also independent — but be ready to collaborate when required.",
+        "If you prefer collaboration, participate actively in discussions and group activities."
+      ],
+      "assignments": [
+        "Do difficult work alone if independent, but check in with others occasionally.",
+        "Organize a group to work together on projects if collaborative."
+      ],
+      "tests": [
+        "Study in a quiet area like the library when you want independence.",
+        "Study where people can discuss ideas and test each other when collaborative."
+      ]
+    },
+    "Structure": {
+      "instruction": [
+        "Remember some things must follow rules (like driver's tests or college apps), even if steps feel excessive.",
+        "If you prefer less structure, ask the teacher about flexibility in how you complete the assignment."
+      ],
+      "assignments": [
+        "Even if you enjoy creativity, follow the core guidelines for assignments.",
+        "Ask for rubrics and templates before starting if you prefer high structure."
+      ],
+      "tests": [
+        "Explore information, but ensure you cover all areas that will be tested.",
+        "Ask about test options (essay vs. multiple choice) that fit your structure preference."
+      ]
+    },
+    "Focus": {
+      "instruction": [
+        "Pause, reflect and ask questions to ensure deeper understanding before jumping in.",
+        "Assign a priority to each task to remain organized."
+      ],
+      "assignments": [
+        "Clearly understand what's expected; discuss with teachers/parents if it feels like too much.",
+        "If you have low focus, use timers (like Pomodoro) to work in short, intense bursts."
+      ],
+      "tests": [
+        "Join a study group or have a friend quiz you if stressed about tests.",
+        "Break test prep into small, manageable chunks over several days if you have low focus."
+      ]
+    },
+    "Self-Motivation": {
+      "instruction": [
+        "Talk with a counselor to find what motivates you outside school and connect it to schoolwork.",
+        "Look at charts showing how education affects employment and pay to find external motivation if needed."
+      ],
+      "assignments": [
+        "Divide assignments into small parts and reward yourself for completing each piece.",
+        "Modify assignments to fit your interests when possible — e.g., create a movie covering the topic."
+      ],
+      "tests": [
+        "Talk to a peer tutor who can point out what might be interesting in school.",
+        "If motivation drops, talk to a school counselor or someone who overcame similar challenges."
+      ]
+    }
+  }
+}
