@@ -82,6 +82,10 @@ export const api = {
   adminSetAllocation: (body: { counsellorId: string; assessmentId: string; quantity: number }) =>
     req('/api/admin/allocations', { method: 'POST', body: JSON.stringify(body) }),
   adminDeleteAllocation: (id: string) => req(`/api/admin/allocations/${id}`, { method: 'DELETE' }),
+  adminTestLinks: () => req<{ links: any[] }>('/api/admin/test-links'),
+  adminGenerateTestLink: (studentId: string, assessmentId: string) =>
+    req<{ link: { token: string; testUrl: string; studentName: string; testTitle: string }; alreadyExists?: boolean }>('/api/admin/test-links', { method: 'POST', body: JSON.stringify({ studentId, assessmentId }) }),
+  adminDeactivateTestLink: (id: string) => req(`/api/admin/test-links/${id}`, { method: 'POST' }),
 
   // reports
   report: (id: string) => req<{ report: any }>(`/api/reports/${id}`),

@@ -13,7 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogT
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Checkbox } from '@/components/ui/checkbox'
 import { ResetPasswordDialog } from '@/components/ResetPasswordDialog'
-import { Users, FileText, ClipboardList, Stethoscope, Activity, ShieldCheck, UserPlus, Download, Search, BookOpen, Award, Ticket, Lock } from 'lucide-react'
+import { Users, FileText, ClipboardList, Stethoscope, Activity, ShieldCheck, UserPlus, Download, Search, BookOpen, Award, Ticket, Lock, Sparkles, Link2, Copy, Ban } from 'lucide-react'
 import { toast } from 'sonner'
 
 export function AdminDashboard() {
@@ -25,13 +25,14 @@ export function AdminDashboard() {
         <p className="text-slate-500 mt-1">Manage students, assessments, reports and counsellors.</p>
       </div>
       <Tabs value={tab} onValueChange={setTab}>
-        <TabsList className="grid grid-cols-3 sm:grid-cols-7 w-full mb-6 h-auto">
+        <TabsList className="grid grid-cols-4 sm:grid-cols-8 w-full mb-6 h-auto">
           <TabsTrigger value="overview" className="text-xs gap-1.5 py-2"><Activity className="w-4 h-4" /> Overview</TabsTrigger>
           <TabsTrigger value="students" className="text-xs gap-1.5 py-2"><Users className="w-4 h-4" /> Students</TabsTrigger>
           <TabsTrigger value="assign" className="text-xs gap-1.5 py-2"><ClipboardList className="w-4 h-4" /> Assign</TabsTrigger>
           <TabsTrigger value="reports" className="text-xs gap-1.5 py-2"><FileText className="w-4 h-4" /> Reports</TabsTrigger>
           <TabsTrigger value="counsellors" className="text-xs gap-1.5 py-2"><Stethoscope className="w-4 h-4" /> Counsellors</TabsTrigger>
           <TabsTrigger value="allocations" className="text-xs gap-1.5 py-2"><Ticket className="w-4 h-4" /> Allocs</TabsTrigger>
+          <TabsTrigger value="test-links" className="text-xs gap-1.5 py-2"><Link2 className="w-4 h-4" /> Links</TabsTrigger>
           <TabsTrigger value="audit" className="text-xs gap-1.5 py-2"><BookOpen className="w-4 h-4" /> Audit</TabsTrigger>
         </TabsList>
         <TabsContent value="overview"><OverviewTab /></TabsContent>
@@ -40,6 +41,7 @@ export function AdminDashboard() {
         <TabsContent value="reports"><ReportsTab /></TabsContent>
         <TabsContent value="counsellors"><CounsellorsTab /></TabsContent>
         <TabsContent value="allocations"><AllocationsTab /></TabsContent>
+        <TabsContent value="test-links"><TestLinksTab /></TabsContent>
         <TabsContent value="audit"><AuditTab /></TabsContent>
       </Tabs>
     </div>
@@ -269,6 +271,8 @@ function ReportsTab() {
   const [counsellors, setCounsellors] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [assignFor, setAssignFor] = useState<string | null>(null)
+  const [interpFor, setInterpFor] = useState<string | null>(null)
+  const [interpHtml, setInterpHtml] = useState<string | null>(null)
   const viewReport = useApp((s) => s.viewReport)
   const load = async () => { setLoading(true); try { const [r, c] = await Promise.all([api.adminReports(), api.adminCounsellors()]); setReports(r.reports); setCounsellors(c.counsellors) } catch (e: any) { toast.error(e.message) } finally { setLoading(false) } }
   useEffect(() => { load() }, [])
@@ -277,6 +281,10 @@ function ReportsTab() {
   }
   async function unlock(reportId: string) {
     try { await api.adminUnlockReport(reportId); toast.success('Report unlocked — student can now view & download it'); load() } catch (e: any) { toast.error(e.message) }
+  }
+  async function loadInterp(reportId: string) {
+    setInterpFor(reportId); setInterpHtml(null)
+    try { const r = await api.reportInterpretation(reportId); setInterpHtml(r.interpretation) } catch (e: any) { toast.error(e.message); setInterpFor(null) }
   }
   return (
     <div className="space-y-4">
@@ -301,6 +309,7 @@ function ReportsTab() {
                 <div className="flex gap-2 flex-wrap">
                   <Button size="sm" variant="outline" onClick={() => viewReport(r.id)}><FileText className="w-3.5 h-3.5" /> View</Button>
                   <a href={api.reportDownloadUrl(r.id)} target="_blank" rel="noreferrer"><Button size="sm" variant="outline"><Download className="w-3.5 h-3.5" /> PDF</Button></a>
+                  <Button size="sm" variant="outline" className="text-teal-600 border-teal-300 hover:bg-teal-50" onClick={() => loadInterp(r.id)}><Sparkles className="w-3.5 h-3.5" /> Interpret</Button>
                   {r.paymentStatus !== 'PAID' && <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700" onClick={() => unlock(r.id)}><Lock className="w-3.5 h-3.5" /> Unlock for Student</Button>}
                   <Select value="" onValueChange={(v) => { if (v) assign(r.id, [v]) }}>
                     <SelectTrigger className="h-8 text-xs w-36"><SelectValue placeholder="Grant access…" /></SelectTrigger>
@@ -313,6 +322,22 @@ function ReportsTab() {
         </div>
       )}
       {assignFor && null}
+
+      {/* Smart Interpretation Dialog */}
+      <Dialog open={!!interpFor} onOpenChange={(o) => !o && setInterpFor(null)}>
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2"><Sparkles className="w-4 h-4 text-teal-600" /> Counselor's Deep-Dive Interpretation</DialogTitle>
+          </DialogHeader>
+          {interpHtml ? (
+            <div className="prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: interpHtml }} />
+          ) : (
+            <div className="flex items-center gap-2 py-8 text-sm text-slate-500">
+              <div className="w-4 h-4 border-2 border-teal-200 border-t-teal-600 rounded-full animate-spin" /> Generating interpretation...
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
@@ -503,6 +528,130 @@ function AllocationsTab() {
                         <td className="px-4 py-3 text-center"><Badge variant="outline" className={avail > 0 ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-100 text-slate-400'}>{avail}</Badge></td>
                         <td className="px-4 py-3 text-right">
                           <Button size="sm" variant="ghost" className="text-xs text-rose-500 hover:text-rose-700" onClick={() => removeAlloc(a.id)} disabled={a.used > 0}>{a.used > 0 ? 'In use' : 'Remove'}</Button>
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  )
+}
+
+function TestLinksTab() {
+  const [links, setLinks] = useState<any[]>([])
+  const [students, setStudents] = useState<any[]>([])
+  const [assessments, setAssessments] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [selStudent, setSelStudent] = useState('')
+  const [selAssessment, setSelAssessment] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [lastLink, setLastLink] = useState<{ testUrl: string; studentName: string; testTitle: string } | null>(null)
+
+  const load = async () => {
+    setLoading(true)
+    try {
+      const [l, s, a] = await Promise.all([api.adminTestLinks(), api.adminStudents(), api.assessments()])
+      setLinks(l.links); setStudents(s.students); setAssessments(a.assessments)
+    } catch (e: any) { toast.error(e.message) }
+    finally { setLoading(false) }
+  }
+  useEffect(() => { load() }, [])
+
+  async function generateLink() {
+    if (!selStudent || !selAssessment) return toast.error('Select a student and a test')
+    setBusy(true)
+    try {
+      const r = await api.adminGenerateTestLink(selStudent, selAssessment)
+      const stuName = students.find(s => s.id === selStudent)?.name || ''
+      const testName = assessments.find(a => a.id === selAssessment)?.title || ''
+      const fullUrl = typeof window !== 'undefined' ? window.location.origin + r.link.testUrl : r.link.testUrl
+      setLastLink({ testUrl: fullUrl, studentName: stuName, testTitle: testName })
+      toast.success(r.alreadyExists ? 'Active link already existed' : 'Direct test link generated')
+      load()
+    } catch (e: any) { toast.error(e.message) }
+    finally { setBusy(false) }
+  }
+
+  async function deactivate(id: string) {
+    try { await api.adminDeactivateTestLink(id); toast.success('Link deactivated'); load() } catch (e: any) { toast.error(e.message) }
+  }
+
+  function copyLink(url: string) {
+    navigator.clipboard?.writeText(url)
+    toast.success('Link copied to clipboard')
+  }
+
+  const statusColors: Record<string, string> = { Active: 'bg-emerald-100 text-emerald-700', Used: 'bg-blue-100 text-blue-700', Expired: 'bg-slate-100 text-slate-500', Deactivated: 'bg-rose-100 text-rose-700' }
+
+  return (
+    <div className="space-y-5">
+      {/* Generate link */}
+      <Card className="border-slate-200">
+        <CardHeader><CardTitle className="text-sm flex items-center gap-2"><Link2 className="w-4 h-4 text-teal-600" /> Generate Direct Test Link</CardTitle></CardHeader>
+        <CardContent className="grid sm:grid-cols-4 gap-3 items-end">
+          <div className="space-y-1.5">
+            <Label>Student</Label>
+            <Select value={selStudent} onValueChange={setSelStudent}>
+              <SelectTrigger><SelectValue placeholder="Select student…" /></SelectTrigger>
+              <SelectContent>{students.map((s) => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}</SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-1.5">
+            <Label>Test</Label>
+            <Select value={selAssessment} onValueChange={setSelAssessment}>
+              <SelectTrigger><SelectValue placeholder="Select test…" /></SelectTrigger>
+              <SelectContent>{assessments.map((a) => <SelectItem key={a.id} value={a.id}>{a.title}</SelectItem>)}</SelectContent>
+            </Select>
+          </div>
+          <Button onClick={generateLink} disabled={busy} className="bg-teal-600 hover:bg-teal-700"><Link2 className="w-4 h-4" /> Generate Link</Button>
+          <div />
+        </CardContent>
+      </Card>
+
+      {/* Last generated link */}
+      {lastLink && (
+        <Card className="border-emerald-200 bg-emerald-50">
+          <CardContent className="pt-5">
+            <p className="text-sm font-semibold text-emerald-800 mb-1">Link ready for {lastLink.studentName} ({lastLink.testTitle})</p>
+            <div className="flex items-center gap-2 flex-wrap">
+              <code className="text-xs bg-white px-3 py-2 rounded-lg border border-slate-200 flex-1 min-w-0 truncate">{lastLink.testUrl}</code>
+              <Button size="sm" variant="outline" onClick={() => copyLink(lastLink.testUrl)}><Copy className="w-3.5 h-3.5" /> Copy</Button>
+              <a href={lastLink.testUrl} target="_blank" rel="noreferrer"><Button size="sm" className="bg-teal-600 hover:bg-teal-700">Open</Button></a>
+              <Button size="sm" variant="ghost" onClick={() => setLastLink(null)}>Dismiss</Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* All links */}
+      {loading ? <Skeletons n={3} /> : links.length === 0 ? (
+        <Card className="border-dashed"><CardContent className="py-10 text-center text-slate-500">No direct test links generated yet. Use the form above to create one.</CardContent></Card>
+      ) : (
+        <Card className="border-slate-200">
+          <CardHeader><CardTitle className="text-sm">All Direct Test Links ({links.length})</CardTitle></CardHeader>
+          <CardContent className="p-0">
+            <div className="overflow-x-auto max-h-[60vh]">
+              <table className="w-full text-sm">
+                <thead className="bg-slate-50 text-slate-600 text-xs uppercase sticky top-0">
+                  <tr><th className="text-left px-4 py-3 font-semibold">Student</th><th className="text-left px-4 py-3 font-semibold hidden sm:table-cell">Test</th><th className="text-left px-4 py-3 font-semibold">Status</th><th className="text-left px-4 py-3 font-semibold hidden md:table-cell">Created</th><th className="text-right px-4 py-3 font-semibold">Actions</th></tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {links.map((l) => {
+                    const fullUrl = typeof window !== 'undefined' ? window.location.origin + l.testUrl : l.testUrl
+                    return (
+                      <tr key={l.id} className="hover:bg-slate-50">
+                        <td className="px-4 py-3 font-medium text-slate-800">{l.studentName}</td>
+                        <td className="px-4 py-3 text-slate-600 hidden sm:table-cell">{l.testTitle}</td>
+                        <td className="px-4 py-3"><Badge variant="outline" className={`text-[10px] font-bold ${statusColors[l.status] || ''}`}>{l.status}</Badge></td>
+                        <td className="px-4 py-3 text-xs text-slate-500 hidden md:table-cell">{new Date(l.createdAt).toLocaleDateString()}</td>
+                        <td className="px-4 py-3 text-right whitespace-nowrap">
+                          <Button size="sm" variant="ghost" className="text-xs" onClick={() => copyLink(fullUrl)}><Copy className="w-3.5 h-3.5" /> Copy</Button>
+                          {l.status === 'Active' && <Button size="sm" variant="ghost" className="text-xs text-rose-500 hover:text-rose-700" onClick={() => deactivate(l.id)}><Ban className="w-3.5 h-3.5" /> Deactivate</Button>}
                         </td>
                       </tr>
                     )
