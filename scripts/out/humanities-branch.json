@@ -1,0 +1,317 @@
+{
+  "slug": "humanities-branch",
+  "sourceFile": "Humanities branch Selector.html",
+  "QUESTIONS": [
+    {
+      "t": "I would love to teach in a primary or secondary school.",
+      "c": "Teaching and Education Related"
+    },
+    {
+      "t": "Becoming a college professor is my dream.",
+      "c": "Teaching and Education Related"
+    },
+    {
+      "t": "Working as a trainer in a coaching center appeals to me.",
+      "c": "Teaching and Education Related"
+    },
+    {
+      "t": "I am interested in academic administration and leadership.",
+      "c": "Teaching and Education Related"
+    },
+    {
+      "t": "I want to work as a social worker or relationship counselor.",
+      "c": "Social Service Related"
+    },
+    {
+      "t": "Mental health and clinical psychology interest me.",
+      "c": "Social Service Related"
+    },
+    {
+      "t": "I would like to work for an NGO.",
+      "c": "Social Service Related"
+    },
+    {
+      "t": "Career counseling is a profession I'd enjoy.",
+      "c": "Social Service Related"
+    },
+    {
+      "t": "I aspire to join the Indian Administrative Services (IAS).",
+      "c": "Public Administration Related"
+    },
+    {
+      "t": "Working in police or revenue services appeals to me.",
+      "c": "Public Administration Related"
+    },
+    {
+      "t": "I am interested in foreign services and diplomacy.",
+      "c": "Public Administration Related"
+    },
+    {
+      "t": "Railway and public service departments sound like good careers.",
+      "c": "Public Administration Related"
+    },
+    {
+      "t": "I want to become a sports coach or physical educationist.",
+      "c": "Physiology and Sports Related"
+    },
+    {
+      "t": "Physiotherapy and gym training interest me.",
+      "c": "Physiology and Sports Related"
+    },
+    {
+      "t": "I would like to work as a yoga trainer.",
+      "c": "Physiology and Sports Related"
+    },
+    {
+      "t": "Alternate medicine therapy is a field I want to explore.",
+      "c": "Physiology and Sports Related"
+    },
+    {
+      "t": "I enjoy organizing books and managing libraries.",
+      "c": "Organizing Skills Related"
+    },
+    {
+      "t": "Documentation and record-keeping work appeals to me.",
+      "c": "Organizing Skills Related"
+    },
+    {
+      "t": "I would like to work as an archivist.",
+      "c": "Organizing Skills Related"
+    },
+    {
+      "t": "Managing information systems in offices sounds interesting.",
+      "c": "Organizing Skills Related"
+    },
+    {
+      "t": "I want to work in Human Resource management.",
+      "c": "Management Related"
+    },
+    {
+      "t": "Operations and finance management appeal to me.",
+      "c": "Management Related"
+    },
+    {
+      "t": "I would enjoy a career in sales and marketing management.",
+      "c": "Management Related"
+    },
+    {
+      "t": "Managing corporate operations sounds like a good career.",
+      "c": "Management Related"
+    },
+    {
+      "t": "I want to work in radio or TV anchoring.",
+      "c": "Mass Media Related"
+    },
+    {
+      "t": "News reading and theater voice-over work appeal to me.",
+      "c": "Mass Media Related"
+    },
+    {
+      "t": "I am interested in photography and advertisement.",
+      "c": "Mass Media Related"
+    },
+    {
+      "t": "Video and audio editing for media sounds exciting.",
+      "c": "Mass Media Related"
+    },
+    {
+      "t": "I want to become a lawyer.",
+      "c": "Law Related"
+    },
+    {
+      "t": "Civil and family law interest me.",
+      "c": "Law Related"
+    },
+    {
+      "t": "Corporate and tax law are fields I'd like to practice.",
+      "c": "Law Related"
+    },
+    {
+      "t": "I aspire to be a judge.",
+      "c": "Law Related"
+    },
+    {
+      "t": "I would love to work as a translator or interpreter.",
+      "c": "Languages Related"
+    },
+    {
+      "t": "Bilingual education and teaching languages appeal to me.",
+      "c": "Languages Related"
+    },
+    {
+      "t": "I am interested in writing grant proposals and publications.",
+      "c": "Languages Related"
+    },
+    {
+      "t": "Linguistics and language research fascinate me.",
+      "c": "Languages Related"
+    },
+    {
+      "t": "I want to work as a reporter for a newspaper.",
+      "c": "Journalism"
+    },
+    {
+      "t": "Editing and copywriting are skills I want to pursue.",
+      "c": "Journalism"
+    },
+    {
+      "t": "Writing screenplays or content for websites sounds exciting.",
+      "c": "Journalism"
+    },
+    {
+      "t": "Investigative journalism and news analysis interest me.",
+      "c": "Journalism"
+    },
+    {
+      "t": "I have a keen interest in fashion and textile design.",
+      "c": "Industrial Design Related"
+    },
+    {
+      "t": "Designing jewelry or accessories appeals to me.",
+      "c": "Industrial Design Related"
+    },
+    {
+      "t": "I would enjoy working as an interior designer.",
+      "c": "Industrial Design Related"
+    },
+    {
+      "t": "Creating industrial product designs is fascinating.",
+      "c": "Industrial Design Related"
+    },
+    {
+      "t": "I want to work in the travel and tourism industry.",
+      "c": "Hospitality - Travel and Tourism Related"
+    },
+    {
+      "t": "Managing logistics and transportation sounds like a good career.",
+      "c": "Hospitality - Travel and Tourism Related"
+    },
+    {
+      "t": "I would enjoy working as an event manager.",
+      "c": "Hospitality - Travel and Tourism Related"
+    },
+    {
+      "t": "Working as cabin crew or customer service manager appeals to me.",
+      "c": "Hospitality - Travel and Tourism Related"
+    },
+    {
+      "t": "I am interested in hotel management.",
+      "c": "Hospitality - Hotel Industry Related"
+    },
+    {
+      "t": "Food and beverage service management excites me.",
+      "c": "Hospitality - Hotel Industry Related"
+    },
+    {
+      "t": "I would like to work in housekeeping or facility maintenance.",
+      "c": "Hospitality - Hotel Industry Related"
+    },
+    {
+      "t": "Managing a restaurant or bar sounds like a career I'd enjoy.",
+      "c": "Hospitality - Hotel Industry Related"
+    },
+    {
+      "t": "I am fascinated by ancient history and archaeology.",
+      "c": "History Related"
+    },
+    {
+      "t": "Working in a museum as a curator is my dream.",
+      "c": "History Related"
+    },
+    {
+      "t": "Anthropology and the study of the human past interest me.",
+      "c": "History Related"
+    },
+    {
+      "t": "Heritage preservation projects sound appealing.",
+      "c": "History Related"
+    },
+    {
+      "t": "I enjoy studying maps and geographical formations.",
+      "c": "Geography Related"
+    },
+    {
+      "t": "Urban and rural planning appeal to me.",
+      "c": "Geography Related"
+    },
+    {
+      "t": "GIS and climatology are fields I want to explore.",
+      "c": "Geography Related"
+    },
+    {
+      "t": "Environmental surveying sounds like an important career.",
+      "c": "Geography Related"
+    },
+    {
+      "t": "I want to work as an economist or financial analyst.",
+      "c": "Economics Related"
+    },
+    {
+      "t": "Economic research and activism interest me.",
+      "c": "Economics Related"
+    },
+    {
+      "t": "I would like to write about economic policies as a journalist.",
+      "c": "Economics Related"
+    },
+    {
+      "t": "Teaching economics at a college level is my goal.",
+      "c": "Economics Related"
+    },
+    {
+      "t": "I enjoy designing websites and user interfaces.",
+      "c": "Computer Related Designing"
+    },
+    {
+      "t": "Graphic design and illustration are skills I want to develop.",
+      "c": "Computer Related Designing"
+    },
+    {
+      "t": "I am interested in animation and game design.",
+      "c": "Computer Related Designing"
+    },
+    {
+      "t": "Creating multimedia content feels like a great career path.",
+      "c": "Computer Related Designing"
+    },
+    {
+      "t": "I want to work as a political analyst or activist.",
+      "c": "Civil Education Related"
+    },
+    {
+      "t": "Philosophy and social reform are causes I care about.",
+      "c": "Civil Education Related"
+    },
+    {
+      "t": "I would like to research civil society and governance.",
+      "c": "Civil Education Related"
+    },
+    {
+      "t": "Teaching civics and social sciences appeals to me.",
+      "c": "Civil Education Related"
+    },
+    {
+      "t": "I am interested in cosmetology and life style consulting.",
+      "c": "Beauty Related"
+    },
+    {
+      "t": "Hair styling and makeup artistry excite me.",
+      "c": "Beauty Related"
+    },
+    {
+      "t": "I would like to work in the movie or theater industry doing makeup.",
+      "c": "Beauty Related"
+    },
+    {
+      "t": "Opening my own beauty enterprise sounds like a great plan.",
+      "c": "Beauty Related"
+    }
+  ],
+  "LIKERT": [
+    "Strongly Disagree",
+    "Disagree",
+    "Neutral",
+    "Agree",
+    "Strongly Agree"
+  ]
+}

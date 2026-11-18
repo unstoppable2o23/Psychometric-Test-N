@@ -1,0 +1,90 @@
+{
+  "totalQuestions": 860,
+  "assessments": [
+    {
+      "slug": "learning-style",
+      "file": "Learning Styles.html",
+      "questions": 64,
+      "varsFound": [
+        "QUESTIONS",
+        "CATS",
+        "LIKERT"
+      ]
+    },
+    {
+      "slug": "personality",
+      "file": "Personality Test.html",
+      "questions": 36,
+      "varsFound": [
+        "QUESTIONS"
+      ]
+    },
+    {
+      "slug": "multiple-intelligence",
+      "file": "Multiple Intelligence Test.html",
+      "questions": 54,
+      "varsFound": [
+        "QUESTIONS",
+        "INTEL",
+        "CLUSTER_MAP",
+        "SALARY_MAP",
+        "SCALE",
+        "eiTraits",
+        "eiRecs"
+      ]
+    },
+    {
+      "slug": "humanities-branch",
+      "file": "Humanities branch Selector.html",
+      "questions": 76,
+      "varsFound": [
+        "QUESTIONS",
+        "LIKERT"
+      ]
+    },
+    {
+      "slug": "engineering-branch",
+      "file": "Engineering Branch Selector.html",
+      "questions": 56,
+      "varsFound": [
+        "QUESTIONS",
+        "LIKERT"
+      ]
+    },
+    {
+      "slug": "commerce-branch",
+      "file": "Commerce Career Selector test.html",
+      "questions": 76,
+      "varsFound": [
+        "QUESTIONS",
+        "LIKERT",
+        "FIN"
+      ]
+    },
+    {
+      "slug": "stream-selector",
+      "file": "stream selector test.html",
+      "questions": 76,
+      "varsFound": [
+        "TEST_SECTIONS",
+        "STREAM_DATABASE"
+      ]
+    },
+    {
+      "slug": "ideal-career",
+      "file": "ideal career.html",
+      "questions": 182,
+      "varsFound": [
+        "questionBank"
+      ]
+    },
+    {
+      "slug": "multi-dimensional",
+      "file": "Multi dimensional test (One test for all).html",
+      "questions": 240,
+      "varsFound": [
+        "questionBank"
+      ]
+    }
+  ]
+}
