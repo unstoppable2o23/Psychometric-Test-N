@@ -44,7 +44,13 @@ export function StudentDashboard() {
       // Open the original HTML test file directly (preserves original format)
       const htmlUrl = slug ? slugToHtml[slug] : undefined
       if (htmlUrl) {
-        setTestLink({ assignmentId, url: htmlUrl, title })
+        // Pass student's name, email, phone as URL params for auto-fill
+        const params = new URLSearchParams({
+          name: user.name,
+          email: user.email,
+          phone: user.phone || '',
+        })
+        setTestLink({ assignmentId, url: `${htmlUrl}?${params.toString()}`, title })
         toast.success(`${title} is ready — click "Open Test" to begin`)
       } else {
         // Fallback to platform test runner
