@@ -49,6 +49,7 @@ export function StudentDashboard() {
           name: user.name,
           email: user.email,
           phone: user.phone || '',
+          slug: slug,
         })
         setTestLink({ assignmentId, url: `${htmlUrl}?${params.toString()}`, title })
         toast.success(`${title} is ready — click "Open Test" to begin`)
