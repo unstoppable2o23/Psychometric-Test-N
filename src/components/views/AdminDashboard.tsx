@@ -196,6 +196,7 @@ function AssignTab() {
   const [selStudents, setSelStudents] = useState<string[]>([])
   const [selAssessments, setSelAssessments] = useState<string[]>([])
   const [busy, setBusy] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
   const load = async () => {
     try {
       const [s, a, asg] = await Promise.all([api.adminStudents(), api.assessments(), api.adminAssignments()])
@@ -209,6 +210,15 @@ function AssignTab() {
     try { const r = await api.adminAssign({ studentIds: selStudents, assessmentIds: selAssessments }); toast.success(`Assigned ${r.count} test(s)`); setSelStudents([]); setSelAssessments([]); load() } catch (e: any) { toast.error(e.message) } finally { setBusy(false) }
   }
   const toggle = (arr: string[], set: (v: string[]) => void, id: string) => set(arr.includes(id) ? arr.filter((x) => x !== id) : [...arr, id])
+
+  // Filter assignments by student name or email (case-insensitive, real-time)
+  const filteredAssignments = assignments.filter((a) => {
+    if (!searchQuery.trim()) return true
+    const q = searchQuery.toLowerCase()
+    const name = (a.student?.name || '').toLowerCase()
+    const email = (a.student?.email || '').toLowerCase()
+    return name.includes(q) || email.includes(q)
+  })
   return (
     <div className="grid lg:grid-cols-3 gap-5">
       <Card className="border-slate-200">
@@ -243,16 +253,38 @@ function AssignTab() {
         </Card>
       </div>
       <Card className="border-slate-200 lg:col-span-3">
-        <CardHeader><CardTitle className="text-sm">All Assignments</CardTitle></CardHeader>
+        <CardHeader>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <CardTitle className="text-sm">All Assignments ({filteredAssignments.length}{searchQuery ? ` of ${assignments.length}` : ''})</CardTitle>
+            <div className="relative max-w-xs w-full">
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <Input
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search by student name or email address..."
+                className="pl-9 h-9 text-sm"
+              />
+            </div>
+          </div>
+        </CardHeader>
         <CardContent className="p-0">
           <div className="overflow-x-auto max-h-96">
             <table className="w-full text-sm">
-              <thead className="bg-slate-50 text-slate-600 text-xs uppercase sticky top-0"><tr><th className="text-left px-4 py-2 font-semibold">Student</th><th className="text-left px-4 py-2 font-semibold">Assessment</th><th className="text-left px-4 py-2 font-semibold">Status</th><th className="text-left px-4 py-2 font-semibold hidden sm:table-cell">Assigned</th></tr></thead>
+              <thead className="bg-slate-50 text-slate-600 text-xs uppercase sticky top-0"><tr>
+                <th className="text-left px-4 py-2 font-semibold">Student Name</th>
+                <th className="text-left px-4 py-2 font-semibold">Student Email</th>
+                <th className="text-left px-4 py-2 font-semibold">Assessment</th>
+                <th className="text-left px-4 py-2 font-semibold">Status</th>
+                <th className="text-left px-4 py-2 font-semibold hidden sm:table-cell">Assigned Date</th>
+              </tr></thead>
               <tbody className="divide-y divide-slate-100">
-                {assignments.map((a) => (
+                {filteredAssignments.length === 0 ? (
+                  <tr><td colSpan={5} className="px-4 py-8 text-center text-slate-400">No assignments found matching "{searchQuery}"</td></tr>
+                ) : filteredAssignments.map((a) => (
                   <tr key={a.id} className="hover:bg-slate-50">
-                    <td className="px-4 py-2.5 font-medium text-slate-800">{a.student.name}</td>
-                    <td className="px-4 py-2.5 text-slate-600">{a.assessment.title}</td>
+                    <td className="px-4 py-2.5 font-medium text-slate-800">{a.student?.name || 'N/A'}</td>
+                    <td className="px-4 py-2.5 text-slate-600">{a.student?.email || 'N/A'}</td>
+                    <td className="px-4 py-2.5 text-slate-600">{a.assessment?.title || 'N/A'}</td>
                     <td className="px-4 py-2.5"><StatusBadge status={a.status} /></td>
                     <td className="px-4 py-2.5 text-slate-500 text-xs hidden sm:table-cell">{new Date(a.createdAt).toLocaleDateString()}</td>
                   </tr>
