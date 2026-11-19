@@ -25,13 +25,14 @@ export function AdminDashboard() {
         <p className="text-slate-500 mt-1">Manage students, assessments, reports and counsellors.</p>
       </div>
       <Tabs value={tab} onValueChange={setTab}>
-        <TabsList className="grid grid-cols-4 sm:grid-cols-8 w-full mb-6 h-auto">
+        <TabsList className="grid grid-cols-5 sm:grid-cols-9 w-full mb-6 h-auto">
           <TabsTrigger value="overview" className="text-xs gap-1.5 py-2"><Activity className="w-4 h-4" /> Overview</TabsTrigger>
           <TabsTrigger value="students" className="text-xs gap-1.5 py-2"><Users className="w-4 h-4" /> Students</TabsTrigger>
           <TabsTrigger value="assign" className="text-xs gap-1.5 py-2"><ClipboardList className="w-4 h-4" /> Assign</TabsTrigger>
           <TabsTrigger value="reports" className="text-xs gap-1.5 py-2"><FileText className="w-4 h-4" /> Reports</TabsTrigger>
           <TabsTrigger value="counsellors" className="text-xs gap-1.5 py-2"><Stethoscope className="w-4 h-4" /> Counsellors</TabsTrigger>
           <TabsTrigger value="allocations" className="text-xs gap-1.5 py-2"><Ticket className="w-4 h-4" /> Allocs</TabsTrigger>
+          <TabsTrigger value="anon-links" className="text-xs gap-1.5 py-2"><Link2 className="w-4 h-4" /> Anon Links</TabsTrigger>
           <TabsTrigger value="test-links" className="text-xs gap-1.5 py-2"><Link2 className="w-4 h-4" /> Links</TabsTrigger>
           <TabsTrigger value="audit" className="text-xs gap-1.5 py-2"><BookOpen className="w-4 h-4" /> Audit</TabsTrigger>
         </TabsList>
@@ -41,6 +42,7 @@ export function AdminDashboard() {
         <TabsContent value="reports"><ReportsTab /></TabsContent>
         <TabsContent value="counsellors"><CounsellorsTab /></TabsContent>
         <TabsContent value="allocations"><AllocationsTab /></TabsContent>
+        <TabsContent value="anon-links"><AnonLinksTab /></TabsContent>
         <TabsContent value="test-links"><TestLinksTab /></TabsContent>
         <TabsContent value="audit"><AuditTab /></TabsContent>
       </Tabs>
@@ -560,6 +562,117 @@ function AllocationsTab() {
                         <td className="px-4 py-3 text-center"><Badge variant="outline" className={avail > 0 ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-100 text-slate-400'}>{avail}</Badge></td>
                         <td className="px-4 py-3 text-right">
                           <Button size="sm" variant="ghost" className="text-xs text-rose-500 hover:text-rose-700" onClick={() => removeAlloc(a.id)} disabled={a.used > 0}>{a.used > 0 ? 'In use' : 'Remove'}</Button>
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  )
+}
+
+function AnonLinksTab() {
+  const [links, setLinks] = useState<any[]>([])
+  const [assessments, setAssessments] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [selAssessment, setSelAssessment] = useState('')
+  const [genCount, setGenCount] = useState('1')
+  const [busy, setBusy] = useState(false)
+  const [lastLinks, setLastLinks] = useState<any[] | null>(null)
+
+  const load = async () => {
+    setLoading(true)
+    try { const [l, a] = await Promise.all([api.adminAnonLinks(), api.assessments()]); setLinks(l.links); setAssessments(a.assessments) }
+    catch (e: any) { toast.error(e.message) } finally { setLoading(false) }
+  }
+  useEffect(() => { load() }, [])
+
+  async function generate() {
+    if (!selAssessment) return toast.error('Select an assessment')
+    const n = Math.min(Math.max(parseInt(genCount) || 1, 1), 50)
+    setBusy(true)
+    try {
+      const r = await api.adminGenAnonLinks(selAssessment, n)
+      setLastLinks(r.links)
+      toast.success(`Generated ${r.count} anonymous link(s)`)
+      load()
+    } catch (e: any) { toast.error(e.message) } finally { setBusy(false) }
+  }
+
+  async function disable(id: string) {
+    try { await api.adminDisableAnonLink(id); toast.success('Link disabled'); load() } catch (e: any) { toast.error(e.message) }
+  }
+
+  function copyUrl(url: string) { navigator.clipboard?.writeText(url); toast.success('Link copied') }
+
+  const statusColors: Record<string, string> = { UNUSED: 'bg-slate-100 text-slate-500', REGISTERED: 'bg-blue-100 text-blue-700', IN_PROGRESS: 'bg-amber-100 text-amber-700', COMPLETED: 'bg-emerald-100 text-emerald-700', REPORT_GENERATED: 'bg-emerald-100 text-emerald-700', DISABLED: 'bg-rose-100 text-rose-700' }
+
+  return (
+    <div className="space-y-5">
+      <Card className="border-slate-200">
+        <CardHeader><CardTitle className="text-sm flex items-center gap-2"><Link2 className="w-4 h-4 text-teal-600" /> Generate Anonymous Test Links</CardTitle></CardHeader>
+        <CardContent className="grid sm:grid-cols-4 gap-3 items-end">
+          <div className="space-y-1.5 sm:col-span-2">
+            <Label>Assessment</Label>
+            <Select value={selAssessment} onValueChange={setSelAssessment}>
+              <SelectTrigger><SelectValue placeholder="Select test..." /></SelectTrigger>
+              <SelectContent>{assessments.map((a) => <SelectItem key={a.id} value={a.id}>{a.title}</SelectItem>)}</SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-1.5"><Label>Count</Label><Input type="number" min={1} max={50} value={genCount} onChange={(e) => setGenCount(e.target.value)} /></div>
+          <Button onClick={generate} disabled={busy} className="bg-teal-600 hover:bg-teal-700"><Link2 className="w-4 h-4" /> Generate</Button>
+        </CardContent>
+      </Card>
+
+      {lastLinks && (
+        <Card className="border-emerald-200 bg-emerald-50">
+          <CardHeader><CardTitle className="text-sm text-emerald-800">Generated Links ({lastLinks.length})</CardTitle></CardHeader>
+          <CardContent className="space-y-2">
+            {lastLinks.map((l) => {
+              const fullUrl = typeof window !== 'undefined' ? window.location.origin + l.shareUrl : l.shareUrl
+              return (
+                <div key={l.token} className="flex items-center gap-2">
+                  <code className="text-xs bg-white px-3 py-2 rounded-lg border border-slate-200 flex-1 min-w-0 truncate">{fullUrl}</code>
+                  <Button size="sm" variant="outline" onClick={() => copyUrl(fullUrl)}><Copy className="w-3.5 h-3.5" /></Button>
+                  <a href={l.shareUrl} target="_blank" rel="noreferrer"><Button size="sm" variant="ghost">Open</Button></a>
+                </div>
+              )
+            })}
+            <Button size="sm" variant="ghost" onClick={() => setLastLinks(null)}>Dismiss</Button>
+          </CardContent>
+        </Card>
+      )}
+
+      {loading ? <Skeletons n={3} /> : links.length === 0 ? (
+        <Card className="border-dashed"><CardContent className="py-10 text-center text-slate-500">No anonymous links generated yet.</CardContent></Card>
+      ) : (
+        <Card className="border-slate-200">
+          <CardHeader><CardTitle className="text-sm">All Anonymous Links ({links.length})</CardTitle></CardHeader>
+          <CardContent className="p-0">
+            <div className="overflow-x-auto max-h-[60vh]">
+              <table className="w-full text-sm">
+                <thead className="bg-slate-50 text-slate-600 text-xs uppercase sticky top-0">
+                  <tr><th className="text-left px-4 py-3 font-semibold">Assessment</th><th className="text-left px-4 py-3 font-semibold">Link Hash</th><th className="text-left px-4 py-3 font-semibold">Student</th><th className="text-left px-4 py-3 font-semibold hidden sm:table-cell">Email</th><th className="text-left px-4 py-3 font-semibold">Status</th><th className="text-left px-4 py-3 font-semibold hidden md:table-cell">Created</th><th className="text-right px-4 py-3 font-semibold">Actions</th></tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {links.map((l) => {
+                    const fullUrl = typeof window !== 'undefined' ? window.location.origin + l.shareUrl : l.shareUrl
+                    return (
+                      <tr key={l.id} className="hover:bg-slate-50">
+                        <td className="px-4 py-3 text-slate-700">{l.assessment?.title || 'N/A'}</td>
+                        <td className="px-4 py-3 font-mono text-xs text-slate-500">{l.token.slice(0, 12)}...</td>
+                        <td className="px-4 py-3 font-medium text-slate-800">{l.student?.name || <span className="text-slate-400 italic">Not Registered</span>}</td>
+                        <td className="px-4 py-3 text-slate-600 hidden sm:table-cell">{l.student?.email || '—'}</td>
+                        <td className="px-4 py-3"><Badge variant="outline" className={`text-[10px] font-bold ${statusColors[l.status] || ''}`}>{l.status.replace(/_/g, ' ')}</Badge></td>
+                        <td className="px-4 py-3 text-xs text-slate-500 hidden md:table-cell">{new Date(l.createdAt).toLocaleDateString()}</td>
+                        <td className="px-4 py-3 text-right whitespace-nowrap">
+                          <Button size="sm" variant="ghost" className="text-xs" onClick={() => copyUrl(fullUrl)}><Copy className="w-3.5 h-3.5" /></Button>
+                          {l.status !== 'DISABLED' && <Button size="sm" variant="ghost" className="text-xs text-rose-500" onClick={() => disable(l.id)}><Ban className="w-3.5 h-3.5" /></Button>}
                         </td>
                       </tr>
                     )
