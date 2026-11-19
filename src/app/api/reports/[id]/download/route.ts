@@ -6,7 +6,6 @@ import { getAssessment } from '@/lib/assessments/loader'
 import { scoreAttempt } from '@/lib/scoring'
 import { generateReportPdfFile } from '@/lib/pdf'
 import { generateUniversalSmartInterpretation, extractInterpretationData, getTestType } from '@/lib/smart-interpreter'
-import fs from 'fs/promises'
 
 // GET /api/reports/[id]/download — role-checked PDF download (A4, vector).
 export const GET = apiHandler(async (req: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
@@ -78,8 +77,7 @@ export const GET = apiHandler(async (req: NextRequest, { params }: { params: Pro
     ),
   }
 
-  const pdfPath = await generateReportPdfFile(pdfData, report.id)
-  const buf = await fs.readFile(pdfPath)
+  const buf = await generateReportPdfFile(pdfData, report.id)
   void req
   return new Response(new Uint8Array(buf), {
     headers: {

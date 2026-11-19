@@ -3,7 +3,6 @@ import { db } from '@/lib/db'
 import { getCurrentUser, requireRole } from '@/lib/auth'
 import { apiHandler, error } from '@/lib/api'
 import { generateManualPdfFile } from '@/lib/pdf'
-import fs from 'fs/promises'
 
 // GET /api/manuals/[assessmentId]/download — counsellor/admin only PDF.
 export const GET = apiHandler(async (_req: NextRequest, { params }: { params: Promise<{ assessmentId: string }> }) => {
@@ -16,8 +15,7 @@ export const GET = apiHandler(async (_req: NextRequest, { params }: { params: Pr
   const manual = await db.interpretationManual.findFirst({ where: { assessmentId }, include: { assessment: true } })
   if (!manual) return error('Manual not found', 404)
   const content = JSON.parse(manual.content)
-  const pdfPath = await generateManualPdfFile(content, `manual-${assessmentId}`)
-  const buf = await fs.readFile(pdfPath)
+  const buf = await generateManualPdfFile(content, `manual-${assessmentId}`)
   return new Response(new Uint8Array(buf), {
     headers: {
       'Content-Type': 'application/pdf',

@@ -16,8 +16,8 @@ var/
 download/student-reports/
 download/test-manuals/
 
-# Scripts output (extracted from HTML — regenerated from source)
-scripts/out/
+# Scripts output — KEEP in Git (assessment data needed at runtime)
+# scripts/out/
 
 # Logs
 *.log

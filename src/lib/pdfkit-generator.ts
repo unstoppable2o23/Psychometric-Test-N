@@ -1,7 +1,6 @@
 // Pure JavaScript PDF generator using pdf-lib — zero native dependencies,
 // runs safely in the Next.js/Turbopack runtime. No Python, no zlib crashes.
 import { PDFDocument, StandardFonts, rgb, PDFFont, PDFPage } from 'pdf-lib'
-import fs from 'fs'
 import { getPersonalityTypeData, getDichotomies, getIntelData, getAllIntel, getStreamData, getLearningStyleDescs } from '@/lib/assessments/report-content'
 import { parseInterpretation } from '@/lib/smart-interpreter'
 
@@ -78,10 +77,7 @@ export interface ReportPdfData {
   interpretation?: string
 }
 
-export async function generateReportPdf(data: ReportPdfData, id: string): Promise<string> {
-  const outPath = `${process.cwd()}/var/reports/report-${id}.pdf`
-  fs.mkdirSync(`${process.cwd()}/var/reports`, { recursive: true })
-
+export async function generateReportPdf(data: ReportPdfData, id: string): Promise<Buffer> {
   const doc = await PDFDocument.create()
   const font = await doc.embedFont(StandardFonts.Helvetica)
   const fontBold = await doc.embedFont(StandardFonts.HelveticaBold)
@@ -738,8 +734,7 @@ export async function generateReportPdf(data: ReportPdfData, id: string): Promis
   doc.setCreator('Psychometric Testing Platform')
 
   const pdfBytes = await doc.save()
-  fs.writeFileSync(outPath, pdfBytes)
-  return outPath
+  return Buffer.from(pdfBytes)
 }
 
 function fmtDate(s?: string): string {
@@ -756,10 +751,7 @@ export interface ManualContent {
   dimensions: { name: string; description: string; high: string; moderate: string; low: string }[]
 }
 
-export async function generateManualPdf(content: ManualContent, id: string): Promise<string> {
-  const outPath = `${process.cwd()}/var/reports/manual-${id}.pdf`
-  fs.mkdirSync(`${process.cwd()}/var/reports`, { recursive: true })
-
+export async function generateManualPdf(content: ManualContent, id: string): Promise<Buffer> {
   const doc = await PDFDocument.create()
   const font = await doc.embedFont(StandardFonts.Helvetica)
   const fontBold = await doc.embedFont(StandardFonts.HelveticaBold)
@@ -826,6 +818,5 @@ export async function generateManualPdf(content: ManualContent, id: string): Pro
   doc.setAuthor('Psychometric Testing Platform')
 
   const pdfBytes = await doc.save()
-  fs.writeFileSync(outPath, pdfBytes)
-  return outPath
+  return Buffer.from(pdfBytes)
 }
