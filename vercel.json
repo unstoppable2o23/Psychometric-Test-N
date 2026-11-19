@@ -1,4 +1,0 @@
-{
-  "buildCommand": "rm -rf node_modules/.prisma node_modules/@prisma/client && prisma generate && next build",
-  "framework": "nextjs"
-}
