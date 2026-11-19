@@ -86,6 +86,10 @@ export const api = {
   adminGenerateTestLink: (studentId: string, assessmentId: string) =>
     req<{ link: { token: string; testUrl: string; studentName: string; testTitle: string }; alreadyExists?: boolean }>('/api/admin/test-links', { method: 'POST', body: JSON.stringify({ studentId, assessmentId }) }),
   adminDeactivateTestLink: (id: string) => req(`/api/admin/test-links/${id}`, { method: 'POST' }),
+  adminAnonLinks: () => req<{ links: any[] }>('/api/admin/anon-links'),
+  adminGenAnonLinks: (assessmentId: string, count?: number) =>
+    req<{ links: any[]; count: number }>('/api/admin/anon-links', { method: 'POST', body: JSON.stringify({ assessmentId, count: count || 1 }) }),
+  adminDisableAnonLink: (id: string) => req(`/api/admin/anon-links/${id}`, { method: 'POST' }),
 
   // reports
   report: (id: string) => req<{ report: any }>(`/api/reports/${id}`),
