@@ -30,13 +30,18 @@ export const useApp = create<AppState>((set, get) => ({
   reportId: null,
   init: async () => {
     // If the page is opened via a unique test link (/?test=TOKEN), show the
-    // test runner directly. The token is validated server-side on every
-    // request, so no session is required to take the test.
+    // test runner directly. Still try to load the user in the background so
+    // the header shows correctly if they're logged in.
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search)
       const testToken = params.get('test')
       if (testToken) {
         set({ testToken, view: 'test-runner', loading: false })
+        // Try to load user in background (non-blocking)
+        try {
+          const { user } = await api.me()
+          if (user) set({ user })
+        } catch {}
         return
       }
     }

@@ -18,6 +18,9 @@ export const metadata: Metadata = {
   description: "Secure psychometric testing platform with server-side scoring, professional A4 PDF reports, and counsellor interpretation manuals.",
   keywords: ["psychometric", "assessment", "career", "personality", "testing", "counselling"],
   authors: [{ name: "Psychometric Testing Platform" }],
+  icons: {
+    icon: "/logo.svg",
+  },
   openGraph: {
     title: "Psychometric Testing Platform",
     description: "Secure psychometric testing platform with server-side scoring and professional reports.",

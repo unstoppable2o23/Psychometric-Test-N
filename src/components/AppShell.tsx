@@ -42,6 +42,11 @@ export function AppShell() {
                 <LogOut className="w-4 h-4" /> <span className="hidden sm:inline">Sign out</span>
               </button>
             </div>
+          ) : view === 'test-runner' ? (
+            <div className="flex items-center gap-2 text-xs text-slate-400">
+              <ShieldCheck className="w-4 h-4 text-teal-500" />
+              <span className="hidden sm:inline">Secure Assessment</span>
+            </div>
           ) : (
             <div className="flex items-center gap-2">
               <button onClick={() => setView('login')} className="px-3 py-1.5 rounded-lg text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors">Sign in</button>
