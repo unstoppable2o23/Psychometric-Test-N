@@ -14,24 +14,20 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Z.ai Code Scaffold - AI-Powered Development",
-  description: "Modern Next.js scaffold optimized for AI-powered development with Z.ai. Built with TypeScript, Tailwind CSS, and shadcn/ui.",
-  keywords: ["Z.ai", "Next.js", "TypeScript", "Tailwind CSS", "shadcn/ui", "AI development", "React"],
-  authors: [{ name: "Z.ai Team" }],
-  icons: {
-    icon: "https://z-cdn.chatglm.cn/z-ai/static/logo.svg",
-  },
+  title: "Psychometric Testing Platform",
+  description: "Secure psychometric testing platform with server-side scoring, professional A4 PDF reports, and counsellor interpretation manuals.",
+  keywords: ["psychometric", "assessment", "career", "personality", "testing", "counselling"],
+  authors: [{ name: "Psychometric Testing Platform" }],
   openGraph: {
-    title: "Z.ai Code Scaffold",
-    description: "AI-powered development with modern React stack",
-    url: "https://chat.z.ai",
-    siteName: "Z.ai",
+    title: "Psychometric Testing Platform",
+    description: "Secure psychometric testing platform with server-side scoring and professional reports.",
+    siteName: "Psychometric Testing Platform",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Z.ai Code Scaffold",
-    description: "AI-powered development with modern React stack",
+    title: "Psychometric Testing Platform",
+    description: "Secure psychometric testing platform with server-side scoring and professional reports.",
   },
 };
 
