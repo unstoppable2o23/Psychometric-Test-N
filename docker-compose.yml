@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: psychometric
+      POSTGRES_PASSWORD: change_this_password
+      POSTGRES_DB: psychometric
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  app:
+    build: .
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://psychometric:change_this_password@db:5432/psychometric
+      NODE_ENV: production
+    depends_on:
+      - db
+    volumes:
+      - app_data:/app/var
+
+volumes:
+  pgdata:
+  app_data:

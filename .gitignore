@@ -1,54 +1,42 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# Dependencies
+node_modules/
+.prisma/
 
-# dependencies
-node_modules
-/.pnp
-.pnp.*
-.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/versions
+# Build output
+.next/
+out/
 
-# testing
-/coverage
+# Database
+db/
+*.db
+*.db-journal
 
-# next.js
-/.next/
-/out/
+# Generated files
+var/
+download/student-reports/
+download/test-manuals/
 
-# production
-/build
+# Scripts output (extracted from HTML — regenerated from source)
+scripts/out/
 
-# misc
-.DS_Store
-*.pem
-
-# debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.pnpm-debug.log*
-
-# env files (can opt-in for committing if needed)
-.env*
-
-# vercel
-.vercel
-
-
-# typescript
-*.tsbuildinfo
-next-env.d.ts
-local-*
-.claude
-.z-ai-config
+# Logs
 *.log
 dev.log
-dev.out.log
-test
-prompt
-
 server.log
-# Skills directory
-/skills/
+
+# Environment
+.env
+.env.local
+.env.production
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Upload (source HTML files — keep in Git if you want version control of tests)
+# Uncomment the line below if you don't want test source files in Git
+# upload/
