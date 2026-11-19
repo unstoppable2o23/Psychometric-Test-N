@@ -25,15 +25,33 @@ export function StudentDashboard() {
   }
   useEffect(() => { load() }, [])
 
-  async function handleStart(assignmentId: string, title: string) {
+  // Map assessment slug to original HTML test file
+  const slugToHtml: Record<string, string> = {
+    'commerce-branch': '/tests/commerce-branch-selector.html',
+    'engineering-branch': '/tests/engineering-branch-selector.html',
+    'humanities-branch': '/tests/humanities-branch-selector.html',
+    'ideal-career': '/tests/ideal-career.html',
+    'learning-style': '/tests/learning-styles.html',
+    'multi-dimensional': '/tests/multi-dimensional.html',
+    'multiple-intelligence': '/tests/multiple-intelligence.html',
+    'personality': '/tests/personality-test.html',
+    'stream-selector': '/tests/stream-selector.html',
+  }
+
+  async function handleStart(assignmentId: string, title: string, slug?: string) {
     setStarting(assignmentId)
     try {
-      const { token } = await api.startTest(assignmentId)
-      // Show an "Open Test" link button instead of using window.open (which
-      // gets blocked by popup blockers when called after an async operation).
-      // A user-initiated click on an <a target="_blank"> link is never blocked.
-      setTestLink({ assignmentId, url: `/?test=${token}`, title })
-      toast.success(`${title} is ready — click "Open Test" to begin`)
+      // Open the original HTML test file directly (preserves original format)
+      const htmlUrl = slug ? slugToHtml[slug] : undefined
+      if (htmlUrl) {
+        setTestLink({ assignmentId, url: htmlUrl, title })
+        toast.success(`${title} is ready — click "Open Test" to begin`)
+      } else {
+        // Fallback to platform test runner
+        const { token } = await api.startTest(assignmentId)
+        setTestLink({ assignmentId, url: `/?test=${token}`, title })
+        toast.success(`${title} is ready — click "Open Test" to begin`)
+      }
     } catch (e: any) {
       toast.error(e.message)
     } finally { setStarting(null) }
@@ -85,7 +103,7 @@ export function StudentDashboard() {
               a={a}
               starting={starting === a.id}
               testLink={testLink?.assignmentId === a.id ? testLink : null}
-              onStart={() => handleStart(a.id, a.assessment.title)}
+              onStart={() => handleStart(a.id, a.assessment.title, a.assessment.slug)}
               onViewReport={() => a.reportId && viewReport(a.reportId)}
               onClearLink={() => setTestLink(null)}
             />

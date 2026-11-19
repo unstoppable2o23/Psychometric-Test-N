@@ -1,0 +1,1531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Engineering Branch Selector</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Lora:wght@500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+<style>
+/* ============ BASE & ANTI-COPY ============ */
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#FAF5EC;
+  --text:#1E293B;
+  --muted:#64748B;
+  --blue:#2563EB;
+  --sky:#0EA5E9;
+  --green:#10B981;
+  --amber:#F59E0B;
+  --rose:#E11D48;
+  --soft:#EFF6FF;
+  --border:#E7E0D2;
+  --navy:#0F172A;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.5;overflow-x:hidden}
+
+/* Anti-Copy Protection on Quiz Interface */
+#quiz-screen, #quiz-screen * {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.bg-deco{position:fixed;inset:0;z-index:-1;overflow:hidden}
+.bg-deco div{position:absolute;border-radius:50%;filter:blur(110px);opacity:.15}
+.b1{width:620px;height:620px;background:#60A5FA;top:-18%;left:-12%;animation:drift 14s ease-in-out infinite alternate}
+.b2{width:520px;height:520px;background:#34D399;bottom:-18%;right:-10%;animation:drift 18s ease-in-out infinite alternate-reverse}
+.b3{width:420px;height:420px;background:#F5C98A;top:40%;left:55%;opacity:.12;animation:drift 16s ease-in-out infinite alternate}
+@keyframes drift{from{transform:translate(0,0)}to{transform:translate(50px,40px) scale(1.08)}}
+main{max-width:940px;margin:0 auto;padding:1.5rem 1rem}
+.screen{display:none}.screen.active{display:block;animation:fadeUp .4s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.glass{background:rgba(255,255,255,.92);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.8);box-shadow:0 20px 60px rgba(80,60,20,.1)}
+
+/* ============ FORM & UI ELEMENTS ============ */
+.form-card{border-radius:24px;padding:2.4rem;max-width:680px;margin:1.5rem auto;position:relative}
+.form-card h1{font-family:'Lora',serif;font-size:2.2rem;color:var(--navy);line-height:1.2}
+.form-card h1 em{font-style:normal;background:linear-gradient(90deg,var(--blue),var(--sky),var(--green));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.accent-bar{width:78px;height:5px;border-radius:3px;background:linear-gradient(90deg,var(--blue),var(--green));margin:.6rem 0 1rem}
+p.sub{color:var(--muted);margin-bottom:1.1rem;font-size:.95rem}
+.chips{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.2rem}
+.chip{background:var(--soft);color:var(--blue);border:1px solid #BFDBFE;font-size:.73rem;font-weight:600;padding:.3rem .8rem;border-radius:999px}
+.info-box{background:#FDFBF6;border:1px solid var(--border);border-left:4px solid var(--blue);border-radius:10px;padding:.9rem 1.1rem;margin-bottom:1rem;font-size:.88rem}
+.info-box h3{font-size:.92rem;color:var(--navy);margin-bottom:.25rem}
+.form-group{margin-bottom:1rem}
+.form-group label{display:block;margin-bottom:.3rem;color:#334155;font-size:.84rem;font-weight:600}
+.form-group input{width:100%;padding:.8rem 1rem;background:rgba(255,255,255,.95);border:2px solid var(--border);border-radius:12px;color:var(--navy);font-family:'Poppins',sans-serif;font-size:.95rem}
+.form-group input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 4px rgba(37,99,235,.13)}
+.btn-row{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-top:.8rem}
+.btn{display:inline-block;padding:.9rem 2rem;background:linear-gradient(90deg,var(--blue),var(--sky));color:#fff;border:none;border-radius:12px;font-family:'Poppins',sans-serif;font-weight:600;cursor:pointer;font-size:.98rem;transition:.2s;box-shadow:0 8px 22px rgba(37,99,235,.3)}
+.btn:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(37,99,235,.4)}
+.sim-btn{background:#F8FAFC;border:1px dashed #94A3B8;color:#475569;padding:.6rem 1rem;border-radius:10px;font-family:'Poppins',sans-serif;font-size:.78rem;font-weight:600;cursor:pointer;transition:.2s}
+.sim-btn:hover{border-color:var(--blue);color:var(--blue);background:var(--soft)}
+
+/* ============ QUIZ INTERFACE ============ */
+.quiz-wrap{max-width:760px;margin:0 auto}
+.quiz-top{display:flex;align-items:center;gap:1rem;margin:.5rem 0 1rem}
+.ring-wrap{position:relative;width:72px;height:72px;flex-shrink:0}
+.ring-wrap svg{width:72px;height:72px;transform:rotate(-90deg)}
+.ring-bg{fill:none;stroke:#E7E0D2;stroke-width:8}
+.ring-fill{fill:none;stroke:url(#ringGrad);stroke-width:8;stroke-linecap:round;stroke-dasharray:326.7;stroke-dashoffset:326.7;transition:stroke-dashoffset .4s ease}
+.ring-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--navy);font-size:.95rem}
+.quiz-meta{flex:1}
+.quiz-meta .t{font-family:'Lora',serif;font-weight:700;color:var(--navy);font-size:1.1rem}
+.quiz-meta .p{font-size:.82rem;color:var(--muted);font-weight:500}
+.stage-pill{background:var(--soft);color:var(--blue);font-size:.74rem;font-weight:700;padding:.35rem .85rem;border-radius:999px;border:1px solid #BFDBFE;white-space:nowrap}
+
+/* Top Progress Bar & Milestone Badges */
+.progress-bar-header{background:#fff;border:1px solid var(--border);border-radius:14px;padding:.75rem 1rem;margin-bottom:12px;box-shadow:0 4px 12px rgba(0,0,0,0.03)}
+.progress-label-row{display:flex;justify-content:space-between;align-items:center;font-size:.78rem;font-weight:700;color:var(--navy);margin-bottom:.4rem}
+.progress-container{width:100%;background:#EDE7DA;height:10px;border-radius:999px;overflow:hidden}
+.test-progress-bar{height:100%;width:0%;background:linear-gradient(90deg,var(--blue),var(--sky),var(--green));border-radius:999px;transition:width 0.35s ease}
+.badge-container{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;min-height:24px}
+.ach-badge{font-size:0.72rem;font-weight:700;padding:0.22rem 0.75rem;border-radius:999px;display:inline-flex;align-items:center;gap:4px;border:1px solid transparent;animation:qIn 0.3s ease}
+
+.q-card-big{border-radius:22px;padding:2rem 2.2rem;animation:qIn .28s ease}
+@keyframes qIn{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:none}}
+.q-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:.9rem}
+.q-sec{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--blue);background:var(--soft);border:1px solid #BFDBFE;padding:.22rem .7rem;border-radius:999px}
+.q-count{font-size:.8rem;font-weight:600;color:var(--muted)}
+.q-big{font-family:'Lora',serif;font-size:1.38rem;font-weight:600;color:var(--navy);line-height:1.4;margin-bottom:1.3rem}
+.opts-list{display:flex;flex-direction:column;gap:.58rem}
+.opt-row{display:flex;align-items:center;gap:.85rem;width:100%;text-align:left;padding:.85rem 1.1rem;background:#FDFBF7;border:2px solid var(--border);border-radius:13px;cursor:pointer;font-family:'Poppins',sans-serif;font-size:.95rem;font-weight:600;color:#475569;transition:all .15s ease}
+.opt-row:hover{border-color:var(--blue);color:var(--blue);background:var(--soft);transform:translateX(4px)}
+.opt-badge{width:30px;height:30px;border-radius:50%;background:#EDE7DA;color:#475569;display:flex;align-items:center;justify-content:center;font-size:.82rem;font-weight:700;flex-shrink:0}
+.opt-row.selected{background:linear-gradient(90deg,var(--blue),var(--sky));color:#fff;border-color:transparent;box-shadow:0 6px 16px rgba(37,99,235,.28);transform:translateX(6px)}
+.opt-row.selected .opt-badge{background:rgba(255,255,255,.25);color:#fff}
+.kbd-hint{margin-top:1rem;font-size:.74rem;color:#8C8574;text-align:center}
+.quiz-nav{display:flex;justify-content:space-between;align-items:center;margin-top:1.2rem}
+.ghost-btn{background:transparent;border:2px solid var(--border);color:#475569;font-family:'Poppins',sans-serif;font-weight:600;padding:.55rem 1.2rem;border-radius:10px;cursor:pointer;font-size:.85rem;transition:.15s}
+.ghost-btn:hover{border-color:var(--blue);color:var(--blue);background:var(--soft)}
+.done-card{border-radius:24px;padding:2.6rem 2rem;text-align:center}
+.done-emoji{font-size:3rem}
+.done-card h2{font-family:'Lora',serif;font-size:1.85rem;color:var(--navy);margin:.4rem 0}
+
+/* ============ REPORT & A4 PAGE ARCHITECTURE ============ */
+.report-toolbar{display:flex;justify-content:space-between;align-items:center;gap:1rem;background:#fff;border:1px solid var(--border);border-radius:14px;padding:.9rem 1.25rem;margin-bottom:1.25rem;box-shadow:0 8px 24px rgba(80,60,20,.08);position:sticky;top:10px;z-index:30}
+.print-btn{background:linear-gradient(90deg,var(--blue),var(--sky));color:#fff;border:none;padding:.75rem 1.5rem;border-radius:10px;font-family:'Poppins',sans-serif;font-weight:600;cursor:pointer;font-size:.9rem;box-shadow:0 6px 18px rgba(37,99,235,.3);transition:.2s}
+.print-btn:hover{transform:translateY(-1px)}
+
+.report-card{background:transparent;border:none;box-shadow:none;padding:0;margin-bottom:2rem}
+
+/* Each .report-page is calibrated to fit on 1 A4 page with balanced spacing and zero overflow */
+.report-page{
+  background:#fff;
+  width:210mm;
+  min-height:282mm;
+  margin:0 auto 1.5rem auto;
+  padding:10mm 12mm;
+  border:1px solid var(--border);
+  border-radius:8px;
+  box-shadow:0 12px 32px rgba(15,23,42,.08);
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  position:relative;
+  box-sizing:border-box;
+}
+.page-body{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-start;
+  gap:0.55rem;
+}
+
+/* Page 1: Cover Brand Header */
+.cover-brand-bar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:1rem;
+  border-bottom:2.5px solid var(--blue);
+  padding-bottom:.65rem;
+}
+.cover-brand-left{display:flex;align-items:center;gap:.9rem}
+.cover-logo-slot{
+  max-width:120px;
+  max-height:80px;
+  display:none;
+  align-items:center;
+  justify-content:flex-start;
+  flex-shrink:0;
+}
+.cover-logo-slot.has-logo{display:flex}
+.cover-logo-slot img{
+  max-width:120px;
+  max-height:80px;
+  width:auto;
+  height:auto;
+  object-fit:contain;
+  display:block;
+}
+.cover-client-info .client-name{
+  font-family:'Lora',serif;
+  font-size:1.38rem;
+  font-weight:700;
+  color:var(--navy);
+  line-height:1.15;
+}
+.cover-client-info .client-sub{
+  font-size:.72rem;
+  font-weight:600;
+  color:var(--blue);
+  text-transform:uppercase;
+  letter-spacing:.06em;
+  margin-top:.15rem;
+}
+
+.cover-candidate-banner{
+  background:linear-gradient(135deg,#EFF6FF 0%,#F8FAFC 100%);
+  border:1px solid #BFDBFE;
+  border-left:5px solid var(--blue);
+  border-radius:10px;
+  padding:.8rem 1.1rem;
+}
+.cover-candidate-banner h1{
+  font-family:'Lora',serif;
+  font-size:1.55rem;
+  color:var(--navy);
+  margin-bottom:.2rem;
+  line-height:1.2;
+}
+.cover-candidate-banner .meta{
+  display:flex;
+  gap:1.2rem;
+  flex-wrap:wrap;
+  font-size:.75rem;
+  color:var(--muted);
+  font-weight:600;
+  text-transform:uppercase;
+  letter-spacing:.03em;
+}
+.cover-candidate-banner .meta b{
+  color:var(--navy);
+  text-transform:none;
+  letter-spacing:0;
+  font-weight:700;
+  margin-left:.25rem;
+}
+
+/* Pages 2–10 Header with 100×100px Top-Right Logo Slot */
+.sub-page-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:1rem;
+  border-bottom:2px solid var(--blue);
+  padding-bottom:.5rem;
+}
+.sub-head-left{flex:1}
+.sub-head-left .brand{
+  font-family:'Lora',serif;
+  font-weight:700;
+  color:var(--blue);
+  font-size:.75rem;
+  text-transform:uppercase;
+  letter-spacing:.05em;
+}
+.sub-head-left .sec-title{
+  font-family:'Lora',serif;
+  font-size:1.22rem;
+  font-weight:700;
+  color:var(--navy);
+  line-height:1.2;
+  margin-top:.1rem;
+}
+.sub-head-left .candidate-tag{
+  font-size:.72rem;
+  color:var(--muted);
+  font-weight:500;
+  margin-top:.1rem;
+}
+/* Reserved 100x100px top-right logo slot */
+.page-logo-slot{
+  width:100px;
+  height:100px;
+  flex-shrink:0;
+  display:none;
+  align-items:center;
+  justify-content:flex-end;
+  overflow:hidden;
+}
+.page-logo-slot.has-logo{display:flex}
+.page-logo-slot img{
+  max-width:100px;
+  max-height:100px;
+  width:auto;
+  height:auto;
+  object-fit:contain;
+  display:block;
+}
+
+/* Sections & Typography */
+.rsec{margin-bottom:.15rem}
+.rsec h2{font-family:'Lora',serif;font-size:1.04rem;color:var(--navy);margin:0 0 .35rem;border-left:4px solid var(--blue);padding-left:.6rem;line-height:1.25}
+.rsec p{color:#334155;margin-bottom:.35rem;font-size:.8rem;line-height:1.48;text-align:left}
+.rsec ul{list-style:none;margin:.25rem 0}
+.rsec ul li{position:relative;padding-left:1.15rem;margin-bottom:.3rem;font-size:.79rem;color:#334155;line-height:1.44;text-align:left}
+.rsec ul li::before{content:'➤';position:absolute;left:0;color:var(--blue);font-size:.65rem;top:2px}
+
+/* KPI & Stat Grids */
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+.stat-grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:.7rem}
+.stat-grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:.65rem}
+.stat-card{background:linear-gradient(135deg,#FDFBF6,#F4EFE3);border:1px solid var(--border);border-radius:9px;padding:.65rem .75rem;text-align:center}
+.stat-card .big{font-family:'Lora',serif;font-size:1.38rem;font-weight:700;color:var(--blue);line-height:1.15}
+.stat-card .lbl{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-top:.15rem}
+.stat-card .sub-lbl{font-size:.69rem;color:#475569;margin-top:.1rem;font-weight:500}
+
+/* Equal-Height 3-Step Cards */
+.method-flow{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:.75rem;
+  align-items:stretch;
+}
+.method-step{
+  background:#FDFBF6;
+  border:1px solid var(--border);
+  border-top:3.5px solid var(--blue);
+  border-radius:9px;
+  padding:.7rem .7rem;
+  text-align:center;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-start;
+  align-items:center;
+}
+.method-icon{
+  width:36px;
+  height:36px;
+  background:var(--soft);
+  border:2px solid var(--blue);
+  border-radius:50%;
+  margin:0 auto .35rem;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:.92rem;
+  font-weight:700;
+  color:var(--blue);
+  flex-shrink:0;
+}
+.method-title{font-weight:700;color:var(--navy);margin-bottom:.2rem;font-size:.82rem}
+.method-desc{font-size:.73rem;color:var(--muted);line-height:1.38}
+
+/* Progress Bars */
+.bar-item{margin-bottom:.42rem}
+.bar-label{display:flex;justify-content:space-between;align-items:center;font-size:.76rem;margin-bottom:.15rem;font-weight:600;color:#334155;gap:.5rem}
+.bar-track{height:7px;background:#EDE7DA;border-radius:4px;overflow:hidden}
+.bar-fill{height:100%;width:0;border-radius:4px}
+.f1{background:linear-gradient(90deg,#1D4ED8,#3B82F6)}
+.f2{background:linear-gradient(90deg,#BE123C,#F43F5E)}
+.f3{background:linear-gradient(90deg,#B45309,#F59E0B)}
+.f4{background:linear-gradient(90deg,#047857,#10B981)}
+
+/* Aligned Fixed-Layout Tables */
+table.data{width:100%;table-layout:fixed;border-collapse:collapse;margin:.25rem 0;font-size:.76rem}
+table.data th,table.data td{border:1px solid #E2D9C5;padding:.42rem .55rem;text-align:left;vertical-align:middle;line-height:1.35;word-wrap:break-word}
+table.data th{background:var(--navy);color:#fff;font-weight:600;text-transform:uppercase;letter-spacing:.03em;font-size:.67rem}
+table.data tr:nth-child(even){background:#FAF8F2}
+table.data td.cat{font-weight:600;color:var(--navy)}
+
+/* 6-Tier Engineering Potential Badges */
+.badge{display:inline-block;padding:.14rem .45rem;border-radius:999px;font-size:.6rem;font-weight:700;text-transform:uppercase;white-space:nowrap}
+.b-vhigh{background:rgba(16,185,129,.15);color:#047857;border:1px solid #047857}
+.b-high{background:rgba(37,99,235,.12);color:#1D4ED8;border:1px solid #1D4ED8}
+.b-above{background:rgba(14,165,233,.14);color:#0369A1;border:1px solid #0369A1}
+.b-avg{background:rgba(100,116,139,.14);color:#475569;border:1px solid #64748B}
+.b-below{background:rgba(245,158,11,.15);color:#B45309;border:1px solid #B45309}
+.b-vlow{background:rgba(225,29,72,.12);color:#BE123C;border:1px solid #BE123C}
+
+/* Charts & Static Print Snapshot Containers */
+.chart-panel{background:#FAF8F2;border:1px solid #EDE7DA;border-radius:9px;padding:.65rem .85rem}
+.panel-title{font-size:.72rem;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.03em;margin-bottom:.3rem}
+.radar-box{position:relative;height:215px;max-width:420px;margin:0 auto;display:flex;align-items:center;justify-content:center}
+.doughnut-box{position:relative;height:165px;max-width:240px;margin:0 auto;display:flex;align-items:center;justify-content:center}
+.bar-canvas-box{position:relative;height:145px;width:100%;margin:0 auto;display:flex;align-items:center;justify-content:center}
+.chart-static-img{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;display:none}
+.two-col-panel{display:grid;grid-template-columns:1fr 1fr;gap:.85rem;align-items:stretch}
+
+.insight-box{
+  background:#EFF6FF;
+  border:1px solid #BFDBFE;
+  border-left:4px solid var(--blue);
+  border-radius:9px;
+  padding:.6rem .85rem;
+  display:flex;
+  gap:.65rem;
+  align-items:flex-start;
+}
+.insight-icon{font-size:1.1rem;line-height:1;flex-shrink:0;margin-top:2px}
+.insight-content h4{color:var(--blue);font-size:.8rem;margin-bottom:.1rem;font-weight:700}
+.insight-content p{margin:0;font-size:.75rem;color:#334155;line-height:1.4}
+
+/* Page Footer */
+.page-footer{
+  margin-top:auto;
+  padding-top:.45rem;
+  border-top:1px solid #E2D9C5;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-size:.69rem;
+  color:#64748B;
+  font-weight:600;
+  flex-shrink:0;
+}
+
+@media (max-width:860px){
+  .report-page{width:100%;min-height:auto;padding:1rem}
+  .form-card{padding:1.5rem}
+  .q-card-big{padding:1.4rem}
+  .q-big{font-size:1.18rem}
+  .stat-grid,.stat-grid-3,.stat-grid-4,.method-flow,.two-col-panel{grid-template-columns:1fr}
+  .stage-pill{display:none}
+}
+
+/* ============ PRINT — A4 PERFECT, NO CLIPPING, NO BLANK OVERFLOW PAGES ============ */
+@page{size:A4 portrait;margin:9mm 10mm}
+@media print{
+  html,body{width:100%;background:#fff!important;color:#1E293B!important;line-height:1.38}
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  .bg-deco,.report-toolbar,.print-btn,#form-screen,#quiz-screen{display:none!important}
+  main{max-width:none!important;width:100%!important;padding:0!important;margin:0!important}
+  .report-card{margin:0!important;padding:0!important}
+
+  .report-page{
+    width:100%!important;
+    min-height:0!important;
+    height:auto!important;
+    margin:0!important;
+    padding:2mm 2mm!important;
+    border:none!important;
+    border-radius:0!important;
+    box-shadow:none!important;
+    page-break-after:always!important;
+    break-after:page!important;
+    overflow:visible!important;
+    display:flex!important;
+    flex-direction:column!important;
+    justify-content:space-between!important;
+  }
+  .report-page:last-child{
+    page-break-after:auto!important;
+    break-after:auto!important;
+  }
+
+  /* Swap live canvases for sharp static PNG images during print so charts never shift or vanish */
+  canvas.chart-canvas{display:none!important}
+  img.chart-static-img{display:block!important}
+
+  table{page-break-inside:auto!important;break-inside:auto!important}
+  tr,td,th,.stat-grid,.stat-grid-3,.stat-grid-4,.method-flow,.method-step,.insight-box,.chart-panel,.page-footer{
+    page-break-inside:avoid!important;
+    break-inside:avoid!important;
+  }
+  h1,h2,h3,h4{page-break-after:avoid!important;break-after:avoid!important}
+}
+</style>
+</head>
+<!-- Website Injection Attributes: Set data-client-name and data-logo-url on body, or window.CLIENT_LOGO_URL in JS -->
+<body data-client-name="" data-logo-url="">
+<svg width="0" height="0" style="position:absolute"><defs><linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#2563EB"/><stop offset="100%" stop-color="#10B981"/></linearGradient></defs></svg>
+<div class="bg-deco"><div class="b1"></div><div class="b2"></div><div class="b3"></div></div>
+
+<main>
+<!-- REGISTRATION SCREEN -->
+<section id="form-screen" class="screen active">
+ <div class="form-card glass">
+  <h1>Engineering Branch <em>Selector</em></h1><div class="accent-bar"></div>
+  <p class="sub">Match your work interests with real-life engineering work situations across 14 branch groups.</p>
+  <div class="chips">
+    <span class="chip">📝 56 Questions</span>
+    <span class="chip">⏱️ ~15 Minutes</span>
+    <span class="chip">🎓 14 Branch Groups</span>
+    <span class="chip">📊 10-Page Graphical Report</span>
+  </div>
+  <div class="info-box">
+    <h3>How to answer</h3>
+    <p>Rate how strongly you agree with each statement — from <strong>Strongly Disagree</strong> to <strong>Strongly Agree</strong>. Selecting an option automatically saves your response and advances to the next question.</p>
+  </div>
+  <div class="form-group"><label>Student Name</label><input type="text" id="s-name" placeholder="e.g. Aarav Sharma"></div>
+  <div class="form-group"><label>Email Address</label><input type="email" id="s-email" placeholder="you@example.com"></div>
+  <div class="form-group"><label>Mobile Number</label><input type="tel" id="s-phone" placeholder="e.g. 98765 43210"></div>
+  <div class="btn-row">
+    <button class="btn" onclick="startTest()">Start Assessment →</button>
+    <button type="button" class="sim-btn" onclick="simulateFullTest()">⚡ Quick-Fill & Test Report</button>
+  </div>
+ </div>
+</section>
+
+<!-- QUIZ SCREEN -->
+<section id="quiz-screen" class="screen">
+ <div class="quiz-wrap">
+  <div class="quiz-top">
+   <div class="ring-wrap">
+     <svg viewBox="0 0 120 120"><circle class="ring-bg" cx="60" cy="60" r="52"/><circle class="ring-fill" id="ring-fill" cx="60" cy="60" r="52"/></svg>
+     <div class="ring-num" id="ring-num">0%</div>
+   </div>
+   <div class="quiz-meta">
+     <div class="t">Engineering Aptitude Test</div>
+     <div class="p" id="prog-text">0 / 56 answered</div>
+   </div>
+   <div class="stage-pill" id="grade-pill"></div>
+  </div>
+
+  <!-- Prominent Top Completion Progress Bar & Dynamic Milestone Badges -->
+  <div class="progress-bar-header">
+    <div class="progress-label-row">
+      <span>Test Completion Progress</span>
+      <span id="top-pct-label">0% Completed</span>
+    </div>
+    <div class="progress-container">
+      <div id="test-progress-bar" class="test-progress-bar"></div>
+    </div>
+    <div id="badge-container" class="badge-container"></div>
+  </div>
+
+  <div id="quiz-body"></div>
+ </div>
+</section>
+
+<!-- REPORT SCREEN -->
+<section id="report-screen" class="screen">
+ <div class="report-toolbar">
+   <div>
+     <strong style="color:var(--navy);font-size:.95rem;">Engineering Branch Selector — 10-Page Graphical Report</strong>
+     <div style="font-size:.76rem;color:var(--muted);">A4 Calibrated · Zero Clipping · Print-Locked Charts</div>
+   </div>
+   <button class="print-btn" onclick="prepareAndPrint()">🖨️ Print / Save as PDF (A4)</button>
+ </div>
+ <div class="report-card" id="report-content"></div>
+</section>
+</main>
+
+<script>
+// ==================== WEBSITE BRANDING HOOKS ====================
+function resolveClientBranding() {
+  const params = new URLSearchParams(window.location.search);
+  const logoUrl = window.CLIENT_LOGO_URL || params.get('logo') || document.body.dataset.logoUrl || '';
+  const clientName = window.CLIENT_NAME || params.get('client') || document.body.dataset.clientName || '';
+  return { logoUrl: logoUrl.trim(), clientName: clientName.trim() };
+}
+
+// ==================== ANTI-COPY PROTECTION ====================
+document.addEventListener('contextmenu', event => {
+  if (document.getElementById('quiz-screen').classList.contains('active')) {
+    event.preventDefault();
+  }
+});
+document.addEventListener('keydown', event => {
+  if (document.getElementById('quiz-screen').classList.contains('active')) {
+    if ((event.ctrlKey || event.metaKey) && ['c','x','u','s','a'].includes(event.key.toLowerCase())) {
+      event.preventDefault();
+    }
+  }
+});
+document.addEventListener('copy', event => {
+  if (document.getElementById('quiz-screen').classList.contains('active')) {
+    event.preventDefault();
+  }
+});
+
+// ==================== ASSESSMENT DATA (UNCHANGED) ====================
+const BRANCHES={
+"Software Design":["Computer Science Engineering","Information Technology"],
+"Flying and Mechanics":["Aeronautical Engineering"],
+"Manufacturing Research & Practices":["Production Engineering","Manufacturing Engineering"],
+"Application of Electricity & Electronics":["Electrical Engineering","Electronics Engineering","Instrumentation Engineering","Optical Engineering","TeleCommunication Engineering"],
+"Application of Biology":["Biochemical Engineering","Biomedical Engineering","Biotechnology"],
+"Chemical Research":["Chemical Engineering","Nuclear Engineering"],
+"Chemicals Compounds Study":["Plastic Technology","Polymer Technology","Rubber Technology"],
+"Application of Bioprocess":["Leather Technology","Pulp and Paper Engineering","Textile Engineering"],
+"Natural Resources in Water":["Marine Engineering","Naval and Ocean Engineering","Petroleum and Oil Engineering"],
+"Of Surface and Substrates":["Ceramic Engineering","Paint Technology"],
+"Agro Based":["Agriculture Engineering","Food Technology"],
+"Construction and Structures":["Architecture Engineering","Civil Engineering"],
+"Machines & Tools":["Automation and Robotic Engineering","Automobile Engineering","Mechanical Engineering"],
+"Natural Resources on Earth":["Environmental Engineering","Material and Metallurgical Engineering","Mining Engineering"]
+};
+
+const QUESTIONS=[
+{t:"I enjoy writing code and developing software applications.",c:"Software Design"},
+{t:"I am fascinated by how computer networks and systems operate.",c:"Software Design"},
+{t:"Algorithms and data structures make sense to me.",c:"Software Design"},
+{t:"I would like to work in the IT industry building software.",c:"Software Design"},
+{t:"The mechanics of flight and aerodynamics fascinate me.",c:"Flying and Mechanics"},
+{t:"I want to understand how aircraft engines work.",c:"Flying and Mechanics"},
+{t:"Designing airplanes and spacecraft is my dream job.",c:"Flying and Mechanics"},
+{t:"I am interested in the structural design of flying vehicles.",c:"Flying and Mechanics"},
+{t:"I enjoy learning about manufacturing processes.",c:"Manufacturing Research & Practices"},
+{t:"Optimizing production lines sounds interesting to me.",c:"Manufacturing Research & Practices"},
+{t:"I would like to work in a factory setting managing production.",c:"Manufacturing Research & Practices"},
+{t:"Quality control and industrial engineering appeal to me.",c:"Manufacturing Research & Practices"},
+{t:"I am interested in electrical circuits and power systems.",c:"Application of Electricity & Electronics"},
+{t:"Working with electronic devices and microchips sounds exciting.",c:"Application of Electricity & Electronics"},
+{t:"Telecommunications and signal processing interest me.",c:"Application of Electricity & Electronics"},
+{t:"I would like to design optical instruments or sensors.",c:"Application of Electricity & Electronics"},
+{t:"Using engineering to solve biological problems interests me.",c:"Application of Biology"},
+{t:"I am fascinated by biomedical equipment in hospitals.",c:"Application of Biology"},
+{t:"Developing biotechnological products sounds appealing.",c:"Application of Biology"},
+{t:"I would like to work at the intersection of biology and engineering.",c:"Application of Biology"},
+{t:"I enjoy chemistry and chemical reactions.",c:"Chemical Research"},
+{t:"Working in a chemical plant sounds like a good career.",c:"Chemical Research"},
+{t:"Nuclear energy and atomic structures fascinate me.",c:"Chemical Research"},
+{t:"I would like to research new chemical compounds.",c:"Chemical Research"},
+{t:"I am interested in the properties of plastics and polymers.",c:"Chemicals Compounds Study"},
+{t:"Rubber technology and material science appeal to me.",c:"Chemicals Compounds Study"},
+{t:"I would like to develop new synthetic materials.",c:"Chemicals Compounds Study"},
+{t:"Working with industrial chemicals sounds interesting.",c:"Chemicals Compounds Study"},
+{t:"I am interested in the leather processing industry.",c:"Application of Bioprocess"},
+{t:"Pulp and paper engineering sounds like a viable career.",c:"Application of Bioprocess"},
+{t:"Textile manufacturing and processing interest me.",c:"Application of Bioprocess"},
+{t:"I would like to work in bioprocess engineering.",c:"Application of Bioprocess"},
+{t:"Ships and marine engineering fascinate me.",c:"Natural Resources in Water"},
+{t:"I would like to design naval and ocean structures.",c:"Natural Resources in Water"},
+{t:"Oil and petroleum extraction engineering sounds exciting.",c:"Natural Resources in Water"},
+{t:"Working on offshore rigs appeals to me.",c:"Natural Resources in Water"},
+{t:"I am interested in ceramic engineering and materials.",c:"Of Surface and Substrates"},
+{t:"Paint technology and surface coatings interest me.",c:"Of Surface and Substrates"},
+{t:"Working with substrates and industrial coatings sounds good.",c:"Of Surface and Substrates"},
+{t:"I would like to research surface materials.",c:"Of Surface and Substrates"},
+{t:"Agricultural engineering and farming tech appeal to me.",c:"Agro Based"},
+{t:"Food processing and food technology sound interesting.",c:"Agro Based"},
+{t:"I would like to develop equipment for farmers.",c:"Agro Based"},
+{t:"Working in the agro-industrial sector is my goal.",c:"Agro Based"},
+{t:"I want to build bridges and large structures.",c:"Construction and Structures"},
+{t:"Architecture and building design fascinate me.",c:"Construction and Structures"},
+{t:"Civil engineering projects like highways excite me.",c:"Construction and Structures"},
+{t:"I would like to work in the construction industry.",c:"Construction and Structures"},
+{t:"I enjoy working with machines and mechanical tools.",c:"Machines & Tools"},
+{t:"Automobile engineering and car design appeal to me.",c:"Machines & Tools"},
+{t:"Robotics and automation are fields I want to enter.",c:"Machines & Tools"},
+{t:"I would like to design mechanical systems and engines.",c:"Machines & Tools"},
+{t:"Environmental engineering and sustainability interest me.",c:"Natural Resources on Earth"},
+{t:"Mining engineering and earth resource extraction sound exciting.",c:"Natural Resources on Earth"},
+{t:"Metallurgical engineering and studying metals appeal to me.",c:"Natural Resources on Earth"},
+{t:"I would like to work in material science engineering.",c:"Natural Resources on Earth"}
+];
+
+const LIKERT=['Strongly Disagree','Disagree','Neutral','Agree','Strongly Agree'];
+const LVCLS={'Very High':'b-vhigh','High':'b-high','Above Average':'b-above','Average':'b-avg','Below Average':'b-below','Very Low':'b-vlow'};
+
+// Engineering Macro Sector Grouping for Analytics (Derived from the 14 existing groups)
+const SECTORS = {
+  "Digital, Electrical & Aero": ["Software Design","Application of Electricity & Electronics","Flying and Mechanics"],
+  "Mechanical, Civil & Production": ["Machines & Tools","Construction and Structures","Manufacturing Research & Practices"],
+  "Chemical, Material & Process": ["Chemical Research","Chemicals Compounds Study","Of Surface and Substrates","Application of Bioprocess"],
+  "Bio, Agro & Earth/Marine": ["Application of Biology","Agro Based","Natural Resources in Water","Natural Resources on Earth"]
+};
+
+// ==================== SEAMLESS AUTO-PROGRESSION ENGINE ====================
+let Q=[],A=[],STU={},qi=0,busy=false,chartRefs=[];
+const CIRC=2*Math.PI*52,$=i=>document.getElementById(i);
+
+function startTest(){
+  const n=$('s-name').value.trim(),e=$('s-email').value.trim(),p=$('s-phone').value.trim();
+  if(!n)return alert('Please enter your Name');
+  if(!e)return alert('Please enter your Email');
+  if(!p)return alert('Please enter your Mobile Number');
+
+  const brand = resolveClientBranding();
+  STU={name:n,email:e,phone:p,clientName:brand.clientName,logoUrl:brand.logoUrl};
+  Q=QUESTIONS;
+  A=new Array(Q.length).fill(null);
+  qi=0;
+  busy=false;
+  $('grade-pill').textContent=STU.name;
+  $('form-screen').classList.remove('active');
+  $('quiz-screen').classList.add('active');
+  renderQ();
+  window.scrollTo(0,0);
+}
+
+// One-Click Diagnostic Simulation so you can inspect the 10-page report immediately
+function simulateFullTest() {
+  const n = $('s-name').value.trim() || 'Aarav Sharma';
+  const e = $('s-email').value.trim() || 'aarav.sharma@example.com';
+  const p = $('s-phone').value.trim() || '98765 43210';
+  const brand = resolveClientBranding();
+  STU = { name: n, email: e, phone: p, clientName: brand.clientName, logoUrl: brand.logoUrl };
+  Q = QUESTIONS;
+  const pattern = [5,5,5,4, 4,5,4,4, 3,4,3,4, 5,4,5,4, 3,3,2,3, 2,3,2,2, 2,2,3,2, 2,1,2,2, 3,3,2,3, 2,2,2,1, 3,3,3,2, 4,4,4,3, 5,4,5,4, 3,3,4,3];
+  A = Q.map((_, idx) => pattern[idx % pattern.length]);
+  qi = Q.length;
+  $('form-screen').classList.remove('active');
+  finish();
+}
+
+function updateProgressAndBadges() {
+  const answeredCount = A.filter(a => a !== null).length;
+  const percentage = Q.length ? Math.round((answeredCount / Q.length) * 100) : 0;
+
+  const progressBar = $('test-progress-bar');
+  if (progressBar) progressBar.style.width = `${percentage}%`;
+  const topPctLabel = $('top-pct-label');
+  if (topPctLabel) topPctLabel.textContent = `${percentage}% Completed (${answeredCount}/${Q.length})`;
+
+  const badgeContainer = $('badge-container');
+  if (badgeContainer) {
+    let badgesHTML = '';
+    if (percentage >= 25) badgesHTML += `<span class="ach-badge" style="background:#D1FAE5;color:#065F46;border-color:#A7F3D0;">🥉 Quarter Completed (25%)</span>`;
+    if (percentage >= 50) badgesHTML += `<span class="ach-badge" style="background:#FEF3C7;color:#92400E;border-color:#FDE68A;">🥈 Half Completed (50%)</span>`;
+    if (percentage >= 75) badgesHTML += `<span class="ach-badge" style="background:#E0E7FF;color:#3730A3;border-color:#C7D2FE;">🥇 Three-Quarter Completed (75%)</span>`;
+    if (percentage === 100) badgesHTML += `<span class="ach-badge" style="background:#DCFCE7;color:#166534;border-color:#86EFAC;">🏆 Test Completed (100%)</span>`;
+    badgeContainer.innerHTML = badgesHTML;
+  }
+}
+
+function renderQ(){
+  ring();
+  updateProgressAndBadges();
+
+  const b=$('quiz-body');
+  if(qi>=Q.length){
+    b.innerHTML=`<div class="done-card glass">
+      <div class="done-emoji">🏆</div>
+      <h2>Assessment Complete, ${STU.name}!</h2>
+      <p>All ${Q.length} responses have been saved. Generating your 10-page graphical report...</p>
+      <button class="btn" style="margin-top:16px;" onclick="finish()">View Complete 10-Page Report →</button>
+    </div>`;
+    setTimeout(() => { if ($('quiz-screen').classList.contains('active')) finish(); }, 400);
+    return;
+  }
+
+  const q=Q[qi];
+  let o='';
+  LIKERT.forEach((l,i)=>{
+    o+=`<button type="button" class="opt-row${A[qi]===i+1?' selected':''}" onclick="pick(${i})"><span class="opt-badge">${i+1}</span><span>${l}</span></button>`;
+  });
+
+  b.innerHTML=`<div class="q-card-big glass">
+    <div class="q-meta"><span class="q-sec">Rate Yourself</span><span class="q-count">Question ${qi+1} of ${Q.length}</span></div>
+    <div class="q-big">${q.t}</div>
+    <div class="opts-list">${o}</div>
+    <div class="kbd-hint">💡 Selecting an option automatically saves and advances · Press keys <b>1–5</b> or <b>← Back</b></div>
+    <div class="quiz-nav">
+      <button type="button" class="ghost-btn" id="back-btn" style="${qi===0?'visibility:hidden':'visibility:visible'}" onclick="back()">← Previous Question</button>
+      <span style="font-size:.76rem;color:var(--muted);font-weight:600;">${A[qi]!==null?'✓ Response Saved':'Select an option to proceed'}</span>
+    </div>
+  </div>`;
+}
+
+function pick(i){
+  if(busy || qi>=Q.length) return;
+  if(i < 0 || i >= LIKERT.length) return;
+  busy = true;
+  A[qi] = i + 1;
+  document.querySelectorAll('#quiz-body .opt-row').forEach((r,x)=>r.classList.toggle('selected',x===i));
+  ring();
+  updateProgressAndBadges();
+
+  setTimeout(()=>{
+    busy = false;
+    if (A[qi] !== null) {
+      qi++;
+      renderQ();
+    }
+  }, 320);
+}
+
+function back(){
+  if(busy || qi===0) return;
+  qi--;
+  renderQ();
+}
+
+function ring(){
+  const d=A.filter(a=>a!==null).length, p=Q.length?d/Q.length:0;
+  $('ring-fill').style.strokeDashoffset=(CIRC*(1-p)).toFixed(1);
+  $('ring-num').textContent=Math.round(p*100)+'%';
+  $('prog-text').textContent=d+' / '+Q.length+' answered';
+}
+
+document.addEventListener('keydown',e=>{
+  if(!$('quiz-screen').classList.contains('active')) return;
+  if(e.key>='1' && e.key<='5' && qi<Q.length) pick(+e.key-1);
+  else if(e.key==='ArrowLeft' || e.key==='Backspace'){ e.preventDefault(); back(); }
+});
+
+// ==================== BRANDED HEADER & FOOTER HELPERS ====================
+function renderCoverHeader() {
+  const hasLogo = Boolean(STU.logoUrl);
+  const logoHtml = hasLogo ? `<img src="${STU.logoUrl}" alt="Client Logo">` : '';
+  const titleText = STU.clientName || 'Engineering Branch Selector';
+  return `
+    <div class="cover-brand-bar">
+      <div class="cover-brand-left">
+        <div class="cover-logo-slot ${hasLogo ? 'has-logo' : ''}">${logoHtml}</div>
+        <div class="cover-client-info">
+          <div class="client-name">${titleText}</div>
+          <div class="client-sub">Psychometric Engineering Aptitude & Branch Selection Report</div>
+        </div>
+      </div>
+      <div style="text-align:right;font-size:.72rem;color:var(--muted);font-weight:600;">
+        <div>REPORT ID: EBS-${new Date().getFullYear()}-${String(Q.length).padStart(3,'0')}</div>
+        <div style="color:var(--blue);margin-top:2px;">VALIDATED ASSESSMENT</div>
+      </div>
+    </div>`;
+}
+
+function renderSubHeader(sectionTitle) {
+  const hasLogo = Boolean(STU.logoUrl);
+  const logoHtml = hasLogo ? `<img src="${STU.logoUrl}" alt="Client Logo">` : '';
+  const brandLabel = STU.clientName ? `${STU.clientName} · Engineering Branch Selector` : `Engineering Branch Selector`;
+  return `
+    <div class="sub-page-head">
+      <div class="sub-head-left">
+        <div class="brand">${brandLabel}</div>
+        <div class="sec-title">${sectionTitle}</div>
+        <div class="candidate-tag">Candidate: <strong>${STU.name}</strong> · Phone: <strong>${STU.phone}</strong></div>
+      </div>
+      <div class="page-logo-slot ${hasLogo ? 'has-logo' : ''}">${logoHtml}</div>
+    </div>`;
+}
+
+function renderFooter(pageNum, totalPages) {
+  const brandText = STU.clientName ? `${STU.clientName} · Engineering Branch Selector` : `Engineering Branch Selector Report`;
+  return `
+    <div class="page-footer">
+      <span>${brandText} · Candidate: ${STU.name}</span>
+      <span>Page ${pageNum} of ${totalPages}</span>
+    </div>`;
+}
+
+// ==================== PRINT-SAFE CHART ENGINE ====================
+function destroyCharts() {
+  chartRefs.forEach(c => { if (c) c.destroy(); });
+  chartRefs = [];
+}
+
+function snapshotChartsForPrint() {
+  const pairs = [
+    ['top5Chart', 'top5ChartImg'],
+    ['tierBarChart', 'tierBarChartImg'],
+    ['sectorChart', 'sectorChartImg'],
+    ['coreBreakChart', 'coreBreakChartImg'],
+    ['radarC', 'radarCImg'],
+    ['specBreakChart', 'specBreakChartImg']
+  ];
+  pairs.forEach(([canvasId, imgId]) => {
+    const canvas = $(canvasId);
+    const img = $(imgId);
+    if (canvas && img) {
+      try {
+        img.src = canvas.toDataURL('image/png', 1.0);
+      } catch (e) {}
+    }
+  });
+}
+
+function prepareAndPrint() {
+  snapshotChartsForPrint();
+  setTimeout(() => { window.print(); }, 120);
+}
+
+window.addEventListener('beforeprint', snapshotChartsForPrint);
+
+function renderAllCharts(sorted, sectorScores, tierCounts) {
+  if (typeof Chart === 'undefined') return;
+  destroyCharts();
+  Chart.defaults.devicePixelRatio = 2;
+
+  const top8 = sorted.slice(0, 8);
+  const top5 = sorted.slice(0, 5);
+  const bottom7 = sorted.slice(7, 14);
+
+  // 1. Page 1: Top 5 Engineering Groups Horizontal Bar Chart
+  const cTop5 = $('top5Chart');
+  if (cTop5) {
+    chartRefs.push(new Chart(cTop5, {
+      type: 'bar',
+      data: {
+        labels: top5.map(([c]) => c.length > 22 ? c.slice(0,20)+'…' : c),
+        datasets: [{
+          label: 'Potential %',
+          data: top5.map(([,s]) => Math.round(s/20*100)),
+          backgroundColor: ['#2563EB','#0EA5E9','#10B981','#6366F1','#F59E0B'],
+          borderRadius: 5,
+          barThickness: 16
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: false,
+        scales: {
+          x: { beginAtZero: true, max: 100, ticks: { stepSize: 25, font: { size: 9 } } },
+          y: { ticks: { font: { family: 'Poppins', weight: '600', size: 9.5 }, color: '#0F172A' }, grid: { display: false } }
+        },
+        plugins: { legend: { display: false } }
+      }
+    }));
+  }
+
+  // 2. Page 2: 6-Tier Potential Distribution Bar Chart
+  const cTier = $('tierBarChart');
+  if (cTier) {
+    chartRefs.push(new Chart(cTier, {
+      type: 'bar',
+      data: {
+        labels: ['Very High', 'High', 'Above Avg', 'Average', 'Below Avg', 'Very Low'],
+        datasets: [{
+          data: [
+            tierCounts['Very High'],
+            tierCounts['High'],
+            tierCounts['Above Average'],
+            tierCounts['Average'],
+            tierCounts['Below Average'],
+            tierCounts['Very Low']
+          ],
+          backgroundColor: ['#047857', '#1D4ED8', '#0284C7', '#64748B', '#F59E0B', '#E11D48'],
+          borderRadius: 5,
+          barThickness: 22
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: false,
+        scales: {
+          y: { beginAtZero: true, max: 8, ticks: { stepSize: 2, font: { size: 9.5, weight: '600' } } },
+          x: { ticks: { font: { family: 'Poppins', weight: '600', size: 8.5 }, color: '#0F172A' }, grid: { display: false } }
+        },
+        plugins: { legend: { display: false } }
+      }
+    }));
+  }
+
+  // 3. Page 3: Engineering Macro Sector Doughnut Chart
+  const cSec = $('sectorChart');
+  if (cSec) {
+    chartRefs.push(new Chart(cSec, {
+      type: 'doughnut',
+      data: {
+        labels: sectorScores.map(s => `${s.name.split(',')[0]} (${s.pct}%)`),
+        datasets: [{
+          data: sectorScores.map(s => s.pct),
+          backgroundColor: ['#2563EB', '#10B981', '#F59E0B', '#6366F1'],
+          borderWidth: 2,
+          borderColor: '#fff'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: false,
+        cutout: '56%',
+        plugins: { legend: { position: 'bottom', labels: { padding: 6, font: { family: 'Poppins', weight: '600', size: 9 } } } }
+      }
+    }));
+  }
+
+  // 4. Page 3: Top 7 Groups Bar Chart
+  const cCore = $('coreBreakChart');
+  if (cCore) {
+    chartRefs.push(new Chart(cCore, {
+      type: 'bar',
+      data: {
+        labels: sorted.slice(0,7).map(([c]) => c.length > 20 ? c.slice(0,18)+'…' : c),
+        datasets: [{
+          data: sorted.slice(0,7).map(([,s]) => Math.round(s/20*100)),
+          backgroundColor: '#2563EB',
+          borderRadius: 4,
+          barThickness: 12
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: false,
+        scales: {
+          x: { beginAtZero: true, max: 100, ticks: { stepSize: 25, font: { size: 9 } } },
+          y: { ticks: { font: { family: 'Poppins', weight: '600', size: 9 }, color: '#0F172A' }, grid: { display: false } }
+        },
+        plugins: { legend: { display: false } }
+      }
+    }));
+  }
+
+  // 5. Page 4: Top 8 Radar Chart
+  const cRad = $('radarC');
+  if (cRad) {
+    chartRefs.push(new Chart(cRad, {
+      type: 'radar',
+      data: {
+        labels: top8.map(([c]) => c.length > 22 ? c.slice(0,20)+'…' : c),
+        datasets: [{
+          data: top8.map(([,s]) => Math.round(s/20*100)),
+          fill: true,
+          backgroundColor: 'rgba(37,99,235,.22)',
+          borderColor: '#1D4ED8',
+          borderWidth: 2,
+          pointBackgroundColor: '#1D4ED8',
+          pointRadius: 3.5
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: false,
+        scales: {
+          r: {
+            min: 0, max: 100,
+            ticks: { stepSize: 25, backdropColor: 'transparent', color: '#475569', font: { size: 8.5, weight: '600' } },
+            grid: { color: '#CBD5E1' },
+            angleLines: { color: '#CBD5E1' },
+            pointLabels: { color: '#0F172A', font: { family: 'Poppins', weight: '600', size: 9.5 } }
+          }
+        },
+        plugins: { legend: { display: false } }
+      }
+    }));
+  }
+
+  // 6. Page 6: Remaining 7 Groups Bar Chart
+  const cSpec = $('specBreakChart');
+  if (cSpec) {
+    chartRefs.push(new Chart(cSpec, {
+      type: 'bar',
+      data: {
+        labels: bottom7.map(([c]) => c.length > 22 ? c.slice(0,20)+'…' : c),
+        datasets: [{
+          data: bottom7.map(([,s]) => Math.round(s/20*100)),
+          backgroundColor: '#10B981',
+          borderRadius: 4,
+          barThickness: 12
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: false,
+        scales: {
+          x: { beginAtZero: true, max: 100, ticks: { stepSize: 25, font: { size: 9 } } },
+          y: { ticks: { font: { family: 'Poppins', weight: '600', size: 9 }, color: '#0F172A' }, grid: { display: false } }
+        },
+        plugins: { legend: { display: false } }
+      }
+    }));
+  }
+
+  setTimeout(snapshotChartsForPrint, 100);
+}
+
+// ==================== COMPLETE 10-PAGE REPORT GENERATOR ====================
+function finish(){
+  const sc={}; Object.keys(BRANCHES).forEach(c=>sc[c]=0);
+  Q.forEach((q,i)=>{ if(A[i]) sc[q.c]+=A[i]; });
+  const sorted=Object.entries(sc).sort((a,b)=>b[1]-a[1]);
+  const lvOf=s=>{const p=s/20;return p>=.8?'Very High':p>=.65?'High':p>=.5?'Above Average':p>=.35?'Average':p>=.2?'Below Average':'Very Low';};
+
+  const tierCounts = {'Very High':0,'High':0,'Above Average':0,'Average':0,'Below Average':0,'Very Low':0};
+  sorted.forEach(([,s]) => { tierCounts[lvOf(s)]++; });
+
+  const sectorScores = Object.entries(SECTORS).map(([name, groups]) => {
+    const raw = groups.reduce((acc, g) => acc + (sc[g] || 0), 0);
+    const max = groups.length * 20;
+    const pct = Math.round((raw / max) * 100);
+    return { name, raw, max, pct, groups };
+  }).sort((a,b) => b.pct - a.pct);
+
+  const top8 = sorted.slice(0,8);
+  const top3 = sorted.slice(0,3);
+  const totalRawScore = Object.values(sc).reduce((a,b)=>a+b,0);
+  const avgGroupPct = Math.round((totalRawScore / (14 * 20)) * 100);
+  const topGroupPct = Math.round(top3[0][1] / 20 * 100);
+  const strongCount = tierCounts['Very High'] + tierCounts['High'] + tierCounts['Above Average'];
+
+  const barsAll14 = sorted.map(([c,s],i)=>{
+    const p=Math.round(s/20*100), l=lvOf(s);
+    return `<div class="bar-item" style="margin-bottom:.38rem;">
+      <div class="bar-label" style="font-size:.75rem;">
+        <span>${i+1}. ${c} <small style="color:var(--muted);font-weight:500;">(${s}/20 pts)</small></span>
+        <span><strong>${p}%</strong> <span class="badge ${LVCLS[l]}">${l}</span></span>
+      </div>
+      <div class="bar-track" style="height:6.5px;"><div class="bar-fill f${i%4+1}" style="width:${p}%"></div></div>
+    </div>`;
+  }).join('');
+
+  const makeGroupTableRows = (list, startRank) => list.map(([c,s], idx) => {
+    const p = Math.round(s/20*100);
+    const l = lvOf(s);
+    const rankIdx = startRank + idx;
+    const barColor = (l==='Very High'||l==='High') ? '#10B981' : (l==='Above Average'||l==='Average') ? '#2563EB' : '#F59E0B';
+    return `<tr>
+      <td class="cat" style="width:25%;">
+        <div>${c}</div>
+        <div style="font-size:.66rem;color:var(--muted);font-weight:500;margin-top:1px;">Rank #${rankIdx} of 14</div>
+      </td>
+      <td style="width:12%;font-weight:700;color:var(--navy);">${s} / 20</td>
+      <td style="width:20%;">
+        <div style="display:flex;align-items:center;gap:6px;">
+          <div style="flex:1;height:7px;background:#EDE7DA;border-radius:4px;overflow:hidden;">
+            <div style="width:${p}%;height:100%;background:${barColor};"></div>
+          </div>
+          <span style="font-size:0.72rem;font-weight:700;min-width:32px;">${p}%</span>
+        </div>
+      </td>
+      <td style="width:15%;text-align:center;"><span class="badge ${LVCLS[l]}">${l}</span></td>
+      <td style="width:28%;">${BRANCHES[c].join(', ')}</td>
+    </tr>`;
+  }).join('');
+
+  const chunk1 = makeGroupTableRows(sorted.slice(0,4), 1);
+  const chunk2 = makeGroupTableRows(sorted.slice(4,8), 5);
+  const chunk3 = makeGroupTableRows(sorted.slice(8,11), 9);
+  const chunk4 = makeGroupTableRows(sorted.slice(11,14), 12);
+
+  const date = new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+  const TOTAL_PAGES = 10;
+
+  const html = `
+  <!-- ==================== PAGE 1: COVER & EXECUTIVE SUMMARY ==================== -->
+  <div class="report-page">
+    <div class="page-body">
+      ${renderCoverHeader()}
+      <div class="cover-candidate-banner">
+        <h1>${STU.name}</h1>
+        <div class="meta">
+          <span>Date:<b>${date}</b></span>
+          <span>Phone:<b>${STU.phone}</b></span>
+          <span>Email:<b>${STU.email}</b></span>
+          <span>Questions:<b>${Q.length} of ${Q.length} Completed</b></span>
+        </div>
+      </div>
+
+      <div class="rsec">
+        <h2>Executive Engineering Aptitude Summary</h2>
+        <p>This psychometric report evaluates <strong>${STU.name}</strong>'s responses across 56 engineering work-situation statements, matching innate technical interests across <strong>14 specialized Engineering Branch Groups</strong> and 34 specific undergraduate engineering disciplines.</p>
+      </div>
+
+      <div class="stat-grid-4">
+        <div class="stat-card">
+          <div class="big">${topGroupPct}%</div>
+          <div class="lbl">#1 Branch Affinity</div>
+          <div class="sub-lbl">${top3[0][0]}</div>
+        </div>
+        <div class="stat-card">
+          <div class="big">${sectorScores[0].pct}%</div>
+          <div class="lbl">Lead Engineering Sector</div>
+          <div class="sub-lbl">${sectorScores[0].name.split(',')[0]}</div>
+        </div>
+        <div class="stat-card">
+          <div class="big">${avgGroupPct}%</div>
+          <div class="lbl">Overall Aptitude Index</div>
+          <div class="sub-lbl">${totalRawScore} / 280 Total Pts</div>
+        </div>
+        <div class="stat-card">
+          <div class="big">${strongCount} / 14</div>
+          <div class="lbl">Recommended Groups</div>
+          <div class="sub-lbl">Above Average to Very High</div>
+        </div>
+      </div>
+
+      <div class="two-col-panel">
+        <div class="chart-panel">
+          <div class="panel-title">Top 5 Engineering Groups Snapshot</div>
+          <div class="bar-canvas-box">
+            <canvas id="top5Chart" class="chart-canvas"></canvas>
+            <img id="top5ChartImg" class="chart-static-img" alt="Top 5 Chart">
+          </div>
+        </div>
+        <div class="chart-panel">
+          <div class="panel-title">Top 3 Recommended Engineering Groups</div>
+          <table class="data" style="margin:0;">
+            <thead><tr><th style="width:18%">Rank</th><th style="width:50%">Engineering Group</th><th style="width:32%">Score</th></tr></thead>
+            <tbody>
+              ${top3.map(([c,s],idx)=>`
+                <tr>
+                  <td><span class="badge ${LVCLS[lvOf(s)]}">#${idx+1}</span></td>
+                  <td class="cat">${c}</td>
+                  <td><strong>${Math.round(s/20*100)}%</strong> (${s}/20)</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="insight-box">
+        <div class="insight-icon">⚙️</div>
+        <div class="insight-content">
+          <h4>Primary Engineering Recommendation for ${STU.name}</h4>
+          <p>Your profile shows peak technical consonance with <strong>${top3.map(x=>x[0]).join(', ')}</strong>, corresponding to B.Tech/B.E. specializations in <strong>${top3.map(x=>BRANCHES[x[0]].join(', ')).join(' · ')}</strong>.</p>
+        </div>
+      </div>
+    </div>
+    ${renderFooter(1, TOTAL_PAGES)}
+  </div>
+
+  <!-- ==================== PAGE 2: WHAT THIS REPORT GIVES YOU & METHODOLOGY ==================== -->
+  <div class="report-page">
+    <div class="page-body">
+      ${renderSubHeader('What This Report Gives You & Evaluation Methodology')}
+
+      <div class="rsec">
+        <h2>What This Report Gives You</h2>
+        <div class="chart-panel">
+          <ul>
+            <li>Brief knowledge about all the major Engineering Branches, and an answer to which Branch you can opt for.</li>
+            <li>A match between your work interests and specific real-life work situations across 14 engineering groups.</li>
+            <li>Results in the form of a radar chart, a potential graph and detailed interpretation tables.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="rsec">
+        <h2>Psychometric Evaluation Architecture</h2>
+        <div class="method-flow">
+          <div class="method-step">
+            <div class="method-icon">1</div>
+            <div class="method-title">56 Work-Situation Items</div>
+            <div class="method-desc">4 targeted statements per engineering group rated on a 5-point Likert scale (maximum 20 points per group).</div>
+          </div>
+          <div class="method-step">
+            <div class="method-icon">2</div>
+            <div class="method-title">14 Branch Families</div>
+            <div class="method-desc">Maps your scores across 14 core engineering clusters spanning 34 undergraduate B.E./B.Tech disciplines.</div>
+          </div>
+          <div class="method-step">
+            <div class="method-icon">3</div>
+            <div class="method-title">6-Level Calibration</div>
+            <div class="method-desc">Categorizes each group into Very High, High, Above Average, Average, Below Average, or Very Low potential.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="two-col-panel">
+        <div class="chart-panel">
+          <div class="panel-title">Distribution Across 6 Potential Levels</div>
+          <div class="bar-canvas-box">
+            <canvas id="tierBarChart" class="chart-canvas"></canvas>
+            <img id="tierBarChartImg" class="chart-static-img" alt="Potential Distribution Chart">
+          </div>
+        </div>
+        <div class="chart-panel">
+          <div class="panel-title">Potential Tier Breakdown</div>
+          <table class="data" style="margin:0;">
+            <thead><tr><th style="width:38%">Potential Level</th><th style="width:22%">Groups</th><th style="width:40%">Selection Guidance</th></tr></thead>
+            <tbody>
+              <tr><td><span class="badge b-vhigh">Very High</span> / <span class="badge b-high">High</span></td><td><strong>${tierCounts['Very High']+tierCounts['High']} Groups</strong></td><td>Top B.Tech/B.E. Choices</td></tr>
+              <tr><td><span class="badge b-above">Above Avg</span> / <span class="badge b-avg">Average</span></td><td><strong>${tierCounts['Above Average']+tierCounts['Average']} Groups</strong></td><td>Viable with Dedicated Study</td></tr>
+              <tr><td><span class="badge b-below">Below Avg</span> / <span class="badge b-vlow">Very Low</span></td><td><strong>${tierCounts['Below Average']+tierCounts['Very Low']} Groups</strong></td><td>Not Recommended</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    ${renderFooter(2, TOTAL_PAGES)}
+  </div>
+
+  <!-- ==================== PAGE 3: MACRO ENGINEERING SECTOR ALIGNMENT ==================== -->
+  <div class="report-page">
+    <div class="page-body">
+      ${renderSubHeader('Macro Engineering Sector Alignment')}
+
+      <div class="rsec">
+        <h2>Four-Pillar Engineering Sector Analysis</h2>
+        <p>To help you understand how your 14 branch groups relate to broader industrial ecosystems, your scores are aggregated below across four macro engineering sectors.</p>
+      </div>
+
+      <div class="stat-grid-4">
+        ${sectorScores.map(s => `
+          <div class="stat-card">
+            <div class="big">${s.pct}%</div>
+            <div class="lbl">${s.name.split(',')[0]}</div>
+            <div class="sub-lbl">${s.raw} / ${s.max} Pts</div>
+          </div>
+        `).join('')}
+      </div>
+
+      <div class="two-col-panel">
+        <div class="chart-panel" style="text-align:center;">
+          <div class="panel-title">Macro Sector Affinity Share</div>
+          <div class="doughnut-box">
+            <canvas id="sectorChart" class="chart-canvas"></canvas>
+            <img id="sectorChartImg" class="chart-static-img" alt="Sector Doughnut Chart">
+          </div>
+        </div>
+        <div class="chart-panel">
+          <div class="panel-title">Top 7 Engineering Groups Comparison</div>
+          <div class="bar-canvas-box" style="height:165px;">
+            <canvas id="coreBreakChart" class="chart-canvas"></canvas>
+            <img id="coreBreakChartImg" class="chart-static-img" alt="Top 7 Groups Chart">
+          </div>
+        </div>
+      </div>
+
+      <div class="insight-box">
+        <div class="insight-icon">🧭</div>
+        <div class="insight-content">
+          <h4>Sector Verdict for ${STU.name}</h4>
+          <p>Your strongest macro cluster is <strong>${sectorScores[0].name} (${sectorScores[0].pct}%)</strong>, followed by <strong>${sectorScores[1].name} (${sectorScores[1].pct}%)</strong>. Interdisciplinary fields bridging these two sectors offer strong career alignment.</p>
+        </div>
+      </div>
+    </div>
+    ${renderFooter(3, TOTAL_PAGES)}
+  </div>
+
+  <!-- ==================== PAGE 4: RADAR CHART — TOP 8 GROUPS ==================== -->
+  <div class="report-page">
+    <div class="page-body">
+      ${renderSubHeader('Engineering Interest Profile — Top 8 Groups')}
+
+      <div class="rsec">
+        <h2>Engineering Interest Profile — Top 8 Groups</h2>
+        <p><strong>${STU.name}</strong>, locate your strongest groups on the radar — the larger the area, the stronger your pull towards that branch family.</p>
+      </div>
+
+      <div class="chart-panel">
+        <div class="radar-box">
+          <canvas id="radarC" class="chart-canvas"></canvas>
+          <img id="radarCImg" class="chart-static-img" alt="Radar Chart">
+        </div>
+      </div>
+
+      <table class="data">
+        <thead><tr><th style="width:28%">Radar Vertex</th><th style="width:13%">Score</th><th style="width:13%">Potential %</th><th style="width:16%">Level</th><th style="width:30%">Core Branches</th></tr></thead>
+        <tbody>
+          ${top8.slice(0,6).map(([c,s],i)=>`
+            <tr>
+              <td class="cat">${i+1}. ${c}</td>
+              <td>${s} / 20</td>
+              <td><strong>${Math.round(s/20*100)}%</strong></td>
+              <td><span class="badge ${LVCLS[lvOf(s)]}">${lvOf(s)}</span></td>
+              <td>${BRANCHES[c].slice(0,2).join(', ')}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+    ${renderFooter(4, TOTAL_PAGES)}
+  </div>
+
+  <!-- ==================== PAGE 5: POTENTIAL GRAPH — ALL 14 GROUPS ==================== -->
+  <div class="report-page">
+    <div class="page-body">
+      ${renderSubHeader('Potential Graph — All 14 Engineering Groups')}
+
+      <div class="rsec">
+        <h2>Potential Graph — All 14 Groups</h2>
+        <div class="chart-panel">
+          ${barsAll14}
+        </div>
+        <ul style="margin-top:.45rem;">
+          <li>This graph depicts your potential to study each engineering category so you can select the right Branch accordingly.</li>
+          <li>Potential refers to capacity, strength and caliber. The graph is divided into six sections: Very High, High, Above Average, Average, Below Average and Very Low.</li>
+        </ul>
+      </div>
+    </div>
+    ${renderFooter(5, TOTAL_PAGES)}
+  </div>
+
+  <!-- ==================== PAGE 6: HOW TO INTERPRET YOUR POTENTIAL LEVEL ==================== -->
+  <div class="report-page">
+    <div class="page-body">
+      ${renderSubHeader('How to Interpret Your Potential Level')}
+
+      <div class="rsec">
+        <h2>How to Interpret Your Potential Level</h2>
+        <table class="data">
+          <thead><tr><th style="width:18%">Category</th><th style="width:82%">Description</th></tr></thead>
+          <tbody>
+            <tr><td><span class="badge b-vhigh">Very High</span></td><td>Branches in this range are at a very high position on the graph. You should feel very confident selecting these — your abilities and interest are in complete consonance with the potential required to study these branches and work as a professional in the area. Maintain your good study habits and keen interest.</td></tr>
+            <tr><td><span class="badge b-high">High</span></td><td>Branches in this range are comparatively high on the graph. You can go about selecting these. Study regularly, keep in touch with good class fellows and professors to remain motivated and guided.</td></tr>
+            <tr><td><span class="badge b-above">Above Average</span></td><td>Your abilities and interest are above average and you are blessed with the potential required for these branches. Study hard regularly and try to develop applied knowledge apart from theoretical facts.</td></tr>
+            <tr><td><span class="badge b-avg">Average</span></td><td>Decide firmly before selecting these branches. Study very hard and regularly, develop conceptual knowledge over rote memory, and keep guidance from professors to remain motivated.</td></tr>
+            <tr><td><span class="badge b-below">Below Average</span></td><td>Selecting these branches might not be the right decision in the long run, as your true potential may not be utilized. If you still choose them by strong personal will, you will have to study extremely hard and regularly.</td></tr>
+            <tr><td><span class="badge b-vlow">Very Low</span></td><td>An alarming score level — selecting these branches might not let your true potential be utilized. Try to match your abilities and interest with the average-to-higher score range branches instead.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="chart-panel">
+        <div class="panel-title">Secondary Engineering Groups Comparison (Ranks 8 to 14)</div>
+        <div class="bar-canvas-box" style="height:125px;">
+          <canvas id="specBreakChart" class="chart-canvas"></canvas>
+          <img id="specBreakChartImg" class="chart-static-img" alt="Secondary Groups Chart">
+        </div>
+      </div>
+    </div>
+    ${renderFooter(6, TOTAL_PAGES)}
+  </div>
+
+  <!-- ==================== PAGE 7: GROUP-WISE SCORES & BRANCHES (PART 1) ==================== -->
+  <div class="report-page">
+    <div class="page-body">
+      ${renderSubHeader('Group-wise Scores & Branches (Part 1 of 4)')}
+
+      <div class="rsec">
+        <h2>Group-wise Scores & Branches — Ranks 1 to 4</h2>
+        <p>Detailed evaluation of your top four scoring engineering groups and their constituent undergraduate degree branches.</p>
+        <table class="data">
+          <thead><tr><th style="width:25%">Engineering Group</th><th style="width:12%">Score</th><th style="width:20%">Potential %</th><th style="width:15%;text-align:center;">Level</th><th style="width:28%">Engineering Branches in the Group</th></tr></thead>
+          <tbody>${chunk1}</tbody>
+        </table>
+      </div>
+
+      <div class="stat-grid-3">
+        ${sorted.slice(0,3).map(([c,s],idx)=>`
+          <div class="stat-card">
+            <div class="big">${Math.round(s/20*100)}%</div>
+            <div class="lbl">#${idx+1}: ${c}</div>
+            <div class="sub-lbl">${BRANCHES[c][0]}</div>
+          </div>
+        `).join('')}
+      </div>
+
+      <div class="insight-box">
+        <div class="insight-icon">💻</div>
+        <div class="insight-content">
+          <h4>Top-Tier Branch Guidance</h4>
+          <p>Your top four groups represent your strongest natural fit for B.E./B.Tech admissions. Prioritize these branches during JEE Main/Advanced, state CET, and university counseling rounds.</p>
+        </div>
+      </div>
+    </div>
+    ${renderFooter(7, TOTAL_PAGES)}
+  </div>
+
+  <!-- ==================== PAGE 8: GROUP-WISE SCORES & BRANCHES (PART 2) ==================== -->
+  <div class="report-page">
+    <div class="page-body">
+      ${renderSubHeader('Group-wise Scores & Branches (Part 2 of 4)')}
+
+      <div class="rsec">
+        <h2>Group-wise Scores & Branches — Ranks 5 to 8</h2>
+        <p>Evaluation of your middle-upper engineering groups (Ranks 5 to 8) and their mapped degree specializations.</p>
+        <table class="data">
+          <thead><tr><th style="width:25%">Engineering Group</th><th style="width:12%">Score</th><th style="width:20%">Potential %</th><th style="width:15%;text-align:center;">Level</th><th style="width:28%">Engineering Branches in the Group</th></tr></thead>
+          <tbody>${chunk2}</tbody>
+        </table>
+      </div>
+
+      <div class="stat-grid-3">
+        ${sorted.slice(4,7).map(([c,s],idx)=>`
+          <div class="stat-card">
+            <div class="big">${Math.round(s/20*100)}%</div>
+            <div class="lbl">#${idx+5}: ${c}</div>
+            <div class="sub-lbl">${BRANCHES[c][0]}</div>
+          </div>
+        `).join('')}
+      </div>
+
+      <div class="insight-box">
+        <div class="insight-icon">🔬</div>
+        <div class="insight-content">
+          <h4>Interdisciplinary Elective Strategy</h4>
+          <p>Groups ranked #5 to #8 serve as strong backup branches during college seat allocation or as minor/honors specializations alongside your primary B.Tech major.</p>
+        </div>
+      </div>
+    </div>
+    ${renderFooter(8, TOTAL_PAGES)}
+  </div>
+
+  <!-- ==================== PAGE 9: GROUP-WISE SCORES & BRANCHES (PART 3) ==================== -->
+  <div class="report-page">
+    <div class="page-body">
+      ${renderSubHeader('Group-wise Scores & Branches (Part 3 of 4)')}
+
+      <div class="rsec">
+        <h2>Group-wise Scores & Branches — Ranks 9 to 11</h2>
+        <p>Evaluation of groups ranked #9 to #11 across specialized industrial, material, and resource engineering fields.</p>
+        <table class="data">
+          <thead><tr><th style="width:25%">Engineering Group</th><th style="width:12%">Score</th><th style="width:20%">Potential %</th><th style="width:15%;text-align:center;">Level</th><th style="width:28%">Engineering Branches in the Group</th></tr></thead>
+          <tbody>${chunk3}</tbody>
+        </table>
+      </div>
+
+      <div class="stat-grid-3">
+        ${sorted.slice(8,11).map(([c,s],idx)=>`
+          <div class="stat-card">
+            <div class="big">${Math.round(s/20*100)}%</div>
+            <div class="lbl">#${idx+9}: ${c}</div>
+            <div class="sub-lbl">${BRANCHES[c][0]}</div>
+          </div>
+        `).join('')}
+      </div>
+
+      <div class="insight-box">
+        <div class="insight-icon">🏭</div>
+        <div class="insight-content">
+          <h4>Specialized Core Sectors</h4>
+          <p>Chemical, Polymer, Ceramic, Bioprocess, and Marine engineering branches offer niche PSU, refinery, and R&D careers, but should only be selected if they fall within your Above Average or higher bands.</p>
+        </div>
+      </div>
+    </div>
+    ${renderFooter(9, TOTAL_PAGES)}
+  </div>
+
+  <!-- ==================== PAGE 10: GROUP-WISE SCORES (PART 4) & ACTION PLAN ==================== -->
+  <div class="report-page">
+    <div class="page-body">
+      ${renderSubHeader('Group-wise Scores (Part 4 of 4) & Action Plan')}
+
+      <div class="rsec">
+        <h2>Group-wise Scores & Branches — Ranks 12 to 14</h2>
+        <table class="data">
+          <thead><tr><th style="width:25%">Engineering Group</th><th style="width:12%">Score</th><th style="width:20%">Potential %</th><th style="width:15%;text-align:center;">Level</th><th style="width:28%">Engineering Branches in the Group</th></tr></thead>
+          <tbody>${chunk4}</tbody>
+        </table>
+      </div>
+
+      <div class="rsec">
+        <h2>Actions & Next Steps for ${STU.name}</h2>
+        <p>Focus primarily on your top-scoring groups — <strong>${top3.map(x=>x[0]).join(', ')}</strong>. Follow this three-step engineering admission roadmap with your counselor:</p>
+        <div class="method-flow">
+          <div class="method-step">
+            <div class="method-icon">1</div>
+            <div class="method-title">1. Lock Top Branch Choices</div>
+            <div class="method-desc">Prioritize ${BRANCHES[top3[0][0]].join(', ')} (${Math.round(top3[0][1]/20*100)}%) and ${BRANCHES[top3[1][0]].join(', ')} (${Math.round(top3[1][1]/20*100)}%) during choice filling.</div>
+          </div>
+          <div class="method-step">
+            <div class="method-icon">2</div>
+            <div class="method-title">2. Entrance & College Mapping</div>
+            <div class="method-desc">Align your JEE Main/Advanced, BITSAT, VITEEE, and state CET target cutoffs with colleges offering strong labs in your top groups.</div>
+          </div>
+          <div class="method-step">
+            <div class="method-icon">3</div>
+            <div class="method-title">3. Applied Skill Building</div>
+            <div class="method-desc">Develop conceptual depth and hands-on project portfolios in ${top3[0][0]} to excel from your first semester of engineering.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="insight-box">
+        <div class="insight-icon">✅</div>
+        <div class="insight-content">
+          <h4>Final Counselor Verdict</h4>
+          <p><strong>${STU.name}</strong>'s highest engineering potential lies in <strong>${top3[0][0]}</strong> (${BRANCHES[top3[0][0]].join(', ')}) and <strong>${top3[1][0]}</strong> (${BRANCHES[top3[1][0]].join(', ')}). Review this report with your parents and career counselor before finalizing admission preferences.</p>
+        </div>
+      </div>
+    </div>
+    ${renderFooter(10, TOTAL_PAGES)}
+  </div>
+  `;
+
+  $('report-content').innerHTML = html;
+  $('quiz-screen').classList.remove('active');
+  $('report-screen').classList.add('active');
+  window.scrollTo(0, 0);
+
+  setTimeout(() => {
+    renderAllCharts(sorted, sectorScores, tierCounts);
+    if (typeof confetti === 'function') {
+      const C = ['#2563EB', '#0EA5E9', '#10B981', '#F59E0B'];
+      confetti({ particleCount: 90, spread: 70, origin: { y: 0.6 }, colors: C });
+    }
+  }, 60);
+}
+</script>
+</body>
+</html>

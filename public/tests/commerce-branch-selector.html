@@ -1,0 +1,1584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Commerce Career Selector</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Lora:wght@500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+<style>
+/* ============ BASE & ANTI-COPY ============ */
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#FAF5EC;
+  --text:#1E293B;
+  --muted:#64748B;
+  --blue:#2563EB;
+  --sky:#0EA5E9;
+  --green:#10B981;
+  --amber:#F59E0B;
+  --rose:#E11D48;
+  --soft:#EFF6FF;
+  --border:#E7E0D2;
+  --navy:#0F172A;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.5;overflow-x:hidden}
+
+/* Anti-Copy Protection on Quiz Interface */
+#quiz-screen, #quiz-screen * {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.bg-deco{position:fixed;inset:0;z-index:-1;overflow:hidden}
+.bg-deco div{position:absolute;border-radius:50%;filter:blur(110px);opacity:.15}
+.b1{width:620px;height:620px;background:#60A5FA;top:-18%;left:-12%;animation:drift 14s ease-in-out infinite alternate}
+.b2{width:520px;height:520px;background:#34D399;bottom:-18%;right:-10%;animation:drift 18s ease-in-out infinite alternate-reverse}
+.b3{width:420px;height:420px;background:#F5C98A;top:40%;left:55%;opacity:.12;animation:drift 16s ease-in-out infinite alternate}
+@keyframes drift{from{transform:translate(0,0)}to{transform:translate(50px,40px) scale(1.08)}}
+main{max-width:940px;margin:0 auto;padding:1.5rem 1rem}
+.screen{display:none}.screen.active{display:block;animation:fadeUp .4s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.glass{background:rgba(255,255,255,.92);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.8);box-shadow:0 20px 60px rgba(80,60,20,.1)}
+
+/* ============ FORM & UI ELEMENTS ============ */
+.form-card{border-radius:24px;padding:2.4rem;max-width:680px;margin:1.5rem auto;position:relative}
+.form-card h1{font-family:'Lora',serif;font-size:2.2rem;color:var(--navy);line-height:1.2}
+.form-card h1 em{font-style:normal;background:linear-gradient(90deg,var(--blue),var(--sky),var(--green));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.accent-bar{width:78px;height:5px;border-radius:3px;background:linear-gradient(90deg,var(--blue),var(--green));margin:.6rem 0 1rem}
+p.sub{color:var(--muted);margin-bottom:1.1rem;font-size:.95rem}
+.chips{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.2rem}
+.chip{background:var(--soft);color:var(--blue);border:1px solid #BFDBFE;font-size:.73rem;font-weight:600;padding:.3rem .8rem;border-radius:999px}
+.info-box{background:#FDFBF6;border:1px solid var(--border);border-left:4px solid var(--blue);border-radius:10px;padding:.9rem 1.1rem;margin-bottom:1rem;font-size:.88rem}
+.info-box h3{font-size:.92rem;color:var(--navy);margin-bottom:.25rem}
+.form-group{margin-bottom:1rem}
+.form-group label{display:block;margin-bottom:.3rem;color:#334155;font-size:.84rem;font-weight:600}
+.form-group input{width:100%;padding:.8rem 1rem;background:rgba(255,255,255,.95);border:2px solid var(--border);border-radius:12px;color:var(--navy);font-family:'Poppins',sans-serif;font-size:.95rem}
+.form-group input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 4px rgba(37,99,235,.13)}
+.btn-row{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-top:.8rem}
+.btn{display:inline-block;padding:.9rem 2rem;background:linear-gradient(90deg,var(--blue),var(--sky));color:#fff;border:none;border-radius:12px;font-family:'Poppins',sans-serif;font-weight:600;cursor:pointer;font-size:.98rem;transition:.2s;box-shadow:0 8px 22px rgba(37,99,235,.3)}
+.btn:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(37,99,235,.4)}
+.sim-btn{background:#F8FAFC;border:1px dashed #94A3B8;color:#475569;padding:.6rem 1rem;border-radius:10px;font-family:'Poppins',sans-serif;font-size:.78rem;font-weight:600;cursor:pointer;transition:.2s}
+.sim-btn:hover{border-color:var(--blue);color:var(--blue);background:var(--soft)}
+
+/* ============ QUIZ INTERFACE ============ */
+.quiz-wrap{max-width:760px;margin:0 auto}
+.quiz-top{display:flex;align-items:center;gap:1rem;margin:.5rem 0 1rem}
+.ring-wrap{position:relative;width:72px;height:72px;flex-shrink:0}
+.ring-wrap svg{width:72px;height:72px;transform:rotate(-90deg)}
+.ring-bg{fill:none;stroke:#E7E0D2;stroke-width:8}
+.ring-fill{fill:none;stroke:url(#ringGrad);stroke-width:8;stroke-linecap:round;stroke-dasharray:326.7;stroke-dashoffset:326.7;transition:stroke-dashoffset .4s ease}
+.ring-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--navy);font-size:.95rem}
+.quiz-meta{flex:1}
+.quiz-meta .t{font-family:'Lora',serif;font-weight:700;color:var(--navy);font-size:1.1rem}
+.quiz-meta .p{font-size:.82rem;color:var(--muted);font-weight:500}
+.stage-pill{background:var(--soft);color:var(--blue);font-size:.74rem;font-weight:700;padding:.35rem .85rem;border-radius:999px;border:1px solid #BFDBFE;white-space:nowrap}
+
+/* Top Progress Bar & Milestone Badges */
+.progress-bar-header{background:#fff;border:1px solid var(--border);border-radius:14px;padding:.75rem 1rem;margin-bottom:12px;box-shadow:0 4px 12px rgba(0,0,0,0.03)}
+.progress-label-row{display:flex;justify-content:space-between;align-items:center;font-size:.78rem;font-weight:700;color:var(--navy);margin-bottom:.4rem}
+.progress-container{width:100%;background:#EDE7DA;height:10px;border-radius:999px;overflow:hidden}
+.test-progress-bar{height:100%;width:0%;background:linear-gradient(90deg,var(--blue),var(--sky),var(--green));border-radius:999px;transition:width 0.35s ease}
+.badge-container{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;min-height:24px}
+.ach-badge{font-size:0.72rem;font-weight:700;padding:0.22rem 0.75rem;border-radius:999px;display:inline-flex;align-items:center;gap:4px;border:1px solid transparent;animation:qIn 0.3s ease}
+
+.q-card-big{border-radius:22px;padding:2rem 2.2rem;animation:qIn .28s ease}
+@keyframes qIn{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:none}}
+.q-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:.9rem}
+.q-sec{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--blue);background:var(--soft);border:1px solid #BFDBFE;padding:.22rem .7rem;border-radius:999px}
+.q-count{font-size:.8rem;font-weight:600;color:var(--muted)}
+.q-big{font-family:'Lora',serif;font-size:1.38rem;font-weight:600;color:var(--navy);line-height:1.4;margin-bottom:1.3rem}
+.opts-list{display:flex;flex-direction:column;gap:.58rem}
+.opt-row{display:flex;align-items:center;gap:.85rem;width:100%;text-align:left;padding:.85rem 1.1rem;background:#FDFBF7;border:2px solid var(--border);border-radius:13px;cursor:pointer;font-family:'Poppins',sans-serif;font-size:.95rem;font-weight:600;color:#475569;transition:all .15s ease}
+.opt-row:hover{border-color:var(--blue);color:var(--blue);background:var(--soft);transform:translateX(4px)}
+.opt-badge{width:30px;height:30px;border-radius:50%;background:#EDE7DA;color:#475569;display:flex;align-items:center;justify-content:center;font-size:.82rem;font-weight:700;flex-shrink:0}
+.opt-row.selected{background:linear-gradient(90deg,var(--blue),var(--sky));color:#fff;border-color:transparent;box-shadow:0 6px 16px rgba(37,99,235,.28);transform:translateX(6px)}
+.opt-row.selected .opt-badge{background:rgba(255,255,255,.25);color:#fff}
+.kbd-hint{margin-top:1rem;font-size:.74rem;color:#8C8574;text-align:center}
+.quiz-nav{display:flex;justify-content:space-between;align-items:center;margin-top:1.2rem}
+.ghost-btn{background:transparent;border:2px solid var(--border);color:#475569;font-family:'Poppins',sans-serif;font-weight:600;padding:.55rem 1.2rem;border-radius:10px;cursor:pointer;font-size:.85rem;transition:.15s}
+.ghost-btn:hover{border-color:var(--blue);color:var(--blue);background:var(--soft)}
+.done-card{border-radius:24px;padding:2.6rem 2rem;text-align:center}
+.done-emoji{font-size:3rem}
+.done-card h2{font-family:'Lora',serif;font-size:1.85rem;color:var(--navy);margin:.4rem 0}
+
+/* ============ REPORT & A4 PAGE ARCHITECTURE ============ */
+.report-toolbar{display:flex;justify-content:space-between;align-items:center;gap:1rem;background:#fff;border:1px solid var(--border);border-radius:14px;padding:.9rem 1.25rem;margin-bottom:1.25rem;box-shadow:0 8px 24px rgba(80,60,20,.08);position:sticky;top:10px;z-index:30}
+.print-btn{background:linear-gradient(90deg,var(--blue),var(--sky));color:#fff;border:none;padding:.75rem 1.5rem;border-radius:10px;font-family:'Poppins',sans-serif;font-weight:600;cursor:pointer;font-size:.9rem;box-shadow:0 6px 18px rgba(37,99,235,.3);transition:.2s}
+.print-btn:hover{transform:translateY(-1px)}
+
+.report-card{background:transparent;border:none;box-shadow:none;padding:0;margin-bottom:2rem}
+
+/* Each .report-page is calibrated to fit on 1 A4 page with balanced spacing and zero overflow */
+.report-page{
+  background:#fff;
+  width:210mm;
+  min-height:282mm;
+  margin:0 auto 1.5rem auto;
+  padding:10mm 12mm;
+  border:1px solid var(--border);
+  border-radius:8px;
+  box-shadow:0 12px 32px rgba(15,23,42,.08);
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  position:relative;
+  box-sizing:border-box;
+}
+.page-body{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-start;
+  gap:0.55rem;
+}
+
+/* Page 1: Cover Brand Header */
+.cover-brand-bar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:1rem;
+  border-bottom:2.5px solid var(--blue);
+  padding-bottom:.65rem;
+}
+.cover-brand-left{display:flex;align-items:center;gap:.9rem}
+.cover-logo-slot{
+  max-width:120px;
+  max-height:80px;
+  display:none;
+  align-items:center;
+  justify-content:flex-start;
+  flex-shrink:0;
+}
+.cover-logo-slot.has-logo{display:flex}
+.cover-logo-slot img{
+  max-width:120px;
+  max-height:80px;
+  width:auto;
+  height:auto;
+  object-fit:contain;
+  display:block;
+}
+.cover-client-info .client-name{
+  font-family:'Lora',serif;
+  font-size:1.38rem;
+  font-weight:700;
+  color:var(--navy);
+  line-height:1.15;
+}
+.cover-client-info .client-sub{
+  font-size:.72rem;
+  font-weight:600;
+  color:var(--blue);
+  text-transform:uppercase;
+  letter-spacing:.06em;
+  margin-top:.15rem;
+}
+
+.cover-candidate-banner{
+  background:linear-gradient(135deg,#EFF6FF 0%,#F8FAFC 100%);
+  border:1px solid #BFDBFE;
+  border-left:5px solid var(--blue);
+  border-radius:10px;
+  padding:.8rem 1.1rem;
+}
+.cover-candidate-banner h1{
+  font-family:'Lora',serif;
+  font-size:1.55rem;
+  color:var(--navy);
+  margin-bottom:.2rem;
+  line-height:1.2;
+}
+.cover-candidate-banner .meta{
+  display:flex;
+  gap:1.2rem;
+  flex-wrap:wrap;
+  font-size:.75rem;
+  color:var(--muted);
+  font-weight:600;
+  text-transform:uppercase;
+  letter-spacing:.03em;
+}
+.cover-candidate-banner .meta b{
+  color:var(--navy);
+  text-transform:none;
+  letter-spacing:0;
+  font-weight:700;
+  margin-left:.25rem;
+}
+
+/* Pages 2–10 Header with 100×100px Top-Right Logo Slot */
+.sub-page-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:1rem;
+  border-bottom:2px solid var(--blue);
+  padding-bottom:.5rem;
+}
+.sub-head-left{flex:1}
+.sub-head-left .brand{
+  font-family:'Lora',serif;
+  font-weight:700;
+  color:var(--blue);
+  font-size:.75rem;
+  text-transform:uppercase;
+  letter-spacing:.05em;
+}
+.sub-head-left .sec-title{
+  font-family:'Lora',serif;
+  font-size:1.22rem;
+  font-weight:700;
+  color:var(--navy);
+  line-height:1.2;
+  margin-top:.1rem;
+}
+.sub-head-left .candidate-tag{
+  font-size:.72rem;
+  color:var(--muted);
+  font-weight:500;
+  margin-top:.1rem;
+}
+/* Reserved 100x100px top-right logo slot */
+.page-logo-slot{
+  width:100px;
+  height:100px;
+  flex-shrink:0;
+  display:none;
+  align-items:center;
+  justify-content:flex-end;
+  overflow:hidden;
+}
+.page-logo-slot.has-logo{display:flex}
+.page-logo-slot img{
+  max-width:100px;
+  max-height:100px;
+  width:auto;
+  height:auto;
+  object-fit:contain;
+  display:block;
+}
+
+/* Sections & Typography */
+.rsec{margin-bottom:.15rem}
+.rsec h2{font-family:'Lora',serif;font-size:1.04rem;color:var(--navy);margin:0 0 .35rem;border-left:4px solid var(--blue);padding-left:.6rem;line-height:1.25}
+.rsec p{color:#334155;margin-bottom:.35rem;font-size:.8rem;line-height:1.48;text-align:left}
+.rsec ul{list-style:none;margin:.25rem 0}
+.rsec ul li{position:relative;padding-left:1.15rem;margin-bottom:.3rem;font-size:.79rem;color:#334155;line-height:1.44;text-align:left}
+.rsec ul li::before{content:'➤';position:absolute;left:0;color:var(--blue);font-size:.65rem;top:2px}
+
+/* KPI & Stat Grids */
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+.stat-grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:.7rem}
+.stat-grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:.65rem}
+.stat-card{background:linear-gradient(135deg,#FDFBF6,#F4EFE3);border:1px solid var(--border);border-radius:9px;padding:.65rem .75rem;text-align:center}
+.stat-card .big{font-family:'Lora',serif;font-size:1.38rem;font-weight:700;color:var(--blue);line-height:1.15}
+.stat-card .lbl{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-top:.15rem}
+.stat-card .sub-lbl{font-size:.69rem;color:#475569;margin-top:.1rem;font-weight:500}
+
+/* Equal-Height 3-Step Cards */
+.method-flow{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:.75rem;
+  align-items:stretch;
+}
+.method-step{
+  background:#FDFBF6;
+  border:1px solid var(--border);
+  border-top:3.5px solid var(--blue);
+  border-radius:9px;
+  padding:.7rem .7rem;
+  text-align:center;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-start;
+  align-items:center;
+}
+.method-icon{
+  width:36px;
+  height:36px;
+  background:var(--soft);
+  border:2px solid var(--blue);
+  border-radius:50%;
+  margin:0 auto .35rem;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:.92rem;
+  font-weight:700;
+  color:var(--blue);
+  flex-shrink:0;
+}
+.method-title{font-weight:700;color:var(--navy);margin-bottom:.2rem;font-size:.82rem}
+.method-desc{font-size:.73rem;color:var(--muted);line-height:1.38}
+
+/* Progress Bars */
+.bar-item{margin-bottom:.42rem}
+.bar-label{display:flex;justify-content:space-between;align-items:center;font-size:.76rem;margin-bottom:.15rem;font-weight:600;color:#334155;gap:.5rem}
+.bar-track{height:7px;background:#EDE7DA;border-radius:4px;overflow:hidden}
+.bar-fill{height:100%;width:0;border-radius:4px}
+.f1{background:linear-gradient(90deg,#1D4ED8,#3B82F6)}
+.f2{background:linear-gradient(90deg,#BE123C,#F43F5E)}
+.f3{background:linear-gradient(90deg,#B45309,#F59E0B)}
+.f4{background:linear-gradient(90deg,#047857,#10B981)}
+
+/* Aligned Fixed-Layout Tables */
+table.data{width:100%;table-layout:fixed;border-collapse:collapse;margin:.25rem 0;font-size:.76rem}
+table.data th,table.data td{border:1px solid #E2D9C5;padding:.42rem .55rem;text-align:left;vertical-align:middle;line-height:1.35;word-wrap:break-word}
+table.data th{background:var(--navy);color:#fff;font-weight:600;text-transform:uppercase;letter-spacing:.03em;font-size:.67rem}
+table.data tr:nth-child(even){background:#FAF8F2}
+table.data td.cat{font-weight:600;color:var(--navy)}
+
+.badge{display:inline-block;padding:.14rem .45rem;border-radius:999px;font-size:.6rem;font-weight:700;text-transform:uppercase;white-space:nowrap}
+.b-high{background:rgba(16,185,129,.14);color:#047857;border:1px solid #047857}
+.b-med{background:rgba(245,158,11,.14);color:#B45309;border:1px solid #B45309}
+.b-low{background:rgba(225,29,72,.1);color:#BE123C;border:1px solid #BE123C}
+
+/* Charts & Static Print Snapshot Containers */
+.chart-panel{background:#FAF8F2;border:1px solid #EDE7DA;border-radius:9px;padding:.65rem .85rem}
+.panel-title{font-size:.72rem;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.03em;margin-bottom:.3rem}
+.radar-box{position:relative;height:215px;max-width:420px;margin:0 auto;display:flex;align-items:center;justify-content:center}
+.doughnut-box{position:relative;height:165px;max-width:220px;margin:0 auto;display:flex;align-items:center;justify-content:center}
+.bar-canvas-box{position:relative;height:145px;width:100%;margin:0 auto;display:flex;align-items:center;justify-content:center}
+.chart-static-img{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;display:none}
+.two-col-panel{display:grid;grid-template-columns:1fr 1fr;gap:.85rem;align-items:stretch}
+
+.insight-box{
+  background:#EFF6FF;
+  border:1px solid #BFDBFE;
+  border-left:4px solid var(--blue);
+  border-radius:9px;
+  padding:.6rem .85rem;
+  display:flex;
+  gap:.65rem;
+  align-items:flex-start;
+}
+.insight-icon{font-size:1.1rem;line-height:1;flex-shrink:0;margin-top:2px}
+.insight-content h4{color:var(--blue);font-size:.8rem;margin-bottom:.1rem;font-weight:700}
+.insight-content p{margin:0;font-size:.75rem;color:#334155;line-height:1.4}
+
+/* Page Footer */
+.page-footer{
+  margin-top:auto;
+  padding-top:.45rem;
+  border-top:1px solid #E2D9C5;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-size:.69rem;
+  color:#64748B;
+  font-weight:600;
+  flex-shrink:0;
+}
+
+@media (max-width:860px){
+  .report-page{width:100%;min-height:auto;padding:1rem}
+  .form-card{padding:1.5rem}
+  .q-card-big{padding:1.4rem}
+  .q-big{font-size:1.18rem}
+  .stat-grid,.stat-grid-3,.stat-grid-4,.method-flow,.two-col-panel{grid-template-columns:1fr}
+  .stage-pill{display:none}
+}
+
+/* ============ PRINT — A4 PERFECT, NO CLIPPING, NO BLANK OVERFLOW PAGES ============ */
+@page{size:A4 portrait;margin:9mm 10mm}
+@media print{
+  html,body{width:100%;background:#fff!important;color:#1E293B!important;line-height:1.38}
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  .bg-deco,.report-toolbar,.print-btn,#form-screen,#quiz-screen{display:none!important}
+  main{max-width:none!important;width:100%!important;padding:0!important;margin:0!important}
+  .report-card{margin:0!important;padding:0!important}
+
+  /* Natural page flow with page-break-after: always and zero clipping */
+  .report-page{
+    width:100%!important;
+    min-height:0!important;
+    height:auto!important;
+    margin:0!important;
+    padding:2mm 2mm!important;
+    border:none!important;
+    border-radius:0!important;
+    box-shadow:none!important;
+    page-break-after:always!important;
+    break-after:page!important;
+    overflow:visible!important;
+    display:flex!important;
+    flex-direction:column!important;
+    justify-content:space-between!important;
+  }
+  .report-page:last-child{
+    page-break-after:auto!important;
+    break-after:auto!important;
+  }
+
+  /* Swap live canvases for sharp static PNG images during print so charts never shift or vanish */
+  canvas.chart-canvas{display:none!important}
+  img.chart-static-img{display:block!important}
+
+  table{page-break-inside:auto!important;break-inside:auto!important}
+  tr,td,th,.stat-grid,.stat-grid-3,.stat-grid-4,.method-flow,.method-step,.insight-box,.chart-panel,.page-footer{
+    page-break-inside:avoid!important;
+    break-inside:avoid!important;
+  }
+  h1,h2,h3,h4{page-break-after:avoid!important;break-after:avoid!important}
+}
+</style>
+</head>
+<!-- Website Injection Attributes: Set data-client-name and data-logo-url on body, or window.CLIENT_LOGO_URL in JS -->
+<body data-client-name="" data-logo-url="">
+<svg width="0" height="0" style="position:absolute"><defs><linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#2563EB"/><stop offset="100%" stop-color="#10B981"/></linearGradient></defs></svg>
+<div class="bg-deco"><div class="b1"></div><div class="b2"></div><div class="b3"></div></div>
+
+<main>
+<!-- REGISTRATION SCREEN -->
+<section id="form-screen" class="screen active">
+ <div class="form-card glass">
+  <h1>Commerce Career <em>Selector</em></h1><div class="accent-bar"></div>
+  <p class="sub">Discover which Commerce career cluster — financial or non-financial — matches your interests best.</p>
+  <div class="chips">
+    <span class="chip">📝 76 Questions</span>
+    <span class="chip">⏱️ ~20 Minutes</span>
+    <span class="chip">🎓 19 Career Clusters</span>
+    <span class="chip">📊 10-Page Graphical Report</span>
+  </div>
+  <div class="info-box">
+    <h3>How to answer</h3>
+    <p>Rate how strongly you agree with each statement — from <strong>Strongly Disagree</strong> to <strong>Strongly Agree</strong>. Selecting an option automatically saves your response and advances to the next question.</p>
+  </div>
+  <div class="form-group"><label>Student Name</label><input type="text" id="s-name" placeholder="e.g. Aarav Sharma"></div>
+  <div class="form-group"><label>Email Address</label><input type="email" id="s-email" placeholder="you@example.com"></div>
+  <div class="form-group"><label>Mobile Number</label><input type="tel" id="s-phone" placeholder="e.g. 98765 43210"></div>
+  <div class="btn-row">
+    <button class="btn" onclick="startTest()">Start Assessment →</button>
+    <button type="button" class="sim-btn" onclick="simulateFullTest()">⚡ Quick-Fill & Test Report</button>
+  </div>
+ </div>
+</section>
+
+<!-- QUIZ SCREEN -->
+<section id="quiz-screen" class="screen">
+ <div class="quiz-wrap">
+  <div class="quiz-top">
+   <div class="ring-wrap">
+     <svg viewBox="0 0 120 120"><circle class="ring-bg" cx="60" cy="60" r="52"/><circle class="ring-fill" id="ring-fill" cx="60" cy="60" r="52"/></svg>
+     <div class="ring-num" id="ring-num">0%</div>
+   </div>
+   <div class="quiz-meta">
+     <div class="t">Commerce Aptitude Test</div>
+     <div class="p" id="prog-text">0 / 76 answered</div>
+   </div>
+   <div class="stage-pill" id="grade-pill"></div>
+  </div>
+
+  <!-- Prominent Top Completion Progress Bar & Dynamic Milestone Badges -->
+  <div class="progress-bar-header">
+    <div class="progress-label-row">
+      <span>Test Completion Progress</span>
+      <span id="top-pct-label">0% Completed</span>
+    </div>
+    <div class="progress-container">
+      <div id="test-progress-bar" class="test-progress-bar"></div>
+    </div>
+    <div id="badge-container" class="badge-container"></div>
+  </div>
+
+  <div id="quiz-body"></div>
+ </div>
+</section>
+
+<!-- REPORT SCREEN -->
+<section id="report-screen" class="screen">
+ <div class="report-toolbar">
+   <div>
+     <strong style="color:var(--navy);font-size:.95rem;">Commerce Career Selector — 10-Page Graphical Report</strong>
+     <div style="font-size:.76rem;color:var(--muted);">A4 Calibrated · Zero Clipping · Print-Locked Charts</div>
+   </div>
+   <button class="print-btn" onclick="prepareAndPrint()">🖨️ Print / Save as PDF (A4)</button>
+ </div>
+ <div class="report-card" id="report-content"></div>
+</section>
+</main>
+
+<script>
+// ==================== WEBSITE BRANDING HOOKS ====================
+function resolveClientBranding() {
+  const params = new URLSearchParams(window.location.search);
+  const logoUrl = window.CLIENT_LOGO_URL || params.get('logo') || document.body.dataset.logoUrl || '';
+  const clientName = window.CLIENT_NAME || params.get('client') || document.body.dataset.clientName || '';
+  return { logoUrl: logoUrl.trim(), clientName: clientName.trim() };
+}
+
+// ==================== ANTI-COPY PROTECTION ====================
+document.addEventListener('contextmenu', event => {
+  if (document.getElementById('quiz-screen').classList.contains('active')) {
+    event.preventDefault();
+  }
+});
+document.addEventListener('keydown', event => {
+  if (document.getElementById('quiz-screen').classList.contains('active')) {
+    if ((event.ctrlKey || event.metaKey) && ['c','x','u','s','a'].includes(event.key.toLowerCase())) {
+      event.preventDefault();
+    }
+  }
+});
+document.addEventListener('copy', event => {
+  if (document.getElementById('quiz-screen').classList.contains('active')) {
+    event.preventDefault();
+  }
+});
+
+// ==================== ASSESSMENT DATA (UNCHANGED) ====================
+const CLUSTERS={
+"Accounts/Taxation":["Accountant","Cost Accountant","Chartered Accountant","Tax Advisor/Tax Inspector"],
+"Analytics":["Statistician","Business Analyst / Market Analyst"],
+"Communication and Media":["Radio and TV Anchoring, News Reading, Theater","Stage and Voice Over Artist, Public Relations","Photography, Advertisement, Online Media, Video and Audio Editor, Camera and Light Professional","Sound Technician etc."],
+"Computer Related Designing":["Web Designer, Graphic Designer, Animator, Game Designer, Illustrator, Multimedia Designer"],
+"Financial Auditing and Investigation":["Security Analyst","Financial Analyst","Investment Analyst","Fraud Management","Auditor, Actuary"],
+"Credit Management":["Risk Management"],
+"Financial Banking and Investment":["Actuary","Corporate/Personal Banker","Treasury Management","Insurance Specialist","Investment Banker"],
+"Financial Management":["Real Estate / Property Management","Finance Management","Sale/Purchase Management","Wealth Management","Asset Management","Micro Finance Management","Financial Planner"],
+"Monitoring and Evaluation Specialist":["Economist, Economic Advisor","Financial Planner","Budget Analyst","Financial Analyst"],
+"Hospitality and Tourism":["Travel Agent, Tourism Manager, Logistics Manager","Transportation Support, Airhostess, Cabin Crew","Customer Service Manager, Travel Desk Officer","Event Manager"],
+"Hotel":["Hotel Manager, Facility Maintenance, Chef, Food and Beverage Specialist, Cleaning and Housekeeping In Charges, Restaurant and Bar In Charge"],
+"Industrial Designing":["Fashion Designer, Textile Designer, Knitwear Designer, Accessory Designer, Jewellery Designer, Interior Designer"],
+"Journalism":["Journalist – Print or Electronic, Reporter, Editor","Copy Writer, Screen Play Writer, Content Writer"],
+"Languages":["Linguist, Translator, Interpreter, News Reader","Bilingual Educator, Copy Writer and Editor, Grant and Proposal Writer, Professor, Teacher and Trainer, Public Relations, Publication, Research"],
+"Law":["Corporate / Company Lawyer","Tax Lawyer","Banking Solicitor","Company Secretary"],
+"Management":["Banking and Insurance Management","Finance Management","HR Management","Marketing and Sales Management","Operations Management","Rural Management","Export Management"],
+"Social Sciences":["Teacher and Professor, Social Workers","Relationship Counselor, Career Counselor","Philosopher, Critic and Political Analyst","Activist, Reformer, Researcher"],
+"Teaching and Education":["Nursery or Pre-Primary Teacher, Primary, Middle School, Secondary and Senior Secondary Teacher","Lecturer and Professor, Institute Trainer, Tutor","Coaching Centre Trainer, Academic Head or Principal"],
+"Trading":["Stock Broker","Foreign Exchange Trader","Derivative Trader","Commodity Trader"]
+};
+
+const QUESTIONS=[
+{t:"I enjoy maintaining ledger books and balancing accounts.",c:"Accounts/Taxation"},
+{t:"I am interested in learning about direct and indirect tax laws.",c:"Accounts/Taxation"},
+{t:"Auditing financial statements sounds like an interesting job.",c:"Accounts/Taxation"},
+{t:"I would like to help individuals and companies file their taxes.",c:"Accounts/Taxation"},
+{t:"I like working with statistical data to find trends.",c:"Analytics"},
+{t:"Using data to solve business problems excites me.",c:"Analytics"},
+{t:"I enjoy creating charts and graphs to represent data.",c:"Analytics"},
+{t:"Market research and consumer data analysis appeal to me.",c:"Analytics"},
+{t:"I am interested in working in radio or TV broadcasting.",c:"Communication and Media"},
+{t:"Public relations and managing corporate image interest me.",c:"Communication and Media"},
+{t:"I would enjoy operating cameras or editing video content.",c:"Communication and Media"},
+{t:"Advertisement and media production fascinate me.",c:"Communication and Media"},
+{t:"I enjoy designing websites and user interfaces.",c:"Computer Related Designing"},
+{t:"Graphic design and illustration are skills I want to develop.",c:"Computer Related Designing"},
+{t:"I am interested in animation and game design.",c:"Computer Related Designing"},
+{t:"Creating multimedia content feels like a great career path.",c:"Computer Related Designing"},
+{t:"Investigating financial frauds sounds exciting to me.",c:"Financial Auditing and Investigation"},
+{t:"I would like to analyze investment opportunities for clients.",c:"Financial Auditing and Investigation"},
+{t:"Evaluating company securities is a career I'd enjoy.",c:"Financial Auditing and Investigation"},
+{t:"I am interested in actuarial science and risk calculation.",c:"Financial Auditing and Investigation"},
+{t:"Assessing creditworthiness of individuals sounds interesting.",c:"Credit Management"},
+{t:"I would like to manage risk in financial institutions.",c:"Credit Management"},
+{t:"Loan approval and credit analysis appeal to me.",c:"Credit Management"},
+{t:"I enjoy evaluating the financial stability of borrowers.",c:"Credit Management"},
+{t:"Working in a bank as a personal banker appeals to me.",c:"Financial Banking and Investment"},
+{t:"I am interested in treasury and foreign exchange management.",c:"Financial Banking and Investment"},
+{t:"Insurance and risk protection products interest me.",c:"Financial Banking and Investment"},
+{t:"I would enjoy a career in investment banking.",c:"Financial Banking and Investment"},
+{t:"I want to manage real estate properties and assets.",c:"Financial Management"},
+{t:"Wealth management for high-net-worth individuals sounds rewarding.",c:"Financial Management"},
+{t:"I am interested in managing micro-finance institutions.",c:"Financial Management"},
+{t:"Financial planning for families and businesses interests me.",c:"Financial Management"},
+{t:"I would like to work as an economic advisor.",c:"Monitoring and Evaluation Specialist"},
+{t:"Preparing budget analyses for organizations sounds interesting.",c:"Monitoring and Evaluation Specialist"},
+{t:"Monitoring project evaluations and outcomes appeals to me.",c:"Monitoring and Evaluation Specialist"},
+{t:"I enjoy analyzing economic indicators and policies.",c:"Monitoring and Evaluation Specialist"},
+{t:"I want to work in the travel and tourism industry.",c:"Hospitality and Tourism"},
+{t:"Managing logistics and transportation sounds like a good career.",c:"Hospitality and Tourism"},
+{t:"I would enjoy working as an event manager or travel agent.",c:"Hospitality and Tourism"},
+{t:"Working as cabin crew or customer service manager appeals to me.",c:"Hospitality and Tourism"},
+{t:"I am interested in hotel management and operations.",c:"Hotel"},
+{t:"Food and beverage service management excites me.",c:"Hotel"},
+{t:"I would like to work in housekeeping or facility maintenance.",c:"Hotel"},
+{t:"Managing a restaurant or bar sounds like a career I'd enjoy.",c:"Hotel"},
+{t:"I have a keen interest in fashion and textile design.",c:"Industrial Designing"},
+{t:"Designing jewelry or accessories appeals to me.",c:"Industrial Designing"},
+{t:"I would enjoy working as an interior designer.",c:"Industrial Designing"},
+{t:"Creating industrial product designs is fascinating.",c:"Industrial Designing"},
+{t:"I want to work as a reporter for a newspaper or news channel.",c:"Journalism"},
+{t:"Editing and copywriting are skills I want to pursue.",c:"Journalism"},
+{t:"Writing screenplays or content for websites sounds exciting.",c:"Journalism"},
+{t:"Investigative journalism and news analysis interest me.",c:"Journalism"},
+{t:"I would love to work as a translator or interpreter.",c:"Languages"},
+{t:"Bilingual education and teaching languages appeal to me.",c:"Languages"},
+{t:"I am interested in writing grant proposals and publications.",c:"Languages"},
+{t:"Linguistics and language research fascinate me.",c:"Languages"},
+{t:"I am interested in corporate law and legal compliance.",c:"Law"},
+{t:"Working as a tax lawyer or banking solicitor appeals to me.",c:"Law"},
+{t:"Company secretarial and legal advisory roles interest me.",c:"Law"},
+{t:"I would like to represent companies in legal matters.",c:"Law"},
+{t:"I want to work in HR management and recruitment.",c:"Management"},
+{t:"Marketing and sales management excite me.",c:"Management"},
+{t:"Operations and supply chain management sound interesting.",c:"Management"},
+{t:"I would like to manage rural or export businesses.",c:"Management"},
+{t:"I want to work as a social worker or relationship counselor.",c:"Social Sciences"},
+{t:"Activism and social reform are causes I care about.",c:"Social Sciences"},
+{t:"Political analysis and criticism interest me.",c:"Social Sciences"},
+{t:"Conducting social research sounds like a fulfilling career.",c:"Social Sciences"},
+{t:"I would love to teach in a primary or secondary school.",c:"Teaching and Education"},
+{t:"Becoming a college professor or lecturer is my goal.",c:"Teaching and Education"},
+{t:"Working as a trainer in a coaching center appeals to me.",c:"Teaching and Education"},
+{t:"I am interested in academic administration and leadership.",c:"Teaching and Education"},
+{t:"I want to work as a stockbroker in the financial markets.",c:"Trading"},
+{t:"Foreign exchange and derivative trading excite me.",c:"Trading"},
+{t:"Commodity trading is a career I'd like to explore.",c:"Trading"},
+{t:"I enjoy watching market fluctuations and making quick decisions.",c:"Trading"}
+];
+const FIN=["Accounts/Taxation","Analytics","Financial Auditing and Investigation","Credit Management","Financial Banking and Investment","Financial Management","Monitoring and Evaluation Specialist","Trading"];
+const LIKERT=['Strongly Disagree','Disagree','Neutral','Agree','Strongly Agree'];
+
+// ==================== SEAMLESS AUTO-PROGRESSION ENGINE ====================
+let Q=[],A=[],STU={},qi=0,busy=false,chartRefs=[];
+const CIRC=2*Math.PI*52,$=i=>document.getElementById(i);
+
+function startTest(){
+  const n=$('s-name').value.trim(),e=$('s-email').value.trim(),p=$('s-phone').value.trim();
+  if(!n)return alert('Please enter your Name');
+  if(!e)return alert('Please enter your Email');
+  if(!p)return alert('Please enter your Mobile Number');
+
+  const brand = resolveClientBranding();
+  STU={name:n,email:e,phone:p,clientName:brand.clientName,logoUrl:brand.logoUrl};
+  Q=QUESTIONS;
+  A=new Array(Q.length).fill(null);
+  qi=0;
+  busy=false;
+  $('grade-pill').textContent=STU.name;
+  $('form-screen').classList.remove('active');
+  $('quiz-screen').classList.add('active');
+  renderQ();
+  window.scrollTo(0,0);
+}
+
+// One-Click Diagnostic Simulation so you can inspect the 10-page report immediately
+function simulateFullTest() {
+  const n = $('s-name').value.trim() || 'Aarav Sharma';
+  const e = $('s-email').value.trim() || 'aarav.sharma@example.com';
+  const p = $('s-phone').value.trim() || '98765 43210';
+  const brand = resolveClientBranding();
+  STU = { name: n, email: e, phone: p, clientName: brand.clientName, logoUrl: brand.logoUrl };
+  Q = QUESTIONS;
+  // Deterministic realistic student profile across all 76 questions
+  const pattern = [5,4,5,4, 5,5,4,5, 2,3,2,3, 3,3,2,3, 4,5,4,4, 3,4,3,4, 5,4,4,5, 4,5,4,5, 3,4,4,3, 2,3,2,2, 2,2,3,2, 3,2,3,2, 3,4,3,3, 2,3,2,3, 4,5,4,5, 5,5,4,4, 3,4,3,3, 3,4,3,4, 4,5,4,5];
+  A = Q.map((_, idx) => pattern[idx % pattern.length]);
+  qi = Q.length;
+  $('form-screen').classList.remove('active');
+  finish();
+}
+
+function updateProgressAndBadges() {
+  const answeredCount = A.filter(a => a !== null).length;
+  const percentage = Q.length ? Math.round((answeredCount / Q.length) * 100) : 0;
+
+  const progressBar = $('test-progress-bar');
+  if (progressBar) progressBar.style.width = `${percentage}%`;
+  const topPctLabel = $('top-pct-label');
+  if (topPctLabel) topPctLabel.textContent = `${percentage}% Completed (${answeredCount}/${Q.length})`;
+
+  const badgeContainer = $('badge-container');
+  if (badgeContainer) {
+    let badgesHTML = '';
+    if (percentage >= 25) badgesHTML += `<span class="ach-badge" style="background:#D1FAE5;color:#065F46;border-color:#A7F3D0;">🥉 Quarter Completed (25%)</span>`;
+    if (percentage >= 50) badgesHTML += `<span class="ach-badge" style="background:#FEF3C7;color:#92400E;border-color:#FDE68A;">🥈 Half Completed (50%)</span>`;
+    if (percentage >= 75) badgesHTML += `<span class="ach-badge" style="background:#E0E7FF;color:#3730A3;border-color:#C7D2FE;">🥇 Three-Quarter Completed (75%)</span>`;
+    if (percentage === 100) badgesHTML += `<span class="ach-badge" style="background:#DCFCE7;color:#166534;border-color:#86EFAC;">🏆 Test Completed (100%)</span>`;
+    badgeContainer.innerHTML = badgesHTML;
+  }
+}
+
+function renderQ(){
+  ring();
+  updateProgressAndBadges();
+
+  const b=$('quiz-body');
+  if(qi>=Q.length){
+    b.innerHTML=`<div class="done-card glass">
+      <div class="done-emoji">🏆</div>
+      <h2>Assessment Complete, ${STU.name}!</h2>
+      <p>All ${Q.length} responses have been saved. Generating your 10-page graphical report...</p>
+      <button class="btn" style="margin-top:16px;" onclick="finish()">View Complete 10-Page Report →</button>
+    </div>`;
+    setTimeout(() => { if ($('quiz-screen').classList.contains('active')) finish(); }, 400);
+    return;
+  }
+
+  const q=Q[qi];
+  let o='';
+  LIKERT.forEach((l,i)=>{
+    o+=`<button type="button" class="opt-row${A[qi]===i+1?' selected':''}" onclick="pick(${i})"><span class="opt-badge">${i+1}</span><span>${l}</span></button>`;
+  });
+
+  b.innerHTML=`<div class="q-card-big glass">
+    <div class="q-meta"><span class="q-sec">Rate Yourself</span><span class="q-count">Question ${qi+1} of ${Q.length}</span></div>
+    <div class="q-big">${q.t}</div>
+    <div class="opts-list">${o}</div>
+    <div class="kbd-hint">💡 Selecting an option automatically saves and advances · Press keys <b>1–5</b> or <b>← Back</b></div>
+    <div class="quiz-nav">
+      <button type="button" class="ghost-btn" id="back-btn" style="${qi===0?'visibility:hidden':'visibility:visible'}" onclick="back()">← Previous Question</button>
+      <span style="font-size:.76rem;color:var(--muted);font-weight:600;">${A[qi]!==null?'✓ Response Saved':'Select an option to proceed'}</span>
+    </div>
+  </div>`;
+}
+
+function pick(i){
+  if(busy || qi>=Q.length) return;
+  if(i < 0 || i >= LIKERT.length) return;
+  busy = true;
+  A[qi] = i + 1;
+  document.querySelectorAll('#quiz-body .opt-row').forEach((r,x)=>r.classList.toggle('selected',x===i));
+  ring();
+  updateProgressAndBadges();
+
+  setTimeout(()=>{
+    busy = false;
+    if (A[qi] !== null) {
+      qi++;
+      renderQ();
+    }
+  }, 320);
+}
+
+function back(){
+  if(busy || qi===0) return;
+  qi--;
+  renderQ();
+}
+
+function ring(){
+  const d=A.filter(a=>a!==null).length, p=Q.length?d/Q.length:0;
+  $('ring-fill').style.strokeDashoffset=(CIRC*(1-p)).toFixed(1);
+  $('ring-num').textContent=Math.round(p*100)+'%';
+  $('prog-text').textContent=d+' / '+Q.length+' answered';
+}
+
+document.addEventListener('keydown',e=>{
+  if(!$('quiz-screen').classList.contains('active')) return;
+  if(e.key>='1' && e.key<='5' && qi<Q.length) pick(+e.key-1);
+  else if(e.key==='ArrowLeft' || e.key==='Backspace'){ e.preventDefault(); back(); }
+});
+
+// ==================== BRANDED HEADER & FOOTER HELPERS ====================
+function renderCoverHeader() {
+  const hasLogo = Boolean(STU.logoUrl);
+  const logoHtml = hasLogo ? `<img src="${STU.logoUrl}" alt="Client Logo">` : '';
+  const titleText = STU.clientName || 'Commerce Career Selector';
+  return `
+    <div class="cover-brand-bar">
+      <div class="cover-brand-left">
+        <div class="cover-logo-slot ${hasLogo ? 'has-logo' : ''}">${logoHtml}</div>
+        <div class="cover-client-info">
+          <div class="client-name">${titleText}</div>
+          <div class="client-sub">Psychometric Career Assessment & Counseling Report</div>
+        </div>
+      </div>
+      <div style="text-align:right;font-size:.72rem;color:var(--muted);font-weight:600;">
+        <div>REPORT ID: CCS-${new Date().getFullYear()}-${String(Q.length).padStart(3,'0')}</div>
+        <div style="color:var(--blue);margin-top:2px;">VALIDATED ASSESSMENT</div>
+      </div>
+    </div>`;
+}
+
+function renderSubHeader(sectionTitle) {
+  const hasLogo = Boolean(STU.logoUrl);
+  const logoHtml = hasLogo ? `<img src="${STU.logoUrl}" alt="Client Logo">` : '';
+  const brandLabel = STU.clientName ? `${STU.clientName} · Commerce Career Selector` : `Commerce Career Selector`;
+  return `
+    <div class="sub-page-head">
+      <div class="sub-head-left">
+        <div class="brand">${brandLabel}</div>
+        <div class="sec-title">${sectionTitle}</div>
+        <div class="candidate-tag">Candidate: <strong>${STU.name}</strong> · Phone: <strong>${STU.phone}</strong></div>
+      </div>
+      <div class="page-logo-slot ${hasLogo ? 'has-logo' : ''}">${logoHtml}</div>
+    </div>`;
+}
+
+function renderFooter(pageNum, totalPages) {
+  const brandText = STU.clientName ? `${STU.clientName} · Commerce Career Selector` : `Commerce Career Selector Report`;
+  return `
+    <div class="page-footer">
+      <span>${brandText} · Candidate: ${STU.name}</span>
+      <span>Page ${pageNum} of ${totalPages}</span>
+    </div>`;
+}
+
+// ==================== PRINT-SAFE CHART ENGINE ====================
+function destroyCharts() {
+  chartRefs.forEach(c => { if (c) c.destroy(); });
+  chartRefs = [];
+}
+
+function snapshotChartsForPrint() {
+  const pairs = [
+    ['top5Chart', 'top5ChartImg'],
+    ['tierBarChart', 'tierBarChartImg'],
+    ['domainChart', 'domainChartImg'],
+    ['finBreakChart', 'finBreakChartImg'],
+    ['radarC', 'radarCImg'],
+    ['nonFinBreakChart', 'nonFinBreakChartImg']
+  ];
+  pairs.forEach(([canvasId, imgId]) => {
+    const canvas = $(canvasId);
+    const img = $(imgId);
+    if (canvas && img) {
+      try {
+        img.src = canvas.toDataURL('image/png', 1.0);
+      } catch (e) {}
+    }
+  });
+}
+
+function prepareAndPrint() {
+  snapshotChartsForPrint();
+  setTimeout(() => { window.print(); }, 120);
+}
+
+window.addEventListener('beforeprint', snapshotChartsForPrint);
+
+function renderAllCharts(sorted, fp, np, highCount, medCount, lowCount, finClusters, nonFinClusters) {
+  if (typeof Chart === 'undefined') return;
+  destroyCharts();
+  Chart.defaults.devicePixelRatio = 2;
+
+  const top8 = sorted.slice(0, 8);
+  const top5 = sorted.slice(0, 5);
+
+  // 1. Page 1: Top 5 Clusters Horizontal Bar Chart
+  const cTop5 = $('top5Chart');
+  if (cTop5) {
+    chartRefs.push(new Chart(cTop5, {
+      type: 'bar',
+      data: {
+        labels: top5.map(([c]) => c.length > 22 ? c.slice(0,20)+'…' : c),
+        datasets: [{
+          label: 'Affinity %',
+          data: top5.map(([,s]) => Math.round(s/20*100)),
+          backgroundColor: ['#2563EB','#0EA5E9','#10B981','#6366F1','#F59E0B'],
+          borderRadius: 5,
+          barThickness: 16
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: false,
+        scales: {
+          x: { beginAtZero: true, max: 100, ticks: { stepSize: 25, font: { size: 9 } } },
+          y: { ticks: { font: { family: 'Poppins', weight: '600', size: 9.5 }, color: '#0F172A' }, grid: { display: false } }
+        },
+        plugins: { legend: { display: false } }
+      }
+    }));
+  }
+
+  // 2. Page 2: Tier Distribution Bar Chart
+  const cTier = $('tierBarChart');
+  if (cTier) {
+    chartRefs.push(new Chart(cTier, {
+      type: 'bar',
+      data: {
+        labels: ['High Level (Top)', 'Medium Level (Mid)', 'Low Level (Base)'],
+        datasets: [{
+          data: [highCount, medCount, lowCount],
+          backgroundColor: ['#10B981', '#F59E0B', '#E11D48'],
+          borderRadius: 6,
+          barThickness: 32
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: false,
+        scales: {
+          y: { beginAtZero: true, max: 10, ticks: { stepSize: 2, font: { size: 9.5, weight: '600' } } },
+          x: { ticks: { font: { family: 'Poppins', weight: '600', size: 9.5 }, color: '#0F172A' }, grid: { display: false } }
+        },
+        plugins: { legend: { display: false } }
+      }
+    }));
+  }
+
+  // 3. Page 3: Domain Doughnut Chart
+  const cDom = $('domainChart');
+  if (cDom) {
+    chartRefs.push(new Chart(cDom, {
+      type: 'doughnut',
+      data: {
+        labels: [`Financial (${fp}%)`, `Non-Financial (${np}%)`],
+        datasets: [{ data: [fp, np], backgroundColor: ['#2563EB', '#10B981'], borderWidth: 2, borderColor: '#fff' }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: false,
+        cutout: '58%',
+        plugins: { legend: { position: 'bottom', labels: { padding: 8, font: { family: 'Poppins', weight: '600', size: 10 } } } }
+      }
+    }));
+  }
+
+  // 4. Page 3: Financial Cluster Comparison Bar Chart
+  const cFin = $('finBreakChart');
+  if (cFin) {
+    chartRefs.push(new Chart(cFin, {
+      type: 'bar',
+      data: {
+        labels: finClusters.map(([c]) => c.length > 20 ? c.slice(0,18)+'…' : c),
+        datasets: [{
+          data: finClusters.map(([,s]) => Math.round(s/20*100)),
+          backgroundColor: '#2563EB',
+          borderRadius: 4,
+          barThickness: 12
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: false,
+        scales: {
+          x: { beginAtZero: true, max: 100, ticks: { stepSize: 25, font: { size: 9 } } },
+          y: { ticks: { font: { family: 'Poppins', weight: '600', size: 9 }, color: '#0F172A' }, grid: { display: false } }
+        },
+        plugins: { legend: { display: false } }
+      }
+    }));
+  }
+
+  // 5. Page 4: Top 8 Radar Chart
+  const cRad = $('radarC');
+  if (cRad) {
+    chartRefs.push(new Chart(cRad, {
+      type: 'radar',
+      data: {
+        labels: top8.map(([c]) => c.length > 22 ? c.slice(0,20)+'…' : c),
+        datasets: [{
+          data: top8.map(([,s]) => Math.round(s/20*100)),
+          fill: true,
+          backgroundColor: 'rgba(37,99,235,.22)',
+          borderColor: '#1D4ED8',
+          borderWidth: 2,
+          pointBackgroundColor: '#1D4ED8',
+          pointRadius: 3.5
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: false,
+        scales: {
+          r: {
+            min: 0, max: 100,
+            ticks: { stepSize: 25, backdropColor: 'transparent', color: '#475569', font: { size: 8.5, weight: '600' } },
+            grid: { color: '#CBD5E1' },
+            angleLines: { color: '#CBD5E1' },
+            pointLabels: { color: '#0F172A', font: { family: 'Poppins', weight: '600', size: 9.5 } }
+          }
+        },
+        plugins: { legend: { display: false } }
+      }
+    }));
+  }
+
+  // 6. Page 6: Non-Financial Cluster Comparison Chart
+  const cNonFin = $('nonFinBreakChart');
+  if (cNonFin) {
+    chartRefs.push(new Chart(cNonFin, {
+      type: 'bar',
+      data: {
+        labels: nonFinClusters.slice(0, 8).map(([c]) => c.length > 22 ? c.slice(0,20)+'…' : c),
+        datasets: [{
+          data: nonFinClusters.slice(0, 8).map(([,s]) => Math.round(s/20*100)),
+          backgroundColor: '#10B981',
+          borderRadius: 4,
+          barThickness: 12
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: false,
+        scales: {
+          x: { beginAtZero: true, max: 100, ticks: { stepSize: 25, font: { size: 9 } } },
+          y: { ticks: { font: { family: 'Poppins', weight: '600', size: 9 }, color: '#0F172A' }, grid: { display: false } }
+        },
+        plugins: { legend: { display: false } }
+      }
+    }));
+  }
+
+  setTimeout(snapshotChartsForPrint, 100);
+}
+
+// ==================== COMPLETE 10-PAGE REPORT GENERATOR ====================
+function finish(){
+  const sc={}; Object.keys(CLUSTERS).forEach(c=>sc[c]=0);
+  Q.forEach((q,i)=>{ if(A[i]) sc[q.c]+=A[i]; });
+  const sorted=Object.entries(sc).sort((a,b)=>b[1]-a[1]);
+  const third=Math.floor(sorted.length/3), lv={};
+  sorted.forEach(([c],i)=>lv[c]= i<third?'High' : i<third*2?'Medium' : 'Low');
+
+  let f=0,nf=0;
+  sorted.forEach(([c,s])=>{ if(FIN.includes(c))f+=s; else nf+=s; });
+  const dom=f>=nf?'Financial Domain':'Non-Financial Domain', tot=(f+nf)||1;
+  const fp=Math.round(100*f/tot), np=100-fp;
+
+  const top8=sorted.slice(0,8);
+  const top3=sorted.slice(0,3);
+  const finClusters = sorted.filter(([c])=>FIN.includes(c));
+  const nonFinClusters = sorted.filter(([c])=>!FIN.includes(c));
+
+  const highCount = Object.values(lv).filter(v=>v==='High').length;
+  const medCount  = Object.values(lv).filter(v=>v==='Medium').length;
+  const lowCount  = Object.values(lv).filter(v=>v==='Low').length;
+
+  const totalRawScore = Object.values(sc).reduce((a,b)=>a+b,0);
+  const avgClusterPct = Math.round((totalRawScore / (19 * 20)) * 100);
+  const topClusterPct = Math.round(top3[0][1] / 20 * 100);
+
+  const barsTop8 = top8.map(([c,s],i)=>{
+    const p=Math.round(s/20*100);
+    return `<div class="bar-item">
+      <div class="bar-label">
+        <span>${i+1}. ${c} <small style="color:var(--muted);font-weight:500;">(${FIN.includes(c)?'Financial':'Non-Financial'} · ${s}/20 pts)</small></span>
+        <span><span>${p}%</span> <span class="badge b-${lv[c].toLowerCase()}">${lv[c]}</span></span>
+      </div>
+      <div class="bar-track"><div class="bar-fill f${i%4+1}" style="width:${p}%"></div></div>
+    </div>`;
+  }).join('');
+
+  const barsRemaining = sorted.slice(8,19).map(([c,s],i)=>{
+    const p=Math.round(s/20*100);
+    return `<div class="bar-item" style="margin-bottom:.32rem;">
+      <div class="bar-label" style="font-size:.73rem;">
+        <span>${i+9}. ${c} <small style="color:var(--muted);">(${FIN.includes(c)?'Financial':'Non-Financial'})</small></span>
+        <span>${p}% <span class="badge b-${lv[c].toLowerCase()}">${lv[c]}</span></span>
+      </div>
+      <div class="bar-track" style="height:6px;"><div class="bar-fill f${(i+2)%4+1}" style="width:${p}%"></div></div>
+    </div>`;
+  }).join('');
+
+  const allClusterNames = Object.keys(CLUSTERS);
+  const makeClusterTableRows = (list) => list.map(c => {
+    const s = sc[c];
+    const p = Math.round(s/20*100);
+    const rankIdx = sorted.findIndex(([k]) => k === c) + 1;
+    return `<tr>
+      <td class="cat" style="width:24%;">
+        <div>${c}</div>
+        <div style="font-size:.66rem;color:var(--muted);font-weight:500;margin-top:1px;">Rank #${rankIdx} of 19 · ${FIN.includes(c)?'Financial':'Non-Financial'}</div>
+      </td>
+      <td style="width:22%;">
+        <div style="display:flex;align-items:center;gap:6px;">
+          <div style="flex:1;height:7px;background:#EDE7DA;border-radius:4px;overflow:hidden;">
+            <div style="width:${p}%;height:100%;background:${lv[c]==='High'?'#10B981':lv[c]==='Medium'?'#F59E0B':'#E11D48'};"></div>
+          </div>
+          <span style="font-size:0.72rem;font-weight:700;min-width:46px;">${p}% (${s}/20)</span>
+        </div>
+      </td>
+      <td style="width:12%;text-align:center;"><span class="badge b-${lv[c].toLowerCase()}">${lv[c]}</span></td>
+      <td style="width:42%;">${CLUSTERS[c].join(', ')}</td>
+    </tr>`;
+  }).join('');
+
+  const chunk1 = makeClusterTableRows(allClusterNames.slice(0,5));
+  const chunk2 = makeClusterTableRows(allClusterNames.slice(5,10));
+  const chunk3 = makeClusterTableRows(allClusterNames.slice(10,15));
+  const chunk4 = makeClusterTableRows(allClusterNames.slice(15,19));
+
+  const date = new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+  const TOTAL_PAGES = 10;
+
+  const html = `
+  <!-- ==================== PAGE 1: COVER & EXECUTIVE SUMMARY ==================== -->
+  <div class="report-page">
+    <div class="page-body">
+      ${renderCoverHeader()}
+      <div class="cover-candidate-banner">
+        <h1>${STU.name}</h1>
+        <div class="meta">
+          <span>Date:<b>${date}</b></span>
+          <span>Phone:<b>${STU.phone}</b></span>
+          <span>Email:<b>${STU.email}</b></span>
+          <span>Questions:<b>${Q.length} of ${Q.length} Completed</b></span>
+        </div>
+      </div>
+
+      <div class="rsec">
+        <h2>Executive Assessment Summary</h2>
+        <p>This psychometric report evaluates <strong>${STU.name}</strong>'s responses across 76 Commerce work-activity statements, mapping innate preferences across <strong>19 specialized Career Clusters</strong> in both the Financial and Non-Financial domains.</p>
+      </div>
+
+      <div class="stat-grid-4">
+        <div class="stat-card">
+          <div class="big">${dom.split(' ')[0]}</div>
+          <div class="lbl">Preferred Domain</div>
+          <div class="sub-lbl">${Math.max(fp,np)}% Domain Share</div>
+        </div>
+        <div class="stat-card">
+          <div class="big">${topClusterPct}%</div>
+          <div class="lbl">Peak Cluster Affinity</div>
+          <div class="sub-lbl">${top3[0][0]}</div>
+        </div>
+        <div class="stat-card">
+          <div class="big">${avgClusterPct}%</div>
+          <div class="lbl">Overall Index</div>
+          <div class="sub-lbl">${totalRawScore} / 380 Total Pts</div>
+        </div>
+        <div class="stat-card">
+          <div class="big">${highCount} / 19</div>
+          <div class="lbl">High-Tier Clusters</div>
+          <div class="sub-lbl">Primary Career Matches</div>
+        </div>
+      </div>
+
+      <div class="two-col-panel">
+        <div class="chart-panel">
+          <div class="panel-title">Top 5 Career Clusters Snapshot</div>
+          <div class="bar-canvas-box">
+            <canvas id="top5Chart" class="chart-canvas"></canvas>
+            <img id="top5ChartImg" class="chart-static-img" alt="Top 5 Chart">
+          </div>
+        </div>
+        <div class="chart-panel">
+          <div class="panel-title">Top 3 Priority Matches</div>
+          <table class="data" style="margin:0;">
+            <thead><tr><th style="width:18%">Rank</th><th style="width:52%">Cluster</th><th style="width:30%">Score</th></tr></thead>
+            <tbody>
+              ${top3.map(([c,s],idx)=>`
+                <tr>
+                  <td><span class="badge b-high">#${idx+1}</span></td>
+                  <td class="cat">${c}</td>
+                  <td><strong>${Math.round(s/20*100)}%</strong> (${s}/20)</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="insight-box">
+        <div class="insight-icon">🎯</div>
+        <div class="insight-content">
+          <h4>Executive Takeaway for ${STU.name}</h4>
+          <p>Your profile shows strongest alignment with <strong>${top3.map(x=>x[0]).join(', ')}</strong>, anchored within the <strong>${dom}</strong>. Prioritize degree tracks and professional certifications that combine these top clusters.</p>
+        </div>
+      </div>
+    </div>
+    ${renderFooter(1, TOTAL_PAGES)}
+  </div>
+
+  <!-- ==================== PAGE 2: METHODOLOGY & DELIVERABLES ==================== -->
+  <div class="report-page">
+    <div class="page-body">
+      ${renderSubHeader('What This Report Gives You & Methodology')}
+
+      <div class="rsec">
+        <h2>What This Report Gives You</h2>
+        <div class="chart-panel">
+          <ul>
+            <li>Brief knowledge about all available Commerce Careers, both in the financial and non-financial domain.</li>
+            <li>An answer to which career option of Commerce you should opt for.</li>
+            <li>A scientifically designed psychometric analysis, customized uniquely for you, matching your activity choices and work-situation preferences with professional careers of Commerce.</li>
+            <li>Results displayed in graphical forms — radar chart, interest level graph and detailed tables.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="rsec">
+        <h2>Psychometric Evaluation Architecture</h2>
+        <div class="method-flow">
+          <div class="method-step">
+            <div class="method-icon">1</div>
+            <div class="method-title">76 Situational Items</div>
+            <div class="method-desc">4 targeted work-activity statements per cluster rated on a 5-point Likert agreement scale (max 20 pts/cluster).</div>
+          </div>
+          <div class="method-step">
+            <div class="method-icon">2</div>
+            <div class="method-title">Domain Classification</div>
+            <div class="method-desc">Evaluates your inclination across 8 Financial clusters versus 11 Non-Financial clusters.</div>
+          </div>
+          <div class="method-step">
+            <div class="method-icon">3</div>
+            <div class="method-title">Relative Norm Tiering</div>
+            <div class="method-desc">Classifies all 19 clusters into High (${highCount}), Medium (${medCount}), and Low (${lowCount}) interest bands.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="two-col-panel">
+        <div class="chart-panel">
+          <div class="panel-title">Cluster Distribution Across Interest Tiers</div>
+          <div class="bar-canvas-box">
+            <canvas id="tierBarChart" class="chart-canvas"></canvas>
+            <img id="tierBarChartImg" class="chart-static-img" alt="Tier Distribution Chart">
+          </div>
+        </div>
+        <div class="chart-panel">
+          <div class="panel-title">Tier Allocation Summary</div>
+          <table class="data" style="margin:0;">
+            <thead><tr><th style="width:28%">Tier Band</th><th style="width:24%">Count</th><th style="width:48%">Action Priority</th></tr></thead>
+            <tbody>
+              <tr><td><span class="badge b-high">High Level</span></td><td><strong>${highCount} Clusters</strong></td><td>Primary Degree & Career Focus</td></tr>
+              <tr><td><span class="badge b-med">Medium Level</span></td><td><strong>${medCount} Clusters</strong></td><td>Secondary Electives & Minors</td></tr>
+              <tr><td><span class="badge b-low">Low Level</span></td><td><strong>${lowCount} Clusters</strong></td><td>Avoid as Core Specialization</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    ${renderFooter(2, TOTAL_PAGES)}
+  </div>
+
+  <!-- ==================== PAGE 3: PREFERRED DOMAIN ANALYSIS ==================== -->
+  <div class="report-page">
+    <div class="page-body">
+      ${renderSubHeader('Your Preferred Domain — Financial vs. Non-Financial')}
+
+      <div class="rsec">
+        <h2>Your Preferred Domain</h2>
+        <p><strong>${STU.name}</strong>, the graph indicates that your interests and aptitude are more inclined towards the <strong>${dom}</strong>. Below is your comparative balance across both macro spheres of Commerce.</p>
+      </div>
+
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="big">${fp}%</div>
+          <div class="lbl">Financial Domain</div>
+          <div class="sub-lbl">8 Quantitative & Capital Clusters (${f} pts)</div>
+        </div>
+        <div class="stat-card">
+          <div class="big">${np}%</div>
+          <div class="lbl">Non-Financial Domain</div>
+          <div class="sub-lbl">11 Corporate, Legal & Media Clusters (${nf} pts)</div>
+        </div>
+      </div>
+
+      <div class="two-col-panel">
+        <div class="chart-panel" style="text-align:center;">
+          <div class="panel-title">Macro Domain Share</div>
+          <div class="doughnut-box">
+            <canvas id="domainChart" class="chart-canvas"></canvas>
+            <img id="domainChartImg" class="chart-static-img" alt="Domain Doughnut Chart">
+          </div>
+        </div>
+        <div class="chart-panel">
+          <div class="panel-title">Financial Domain Cluster Breakdown</div>
+          <div class="bar-canvas-box" style="height:165px;">
+            <canvas id="finBreakChart" class="chart-canvas"></canvas>
+            <img id="finBreakChartImg" class="chart-static-img" alt="Financial Breakdown Chart">
+          </div>
+        </div>
+      </div>
+
+      <div class="insight-box">
+        <div class="insight-icon">🧭</div>
+        <div class="insight-content">
+          <h4>Domain Synthesis</h4>
+          <p>Your top Financial cluster is <strong>${finClusters[0][0]} (${Math.round(finClusters[0][1]/20*100)}%)</strong> and your top Non-Financial cluster is <strong>${nonFinClusters[0][0]} (${Math.round(nonFinClusters[0][1]/20*100)}%)</strong>. Combining these two areas creates a strong technocratic-managerial profile.</p>
+        </div>
+      </div>
+    </div>
+    ${renderFooter(3, TOTAL_PAGES)}
+  </div>
+
+  <!-- ==================== PAGE 4: RADAR CHART & COMPETENCY GEOMETRY ==================== -->
+  <div class="report-page">
+    <div class="page-body">
+      ${renderSubHeader('Interest Profile — Top 8 Clusters Radar')}
+
+      <div class="rsec">
+        <h2>Interest Profile — Top 8 Clusters</h2>
+        <ul>
+          <li>The radar chart depicts your top career domains. The portion with the larger area is your preferred direction.</li>
+          <li>Locate the career options which fall in the High, Medium and Low range below.</li>
+        </ul>
+      </div>
+
+      <div class="chart-panel">
+        <div class="radar-box">
+          <canvas id="radarC" class="chart-canvas"></canvas>
+          <img id="radarCImg" class="chart-static-img" alt="Radar Chart">
+        </div>
+      </div>
+
+      <table class="data">
+        <thead><tr><th style="width:32%">Radar Vertex</th><th style="width:26%">Domain Category</th><th style="width:14%">Raw Score</th><th style="width:14%">Affinity %</th><th style="width:14%">Tier</th></tr></thead>
+        <tbody>
+          ${top8.slice(0,6).map(([c,s],i)=>`
+            <tr>
+              <td class="cat">${i+1}. ${c}</td>
+              <td>${FIN.includes(c)?'Financial Domain':'Non-Financial Domain'}</td>
+              <td>${s} / 20</td>
+              <td><strong>${Math.round(s/20*100)}%</strong></td>
+              <td><span class="badge b-${lv[c].toLowerCase()}">${lv[c]}</span></td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+    ${renderFooter(4, TOTAL_PAGES)}
+  </div>
+
+  <!-- ==================== PAGE 5: INTEREST LEVEL GRAPH ==================== -->
+  <div class="report-page">
+    <div class="page-body">
+      ${renderSubHeader('Interest Level Graph — Complete 19-Cluster Spectrum')}
+
+      <div class="rsec">
+        <h2>Interest Level Graph (Top 8 Primary Clusters)</h2>
+        <div class="chart-panel">
+          ${barsTop8}
+        </div>
+      </div>
+
+      <div class="rsec">
+        <h2>Remaining Clusters Spectrum (Ranks 9 to 19)</h2>
+        <div class="chart-panel">
+          ${barsRemaining}
+        </div>
+      </div>
+    </div>
+    ${renderFooter(5, TOTAL_PAGES)}
+  </div>
+
+  <!-- ==================== PAGE 6: INTEREST LEVEL DESCRIPTORS ==================== -->
+  <div class="report-page">
+    <div class="page-body">
+      ${renderSubHeader('Interest Level Descriptors & Non-Financial Breakdown')}
+
+      <div class="rsec">
+        <h2>Interest Level Descriptors</h2>
+        <table class="data">
+          <thead><tr><th style="width:18%">Interest Level</th><th style="width:82%">Description</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="badge b-high">High Level</span></td>
+              <td>This level indicates High interest in the given Commerce Career Options with awareness and knowledge about the subject and career as well as enthusiasm to face the work life situations accepting its pros and cons. The student has deep understanding as well as interest to opt for given career options, and knows what kind of professional personality is required — so he or she has the zeal to develop as a professional accordingly. It is recommended to select career options from this level while maintaining motivation and dedicated study.</td>
+            </tr>
+            <tr>
+              <td><span class="badge b-med">Medium Level</span></td>
+              <td>This level indicates Medium interest in the given Commerce Career Options — the student is moderately able and interested to enjoy the pros and cons of work life situations, with moderate understanding and average general awareness about the career. It is advisable that students selecting from this level develop optimum zeal, motivation and a dedicated study pattern to grow as a professional in the field.</td>
+            </tr>
+            <tr>
+              <td><span class="badge b-low">Low Level</span></td>
+              <td>This level indicates Low interest as well as lack of understanding, awareness and knowledge about the given Commerce Career Options. There is profound reluctance in utilizing skills for small-scale tasks in the given career option. It will be an uphill task to build knowledge in a career option one is not interested in.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="chart-panel">
+        <div class="panel-title">Non-Financial Domain Cluster Breakdown (Top 8)</div>
+        <div class="bar-canvas-box" style="height:140px;">
+          <canvas id="nonFinBreakChart" class="chart-canvas"></canvas>
+          <img id="nonFinBreakChartImg" class="chart-static-img" alt="Non-Financial Breakdown Chart">
+        </div>
+      </div>
+    </div>
+    ${renderFooter(6, TOTAL_PAGES)}
+  </div>
+
+  <!-- ==================== PAGE 7: CAREER CLUSTERS PART 1 ==================== -->
+  <div class="report-page">
+    <div class="page-body">
+      ${renderSubHeader('Career Clusters & Options (Part 1 of 4)')}
+
+      <div class="rsec">
+        <h2>Career Clusters & Options — Clusters 1 to 5</h2>
+        <p>Evaluation of Accounts/Taxation, Analytics, Communication & Media, Computer Related Designing, and Financial Auditing & Investigation.</p>
+        <table class="data">
+          <thead><tr><th style="width:24%">Career Cluster</th><th style="width:22%">Affinity Score</th><th style="width:12%;text-align:center;">Level</th><th style="width:42%">Career Options</th></tr></thead>
+          <tbody>${chunk1}</tbody>
+        </table>
+      </div>
+
+      <div class="stat-grid-3">
+        <div class="stat-card">
+          <div class="big">${Math.round(sc["Accounts/Taxation"]/20*100)}%</div>
+          <div class="lbl">Accounts & Taxation</div>
+          <div class="sub-lbl">CA / CPA / Tax Advisory</div>
+        </div>
+        <div class="stat-card">
+          <div class="big">${Math.round(sc["Analytics"]/20*100)}%</div>
+          <div class="lbl">Business Analytics</div>
+          <div class="sub-lbl">Data & Market Modeling</div>
+        </div>
+        <div class="stat-card">
+          <div class="big">${Math.round(sc["Financial Auditing and Investigation"]/20*100)}%</div>
+          <div class="lbl">Auditing & Forensics</div>
+          <div class="sub-lbl">Actuarial & Security Analysis</div>
+        </div>
+      </div>
+
+      <div class="insight-box">
+        <div class="insight-icon">📊</div>
+        <div class="insight-content">
+          <h4>Pathway Note — Quantitative vs. Digital Media</h4>
+          <p>Students scoring High in Accounts/Taxation and Financial Auditing thrive in Chartered Accountancy (CA), CMA, and Forensic Accounting, while high scorers in Analytics and Computer Designing excel in Business Intelligence and UI/UX Product roles.</p>
+        </div>
+      </div>
+    </div>
+    ${renderFooter(7, TOTAL_PAGES)}
+  </div>
+
+  <!-- ==================== PAGE 8: CAREER CLUSTERS PART 2 ==================== -->
+  <div class="report-page">
+    <div class="page-body">
+      ${renderSubHeader('Career Clusters & Options (Part 2 of 4)')}
+
+      <div class="rsec">
+        <h2>Career Clusters & Options — Clusters 6 to 10</h2>
+        <p>Evaluation of Credit Management, Financial Banking & Investment, Financial Management, Monitoring & Evaluation Specialist, and Hospitality & Tourism.</p>
+        <table class="data">
+          <thead><tr><th style="width:24%">Career Cluster</th><th style="width:22%">Affinity Score</th><th style="width:12%;text-align:center;">Level</th><th style="width:42%">Career Options</th></tr></thead>
+          <tbody>${chunk2}</tbody>
+        </table>
+      </div>
+
+      <div class="stat-grid-3">
+        <div class="stat-card">
+          <div class="big">${Math.round(sc["Credit Management"]/20*100)}%</div>
+          <div class="lbl">Credit & Risk</div>
+          <div class="sub-lbl">FRM / Institutional Lending</div>
+        </div>
+        <div class="stat-card">
+          <div class="big">${Math.round(sc["Financial Banking and Investment"]/20*100)}%</div>
+          <div class="lbl">Banking & Investment</div>
+          <div class="sub-lbl">CFA / Investment Banking</div>
+        </div>
+        <div class="stat-card">
+          <div class="big">${Math.round(sc["Monitoring and Evaluation Specialist"]/20*100)}%</div>
+          <div class="lbl">Economics & Policy</div>
+          <div class="sub-lbl">Economic & Budget Advisory</div>
+        </div>
+      </div>
+
+      <div class="insight-box">
+        <div class="insight-icon">🏦</div>
+        <div class="insight-content">
+          <h4>Pathway Note — Capital Markets & Institutional Finance</h4>
+          <p>High scores across Banking, Credit Management, and Financial Management align strongly with B.Com (Hons), BBA (Finance), BA (Hons) Economics, and global credentials such as CFA and FRM.</p>
+        </div>
+      </div>
+    </div>
+    ${renderFooter(8, TOTAL_PAGES)}
+  </div>
+
+  <!-- ==================== PAGE 9: CAREER CLUSTERS PART 3 ==================== -->
+  <div class="report-page">
+    <div class="page-body">
+      ${renderSubHeader('Career Clusters & Options (Part 3 of 4)')}
+
+      <div class="rsec">
+        <h2>Career Clusters & Options — Clusters 11 to 15</h2>
+        <p>Evaluation of Hotel Operations, Industrial Designing, Journalism, Languages, and Corporate/Tax Law.</p>
+        <table class="data">
+          <thead><tr><th style="width:24%">Career Cluster</th><th style="width:22%">Affinity Score</th><th style="width:12%;text-align:center;">Level</th><th style="width:42%">Career Options</th></tr></thead>
+          <tbody>${chunk3}</tbody>
+        </table>
+      </div>
+
+      <div class="stat-grid-3">
+        <div class="stat-card">
+          <div class="big">${Math.round(sc["Law"]/20*100)}%</div>
+          <div class="lbl">Corporate & Tax Law</div>
+          <div class="sub-lbl">BBA LLB / Company Secretary</div>
+        </div>
+        <div class="stat-card">
+          <div class="big">${Math.round(sc["Journalism"]/20*100)}%</div>
+          <div class="lbl">Journalism & Copy</div>
+          <div class="sub-lbl">Print, Electronic & Content</div>
+        </div>
+        <div class="stat-card">
+          <div class="big">${Math.round(sc["Industrial Designing"]/20*100)}%</div>
+          <div class="lbl">Industrial Design</div>
+          <div class="sub-lbl">Fashion, Jewellery & Interior</div>
+        </div>
+      </div>
+
+      <div class="insight-box">
+        <div class="insight-icon">⚖️</div>
+        <div class="insight-content">
+          <h4>Pathway Note — Regulatory, Creative & Linguistic Tracks</h4>
+          <p>Commerce students with strong Law affinities frequently pair B.Com/BBA with LLB (5-year integrated law via CLAT) or pursue Company Secretaryship (CS) to lead corporate governance and regulatory compliance.</p>
+        </div>
+      </div>
+    </div>
+    ${renderFooter(9, TOTAL_PAGES)}
+  </div>
+
+  <!-- ==================== PAGE 10: CAREER CLUSTERS PART 4 & ACTION PLAN ==================== -->
+  <div class="report-page">
+    <div class="page-body">
+      ${renderSubHeader('Career Clusters (Part 4 of 4) & Action Plan')}
+
+      <div class="rsec">
+        <h2>Career Clusters & Options — Clusters 16 to 19</h2>
+        <table class="data">
+          <thead><tr><th style="width:24%">Career Cluster</th><th style="width:22%">Affinity Score</th><th style="width:12%;text-align:center;">Level</th><th style="width:42%">Career Options</th></tr></thead>
+          <tbody>${chunk4}</tbody>
+        </table>
+      </div>
+
+      <div class="rsec">
+        <h2>Actions & Next Steps for ${STU.name}</h2>
+        <p>Focus primarily on the clusters marked with a <span class="badge b-high">High</span> level — specifically <strong>${top3.map(x=>x[0]).join(', ')}</strong>. Execute the three-step academic roadmap below:</p>
+        <div class="method-flow">
+          <div class="method-step">
+            <div class="method-icon">1</div>
+            <div class="method-title">1. Shortlist Top Clusters</div>
+            <div class="method-desc">Prioritize ${top3[0][0]} (${Math.round(top3[0][1]/20*100)}%) and ${top3[1][0]} (${Math.round(top3[1][1]/20*100)}%) when selecting your undergraduate specialization.</div>
+          </div>
+          <div class="method-step">
+            <div class="method-icon">2</div>
+            <div class="method-title">2. Counselor Review</div>
+            <div class="method-desc">Map entrance exams (CUET, IPMAT, CLAT, CA/CS Foundation) with your counselor based on your ${dom} inclination.</div>
+          </div>
+          <div class="method-step">
+            <div class="method-icon">3</div>
+            <div class="method-title">3. Skill & Certification Plan</div>
+            <div class="method-desc">Pair your degree with practical internships and professional certifications aligned with your High-level clusters.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="insight-box">
+        <div class="insight-icon">✅</div>
+        <div class="insight-content">
+          <h4>Final Counselor Summary</h4>
+          <p><strong>${STU.name}</strong>'s highest career sustainability lies at the intersection of <strong>${top3[0][0]}</strong> and <strong>${top3[1][0]}</strong>. Revisit this report every 6 months to track academic milestones.</p>
+        </div>
+      </div>
+    </div>
+    ${renderFooter(10, TOTAL_PAGES)}
+  </div>
+  `;
+
+  $('report-content').innerHTML = html;
+  $('quiz-screen').classList.remove('active');
+  $('report-screen').classList.add('active');
+  window.scrollTo(0, 0);
+
+  setTimeout(() => {
+    renderAllCharts(sorted, fp, np, highCount, medCount, lowCount, finClusters, nonFinClusters);
+    if (typeof confetti === 'function') {
+      const C = ['#2563EB', '#0EA5E9', '#10B981', '#F59E0B'];
+      confetti({ particleCount: 90, spread: 70, origin: { y: 0.6 }, colors: C });
+    }
+  }, 60);
+}
+</script>
+</body>
+</html>
