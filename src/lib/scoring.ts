@@ -4,6 +4,8 @@
 
 import { NormAssessment, ScoreResult, DimensionDef } from '@/lib/assessments/types'
 import { answersMapToLikertArray, calculateCommerceResults, commerceResultToScoreResult } from '@/lib/tests/commerce/scoring'
+import { getPlatformTestConfig, slugToTestId } from '@/tests'
+import { assessmentResultToScoreResult, evaluateTest, toUnifiedAnswerMap } from '@/scoring/scoringEngine'
 
 function levelFromBands(pct: number, bands: DimensionDef['bands']): string {
   let level = bands[0]?.label || 'Low'
@@ -37,6 +39,23 @@ export function scoreAttempt(
       arr,
     )
     return commerceResultToScoreResult(result)
+  }
+
+  // Unified pipeline for the assessments that previously used the generic
+  // SCORING_MAP path: humanities-branch, engineering-branch, ideal-career and
+  // multi-dimensional. This stores the original per-test methodology (6-tier
+  // potential scale, RIASEC ranking, grade-adaptive buckets, etc.) so the
+  // dashboard chart matches the colorful unified PDF.
+  const unifiedTestId = slugToTestId(assessment.slug)
+  const UNIFIED_STORED: string[] = ['humanities', 'engineering', 'ideal-career', 'multi-dimensional']
+  if (unifiedTestId && UNIFIED_STORED.includes(unifiedTestId)) {
+    const cfg = getPlatformTestConfig(unifiedTestId)
+    if (cfg) {
+      const student = { name: '', email: '', phone: '' }
+      const unified = toUnifiedAnswerMap(cfg, student, answers)
+      const r = evaluateTest(cfg, student, unified)
+      return assessmentResultToScoreResult(r)
+    }
   }
 
   switch (assessment.scoringMethod) {

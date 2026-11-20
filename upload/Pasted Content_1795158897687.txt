@@ -1,0 +1,1757 @@
+Plaintextsrc/
+├── types/
+│   └── assessment.ts               # Shared TypeScript models for all 9 tests
+├── tests/
+│   ├── index.ts                    # Dynamic Test Registry (loads config by testId)
+│   ├── commerce.config.ts          # 76 Qs, 19 clusters (Financial vs Non-Financial)
+│   ├── engineering.config.ts       # 56 Qs, 14 groups (6-tier potential)
+│   ├── humanities.config.ts        # 76 Qs, 19 clusters (Public vs Creative)
+│   ├── idealCareer.config.ts       # 182 Qs, 7 sections (Aptitude + RIASEC + OCEAN + Motivators)
+│   ├── learningStyles.config.ts    # 64 Qs (w/ reverse scoring), 16 preferences
+│   ├── multiDimensional.config.ts  # Grade-adaptive 60 Qs (4 grades), 5 dimensions
+│   ├── multipleIntel.config.ts     # 54 Qs (1–7 scale), 9 intelligences + EI
+│   ├── personality.config.ts       # 36 A/B Qs, 16 MBTI types
+│   └── streamSelector.config.ts    # 76 Qs (w/ passages), 4 streams (Aptitude vs Interest)
+├── scoring/
+│   └── scoringEngine.ts            # Centralized engine with all 9 exact scoring methodologies
+├── reports/
+│   └── reportConfigs.ts            # 9 test-specific report templates & visual configs
+├── pdf-generator/
+│   └── generateReportPdf.ts        # Centralized colorful multi-page A4 pdf-lib engine
+├── services/
+│   └── assessmentService.ts        # Client API service for submission & PDF download
+├── app/api/reports/[testId]/pdf/
+│   └── route.ts                    # Single dynamic Next.js API route for all 9 PDFs
+└── components/TestRunner/
+    └── TestRunner.tsx              # Single reusable React/TS TestRunner + Report Preview
+2. Shared TypeScript Models (src/types/assessment.ts)TypeScriptexport type TestId =
+  | 'commerce'
+  | 'engineering'
+  | 'humanities'
+  | 'ideal-career'
+  | 'learning-styles'
+  | 'multi-dimensional'
+  | 'multiple-intelligence'
+  | 'personality'
+  | 'stream-selector';
+
+export type QuestionType = 'likert-5' | 'likert-7' | 'forced-choice-ab' | 'mcq' | 'multi-select';
+
+export type GradeLevel = 'Class 8 - 10' | 'Class 11 - 12' | 'Undergraduate' | 'Postgraduate';
+
+export type BadgeColor = 'green' | 'blue' | 'sky' | 'amber' | 'rose' | 'slate';
+
+export interface StudentInfo {
+  name: string;
+  email: string;
+  phone: string;
+  grade?: GradeLevel;
+}
+
+export interface BrandingConfig {
+  clientName?: string;
+  logoUrl?: string;
+}
+
+export interface QuestionItem {
+  id: string;
+  section: string;
+  text: string;
+  type: QuestionType;
+  options: string[];
+  /** Optional metadata used by test-specific scoring rules */
+  category?: string;
+  reverse?: boolean;
+  passage?: string;
+  codeDisplay?: string;
+  correctOption?: string;
+  aptitudeDomain?: 'critical' | 'numerical' | 'verbal' | 'acuteness' | 'spatial';
+  streamDomain?: 'sci_math' | 'commerce' | 'sci_bio' | 'humanities';
+  streamMetric?: 'interest' | 'interest_reverse' | 'aptitude';
+  abTraits?: [string, string]; // e.g., ['E', 'I']
+  scoringMap?: {
+    riasec?: Record<string, Record<string, number>>;
+    bigFive?: Record<string, Record<string, number>>;
+    motivator?: string;
+    values?: Record<string, number>;
+  };
+}
+
+export interface TestConfig {
+  id: TestId;
+  title: string;
+  highlightedTitle: string;
+  subtitle: string;
+  estimatedMinutes: string;
+  badgeChips: string[];
+  instructions: string;
+  requiresGrade?: boolean;
+  autoAdvanceOnSelect?: boolean;
+  /** Either static questions or grade-keyed question banks (for Multi-Dimensional) */
+  questions: QuestionItem[] | Record<GradeLevel, QuestionItem[]>;
+  metadata: Record<string, unknown>;
+}
+
+/** Standardized output produced by the Centralized Scoring Engine */
+export interface ScoredDimension {
+  label: string;
+  subLabel?: string;
+  rawScore: number;
+  maxScore: number;
+  percentage: number;
+  tier: string;
+  tierColor: BadgeColor;
+  details?: string;
+}
+
+export interface DivergentPair {
+  leftLabel: string;
+  rightLabel: string;
+  leftPct: number;
+  rightPct: number;
+}
+
+export interface AssessmentResult {
+  testId: TestId;
+  testTitle: string;
+  reportId: string;
+  student: StudentInfo;
+  dateFormatted: string;
+  totalQuestions: number;
+  answeredCount: number;
+  heroBadge?: { code: string; subtitle: string }; // Used for MBTI (e.g., INTJ - The Architect)
+  kpis: Array<{ big: string; label: string; sub: string; color: 'blue' | 'green' | 'indigo' | 'amber' }>;
+  macroSplit?: Array<{ label: string; percentage: number; sub: string; color: 'blue' | 'green' | 'amber' | 'indigo' }>;
+  divergentPairs?: DivergentPair[]; // Used for MBTI 4-axis split
+  radarData?: Array<{ label: string; value: number }>;
+  rankedDimensions: ScoredDimension[];
+  detailRows: Array<{
+    name: string;
+    sub: string;
+    scoreText: string;
+    percentage: number;
+    badge: string;
+    badgeColor: BadgeColor;
+    description: string;
+  }>;
+  executiveSummary: string;
+  executiveTakeaway: string;
+  actionSteps: Array<{ title: string; desc: string }>;
+  finalVerdict: string;
+}
+
+export interface ReportTemplateConfig {
+  testId: TestId;
+  reportTitle: string;
+  reportSubtitle: string;
+  accentHex: [number, number, number]; // RGB 0-1 for pdf-lib
+  methodologySteps: Array<{ title: string; desc: string }>;
+  deliverables: string[];
+  descriptors: Array<{ badge: string; color: BadgeColor; text: string }>;
+  chartMode: 'radar-and-bars' | 'divergent-bars' | 'grouped-bars';
+}
+3. Centralized Scoring Engine (src/scoring/scoringEngine.ts)Preserves all 9 original scoring methodologies without simplification.   TypeScriptimport {
+  AssessmentResult,
+  QuestionItem,
+  ScoredDimension,
+  StudentInfo,
+  TestConfig,
+} from '@/types/assessment';
+
+export type AnswerMap = Record<string, string | number | string[]>;
+
+function getQuestionsForStudent(config: TestConfig, student: StudentInfo): QuestionItem[] {
+  if (Array.isArray(config.questions)) return config.questions;
+  const grade = student.grade || 'Class 11 - 12';
+  return config.questions[grade] || [];
+}
+
+function buildHeaderMeta(prefix: string, total: number) {
+  const now = new Date();
+  return {
+    dateFormatted: now.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }),
+    reportId: `${prefix}-${now.getFullYear()}-${String(total).padStart(3, '0')}`,
+  };
+}
+
+export function evaluateTest(
+  config: TestConfig,
+  student: StudentInfo,
+  answers: AnswerMap
+): AssessmentResult {
+  const questions = getQuestionsForStudent(config, student);
+  const answeredCount = questions.filter((q) => answers[q.id] !== undefined && answers[q.id] !== '').length;
+
+  switch (config.id) {
+    case 'commerce':
+      return scoreCommerce(config, student, questions, answers, answeredCount);
+    case 'engineering':
+      return scoreEngineering(config, student, questions, answers, answeredCount);
+    case 'humanities':
+      return scoreHumanities(config, student, questions, answers, answeredCount);
+    case 'ideal-career':
+      return scoreIdealCareer(config, student, questions, answers, answeredCount);
+    case 'learning-styles':
+      return scoreLearningStyles(config, student, questions, answers, answeredCount);
+    case 'multi-dimensional':
+      return scoreMultiDimensional(config, student, questions, answers, answeredCount);
+    case 'multiple-intelligence':
+      return scoreMultipleIntelligence(config, student, questions, answers, answeredCount);
+    case 'personality':
+      return scorePersonality(config, student, questions, answers, answeredCount);
+    case 'stream-selector':
+      return scoreStreamSelector(config, student, questions, answers, answeredCount);
+    default:
+      throw new Error(`Unsupported testId: ${config.id}`);
+  }
+}
+
+/* 1. COMMERCE CAREER SELECTOR (76 Qs, 19 Clusters, 1/3rd Normative Tiering, Financial vs Non-Financial) */
+function scoreCommerce(
+  config: TestConfig,
+  student: StudentInfo,
+  questions: QuestionItem[],
+  answers: AnswerMap,
+  answeredCount: number
+): AssessmentResult {
+  const clusters = config.metadata.clusters as Record<string, string[]>;
+  const finSet = new Set(config.metadata.financialClusters as string[]);
+  const sc: Record<string, number> = {};
+  Object.keys(clusters).forEach((c) => (sc[c] = 0));
+
+  questions.forEach((q) => {
+    const val = Number(answers[q.id]);
+    if (val >= 1 && val <= 5 && q.category) sc[q.category] += val;
+  });
+
+  const sorted = Object.entries(sc).sort((a, b) => b[1] - a[1]);
+  const third = Math.floor(sorted.length / 3);
+  let fin = 0, nonFin = 0;
+
+  const ranked: ScoredDimension[] = sorted.map(([c, s], i) => {
+    if (finSet.has(c)) fin += s; else nonFin += s;
+    const tier = i < third ? 'High' : i < third * 2 ? 'Medium' : 'Low';
+    return {
+      label: c,
+      subLabel: `Rank #${i + 1} · ${finSet.has(c) ? 'Financial' : 'Non-Financial'}`,
+      rawScore: s,
+      maxScore: 20,
+      percentage: Math.round((s / 20) * 100),
+      tier,
+      tierColor: tier === 'High' ? 'green' : tier === 'Medium' ? 'amber' : 'rose',
+      details: clusters[c].join(', '),
+    };
+  });
+
+  const tot = fin + nonFin || 1;
+  const fp = Math.round((100 * fin) / tot);
+  const np = 100 - fp;
+  const dom = fin >= nonFin ? 'Financial Domain' : 'Non-Financial Domain';
+  const top3 = ranked.slice(0, 3);
+
+  return {
+    testId: 'commerce',
+    testTitle: config.title,
+    ...buildHeaderMeta('CCS', questions.length),
+    student,
+    totalQuestions: questions.length,
+    answeredCount,
+    kpis: [
+      { big: dom.split(' ')[0], label: 'Preferred Domain', sub: `${Math.max(fp, np)}% Share`, color: 'blue' },
+      { big: `${top3[0].percentage}%`, label: 'Peak Cluster', sub: top3[0].label, color: 'green' },
+      { big: `${Math.round(((fin + nonFin) / 380) * 100)}%`, label: 'Overall Index', sub: `${fin + nonFin}/380 Pts`, color: 'indigo' },
+      { big: `${third}/19`, label: 'High-Tier Matches', sub: 'Primary Focus', color: 'amber' },
+    ],
+    macroSplit: [
+      { label: 'Financial Domain', percentage: fp, sub: `${fin} pts (8 Clusters)`, color: 'blue' },
+      { label: 'Non-Financial Domain', percentage: np, sub: `${nonFin} pts (11 Clusters)`, color: 'green' },
+    ],
+    radarData: ranked.slice(0, 8).map((r) => ({ label: r.label, value: r.percentage })),
+    rankedDimensions: ranked,
+    detailRows: ranked.map((r) => ({
+      name: r.label,
+      sub: r.subLabel || '',
+      scoreText: `${r.percentage}% (${r.rawScore}/20)`,
+      percentage: r.percentage,
+      badge: r.tier,
+      badgeColor: r.tierColor,
+      description: r.details || '',
+    })),
+    executiveSummary: `Evaluates ${student.name}'s responses across 76 Commerce work-activity statements, mapping innate preferences across 19 specialized Career Clusters in both Financial and Non-Financial domains.`,
+    executiveTakeaway: `Strongest alignment with ${top3.map((x) => x.label).join(', ')}, anchored in the ${dom}.`,
+    actionSteps: [
+      { title: 'Shortlist Top Clusters', desc: `Prioritize ${top3[0].label} (${top3[0].percentage}%) and ${top3[1].label} (${top3[1].percentage}%).` },
+      { title: 'Counselor Review', desc: `Map CUET, IPMAT, CLAT, or CA/CS Foundation tracks for the ${dom}.` },
+      { title: 'Skill & Certification Plan', desc: 'Pair undergraduate degrees with practical internships in High-tier clusters.' },
+    ],
+    finalVerdict: `${student.name}'s highest career sustainability lies at the intersection of ${top3[0].label} and ${top3[1].label}.`,
+  };
+}
+
+/* 2. ENGINEERING BRANCH SELECTOR (56 Qs, 14 Groups, 6-Tier Potential Scale) */
+function scoreEngineering(
+  config: TestConfig,
+  student: StudentInfo,
+  questions: QuestionItem[],
+  answers: AnswerMap,
+  answeredCount: number
+): AssessmentResult {
+  const branches = config.metadata.branches as Record<string, string[]>;
+  const sectors = config.metadata.sectors as Record<string, string[]>;
+  const sc: Record<string, number> = {};
+  Object.keys(branches).forEach((g) => (sc[g] = 0));
+
+  questions.forEach((q) => {
+    const val = Number(answers[q.id]);
+    if (val >= 1 && val <= 5 && q.category) sc[q.category] += val;
+  });
+
+  const lvOf = (s: number) => {
+    const p = s / 20;
+    if (p >= 0.8) return { t: 'Very High', c: 'green' as const };
+    if (p >= 0.65) return { t: 'High', c: 'blue' as const };
+    if (p >= 0.5) return { t: 'Above Average', c: 'sky' as const };
+    if (p >= 0.35) return { t: 'Average', c: 'slate' as const };
+    if (p >= 0.2) return { t: 'Below Average', c: 'amber' as const };
+    return { t: 'Very Low', c: 'rose' as const };
+  };
+
+  const sorted = Object.entries(sc).sort((a, b) => b[1] - a[1]);
+  const ranked: ScoredDimension[] = sorted.map(([g, s], i) => {
+    const lv = lvOf(s);
+    return {
+      label: g,
+      subLabel: `Rank #${i + 1} of 14`,
+      rawScore: s,
+      maxScore: 20,
+      percentage: Math.round((s / 20) * 100),
+      tier: lv.t,
+      tierColor: lv.c,
+      details: branches[g].join(', '),
+    };
+  });
+
+  const sectorColors = ['blue', 'green', 'amber', 'indigo'] as const;
+  const macroSplit = Object.entries(sectors)
+    .map(([name, gs], idx) => {
+      const raw = gs.reduce((a, g) => a + (sc[g] || 0), 0);
+      return { label: name, percentage: Math.round((raw / (gs.length * 20)) * 100), sub: `${raw}/${gs.length * 20} pts`, color: sectorColors[idx % 4] };
+    })
+    .sort((a, b) => b.percentage - a.percentage);
+
+  const totalRaw = Object.values(sc).reduce((a, b) => a + b, 0);
+  const top3 = ranked.slice(0, 3);
+
+  return {
+    testId: 'engineering',
+    testTitle: config.title,
+    ...buildHeaderMeta('EBS', questions.length),
+    student,
+    totalQuestions: questions.length,
+    answeredCount,
+    kpis: [
+      { big: `${top3[0].percentage}%`, label: '#1 Branch Affinity', sub: top3[0].label, color: 'blue' },
+      { big: `${macroSplit[0].percentage}%`, label: 'Lead Sector', sub: macroSplit[0].label.split(',')[0], color: 'green' },
+      { big: `${Math.round((totalRaw / 280) * 100)}%`, label: 'Aptitude Index', sub: `${totalRaw}/280 Pts`, color: 'indigo' },
+      { big: `${ranked.filter((r) => r.percentage >= 50).length}/14`, label: 'Recommended', sub: 'Above Avg to Very High', color: 'amber' },
+    ],
+    macroSplit,
+    radarData: ranked.slice(0, 8).map((r) => ({ label: r.label, value: r.percentage })),
+    rankedDimensions: ranked,
+    detailRows: ranked.map((r) => ({
+      name: r.label,
+      sub: r.subLabel || '',
+      scoreText: `${r.rawScore}/20 (${r.percentage}%)`,
+      percentage: r.percentage,
+      badge: r.tier,
+      badgeColor: r.tierColor,
+      description: r.details || '',
+    })),
+    executiveSummary: `Evaluates ${student.name}'s responses across 56 engineering work-situation statements across 14 branch groups and 34 B.E./B.Tech disciplines.`,
+    executiveTakeaway: `Peak technical consonance with ${top3.map((t) => t.label).join(', ')} (${top3[0].details}).`,
+    actionSteps: [
+      { title: 'Lock Top Branch Choices', desc: `Prioritize ${top3[0].details} (${top3[0].percentage}%) during choice filling.` },
+      { title: 'Entrance & College Mapping', desc: 'Align JEE Main/Advanced, BITSAT, and state CET targets with top departmental labs.' },
+      { title: 'Applied Skill Building', desc: `Build hands-on projects in ${top3[0].label} before Semester 1.` },
+    ],
+    finalVerdict: `${student.name}'s highest engineering potential lies in ${top3[0].label} and ${top3[1].label}.`,
+  };
+}
+
+/* 3. HUMANITIES CAREER SELECTOR (76 Qs, 19 Clusters, Public vs Creative) */
+function scoreHumanities(
+  config: TestConfig,
+  student: StudentInfo,
+  questions: QuestionItem[],
+  answers: AnswerMap,
+  answeredCount: number
+): AssessmentResult {
+  const clusters = config.metadata.clusters as Record<string, { careers: string[]; work: string }>;
+  const pubSet = new Set(config.metadata.publicClusters as string[]);
+  const sc: Record<string, number> = {};
+  Object.keys(clusters).forEach((c) => (sc[c] = 0));
+
+  questions.forEach((q) => {
+    const val = Number(answers[q.id]);
+    if (val >= 1 && val <= 5 && q.category) sc[q.category] += val;
+  });
+
+  const sorted = Object.entries(sc).sort((a, b) => b[1] - a[1]);
+  const third = Math.floor(sorted.length / 3);
+  let pub = 0, cre = 0;
+
+  const ranked: ScoredDimension[] = sorted.map(([c, s], i) => {
+    if (pubSet.has(c)) pub += s; else cre += s;
+    const tier = i < third ? 'High' : i < third * 2 ? 'Medium' : 'Low';
+    return {
+      label: c,
+      subLabel: `Rank #${i + 1} · ${pubSet.has(c) ? 'Public Service' : 'Creative & Media'}`,
+      rawScore: s,
+      maxScore: 20,
+      percentage: Math.round((s / 20) * 100),
+      tier,
+      tierColor: tier === 'High' ? 'green' : tier === 'Medium' ? 'amber' : 'rose',
+      details: `Careers: ${clusters[c].careers.join(', ')} | Work: ${clusters[c].work}`,
+    };
+  });
+
+  const tot = pub + cre || 1;
+  const pubPct = Math.round((100 * pub) / tot);
+  const crePct = 100 - pubPct;
+  const dom = pub >= cre ? 'Public Service & Management' : 'Creative, Media & Applied Arts';
+  const top3 = ranked.slice(0, 3);
+
+  return {
+    testId: 'humanities',
+    testTitle: config.title,
+    ...buildHeaderMeta('HCS', questions.length),
+    student,
+    totalQuestions: questions.length,
+    answeredCount,
+    kpis: [
+      { big: dom.split(' ')[0], label: 'Preferred Domain', sub: `${Math.max(pubPct, crePct)}% Share`, color: 'blue' },
+      { big: `${top3[0].percentage}%`, label: 'Peak Cluster', sub: top3[0].label.replace(' Related', ''), color: 'green' },
+      { big: `${Math.round(((pub + cre) / 380) * 100)}%`, label: 'Overall Index', sub: `${pub + cre}/380 Pts`, color: 'indigo' },
+      { big: `${third}/19`, label: 'High-Tier Matches', sub: 'Primary Focus', color: 'amber' },
+    ],
+    macroSplit: [
+      { label: 'Public Service & Management', percentage: pubPct, sub: `${pub} pts (10 Clusters)`, color: 'blue' },
+      { label: 'Creative, Media & Applied Arts', percentage: crePct, sub: `${cre} pts (9 Clusters)`, color: 'green' },
+    ],
+    radarData: ranked.slice(0, 8).map((r) => ({ label: r.label.replace(' Related', ''), value: r.percentage })),
+    rankedDimensions: ranked,
+    detailRows: ranked.map((r) => ({
+      name: r.label,
+      sub: r.subLabel || '',
+      scoreText: `${r.percentage}% (${r.rawScore}/20)`,
+      percentage: r.percentage,
+      badge: r.tier,
+      badgeColor: r.tierColor,
+      description: r.details || '',
+    })),
+    executiveSummary: `Evaluates ${student.name}'s responses across 76 Humanities statements across 19 clusters spanning Public Service and Creative Media.`,
+    executiveTakeaway: `Strongest alignment with ${top3.map((x) => x.label).join(', ')} in the ${dom} track.`,
+    actionSteps: [
+      { title: 'Shortlist Top Clusters', desc: `Prioritize High-tier clusters: ${top3.map((x) => x.label.replace(' Related', '')).join(', ')}.` },
+      { title: 'Counselor Consultation', desc: 'Map BA, BFA, BMM, or Integrated Law (CLAT, NIFT, CUET) targets.' },
+      { title: 'Degree & Portfolio', desc: 'Build writing samples, design portfolios, or civic internships.' },
+    ],
+    finalVerdict: `${student.name}'s optimal Humanities trajectory bridges ${top3[0].label} and ${top3[1].label}.`,
+  };
+}
+
+/* 4. IDEAL CAREER TEST (182 Qs: Aptitude/10 + RIASEC + Big Five + Motivators) */
+function scoreIdealCareer(
+  config: TestConfig,
+  student: StudentInfo,
+  questions: QuestionItem[],
+  answers: AnswerMap,
+  answeredCount: number
+): AssessmentResult {
+  const careerMap = config.metadata.careerMap as Record<string, { title: string; desc: string; jobs: string[] }>;
+  const riasec: Record<string, number> = { R: 0, I: 0, A: 0, S: 0, E: 0, C: 0 };
+  const bigFive: Record<string, number> = { openness: 0, conscientiousness: 0, extraversion: 0, agreeableness: 0, stability: 0 };
+  const motivators: Record<string, number> = { money: 0, freedom: 0, stability: 0, leisure: 0, service: 0, variety: 0, leadership: 0, respect: 0, challenge: 0, interest: 0 };
+  const aptCorrect: Record<string, number> = { critical: 0, numerical: 0, verbal: 0, acuteness: 0, spatial: 0 };
+  const aptTotal: Record<string, number> = { critical: 0, numerical: 0, verbal: 0, acuteness: 0, spatial: 0 };
+
+  questions.forEach((q) => {
+    const val = String(answers[q.id] ?? '');
+    if (!val) return;
+    if (q.correctOption && q.aptitudeDomain) {
+      aptTotal[q.aptitudeDomain]++;
+      if (val === q.correctOption) aptCorrect[q.aptitudeDomain]++;
+    }
+    if (q.scoringMap?.riasec) {
+      for (const k in q.scoringMap.riasec) riasec[k] += q.scoringMap.riasec[k][val] ?? 0;
+    }
+    if (q.scoringMap?.bigFive) {
+      for (const k in q.scoringMap.bigFive) bigFive[k] += q.scoringMap.bigFive[k][val] ?? 0;
+    }
+    if (q.scoringMap?.motivator && q.scoringMap.values) {
+      motivators[q.scoringMap.motivator] += q.scoringMap.values[val] ?? 0;
+    }
+  });
+
+  const aptScores = Object.keys(aptTotal).map((k) => {
+    const score10 = aptTotal[k] ? Math.round((aptCorrect[k] / aptTotal[k]) * 10) : 7;
+    return { key: k, score10, pct: score10 * 10 };
+  });
+
+  const sortedRiasec = Object.entries(riasec).sort((a, b) => b[1] - a[1]);
+  const top3Fields = sortedRiasec.slice(0, 3).map(([code]) => ({ code, ...careerMap[code] }));
+  const topMot = Object.entries(motivators).sort((a, b) => b[1] - a[1])[0][0];
+
+  const ranked: ScoredDimension[] = [
+    ...aptScores.map((a) => ({
+      label: `${a.key.toUpperCase()} Aptitude`,
+      subLabel: 'Cognitive Baseline',
+      rawScore: a.score10,
+      maxScore: 10,
+      percentage: a.pct,
+      tier: a.score10 >= 8 ? 'High' : a.score10 >= 5 ? 'Moderate' : 'Developing',
+      tierColor: (a.score10 >= 8 ? 'green' : a.score10 >= 5 ? 'amber' : 'rose') as 'green' | 'amber' | 'rose',
+      details: `Score: ${a.score10} / 10`,
+    })),
+    ...sortedRiasec.map(([code, val]) => ({
+      label: `${careerMap[code].title} (${code})`,
+      subLabel: 'RIASEC Interest Theme',
+      rawScore: val,
+      maxScore: 30,
+      percentage: Math.min(100, Math.round((val / 25) * 100)),
+      tier: val >= 15 ? 'High' : val >= 8 ? 'Moderate' : 'Low',
+      tierColor: (val >= 15 ? 'green' : val >= 8 ? 'amber' : 'rose') as 'green' | 'amber' | 'rose',
+      details: careerMap[code].jobs.join(', '),
+    })),
+  ];
+
+  return {
+    testId: 'ideal-career',
+    testTitle: config.title,
+    ...buildHeaderMeta('ICT', questions.length),
+    student,
+    totalQuestions: questions.length,
+    answeredCount,
+    kpis: [
+      { big: top3Fields[0].title.split(' ')[0], label: 'Primary Field', sub: `Code: ${top3Fields.map((f) => f.code).join('')}`, color: 'blue' },
+      { big: `${aptScores.reduce((a, b) => a + b.score10, 0)}/50`, label: 'Aptitude Total', sub: '5 Cognitive Areas', color: 'green' },
+      { big: topMot.toUpperCase(), label: 'Top Motivator', sub: 'Core Driver', color: 'indigo' },
+      { big: `${answeredCount}/${questions.length}`, label: 'Items Completed', sub: '4-Pillar Model', color: 'amber' },
+    ],
+    radarData: Object.entries(bigFive).map(([k, v]) => ({ label: k.toUpperCase(), value: Math.min(100, v * 12) })),
+    rankedDimensions: ranked,
+    detailRows: top3Fields.map((f, idx) => ({
+      name: `#${idx + 1} ${f.title} (${f.code})`,
+      sub: f.desc,
+      scoreText: `RIASEC Score: ${riasec[f.code]}`,
+      percentage: Math.min(100, Math.round((riasec[f.code] / 25) * 100)),
+      badge: idx === 0 ? 'Top Match' : 'Strong Fit',
+      badgeColor: idx === 0 ? 'green' : 'blue',
+      description: f.jobs.join(', '),
+    })),
+    executiveSummary: `360-degree evaluation of ${student.name}'s cognitive aptitudes, RIASEC interests, Big Five personality traits, and internal career motivators.`,
+    executiveTakeaway: `Ideal career intersection: ${top3Fields[0].title} + ${top3Fields[1].title}, driven by ${topMot}.`,
+    actionSteps: [
+      { title: 'Skill Verification', desc: `Research undergraduate tracks for ${top3Fields[0].jobs.slice(0, 2).join(' & ')}.` },
+      { title: 'Pilot Testing', desc: `Complete a project or shadowing day in ${top3Fields[0].title}.` },
+      { title: 'Aptitude Building', desc: 'Target targeted practice in your lowest-scoring cognitive aptitude.' },
+    ],
+    finalVerdict: `${student.name} is structurally aligned with ${top3Fields[0].title} environments that reward ${topMot}.`,
+  };
+}
+
+/* 5. LEARNING STYLES (64 Qs w/ reverse scoring 6-v, 16 Preferences) */
+function scoreLearningStyles(
+  config: TestConfig,
+  student: StudentInfo,
+  questions: QuestionItem[],
+  answers: AnswerMap,
+  answeredCount: number
+): AssessmentResult {
+  const cats = config.metadata.categories as Array<{ n: string; type: 'Sensory' | 'Environmental' | 'Mindset' }>;
+  const descs = config.metadata.descriptions as Record<string, string>;
+  const raw: Record<string, number> = {};
+  cats.forEach((c) => (raw[c.n] = 0));
+
+  questions.forEach((q) => {
+    const val = Number(answers[q.id]);
+    if (val >= 1 && val <= 5 && q.category) {
+      raw[q.category] += q.reverse ? 6 - val : val;
+    }
+  });
+
+  const sorted = Object.entries(raw).sort((a, b) => b[1] - a[1]);
+  let sens = 0, env = 0, mind = 0;
+
+  const ranked: ScoredDimension[] = sorted.map(([c, s], i) => {
+    const type = cats.find((x) => x.n === c)?.type || 'Sensory';
+    if (type === 'Sensory') sens += s; else if (type === 'Environmental') env += s; else mind += s;
+    const tier = s >= 16 ? 'Very High' : s >= 12 ? 'High' : s >= 8 ? 'Moderate' : 'Low';
+    return {
+      label: c,
+      subLabel: `${type} · Rank #${i + 1}`,
+      rawScore: s,
+      maxScore: 20,
+      percentage: Math.round((s / 20) * 100),
+      tier,
+      tierColor: s >= 12 ? 'green' : s >= 8 ? 'amber' : 'rose',
+      details: descs[c],
+    };
+  });
+
+  const tot = sens + env + mind || 1;
+  const top3 = ranked.slice(0, 3);
+
+  return {
+    testId: 'learning-styles',
+    testTitle: config.title,
+    ...buildHeaderMeta('LSA', questions.length),
+    student,
+    totalQuestions: questions.length,
+    answeredCount,
+    kpis: [
+      { big: top3[0].label, label: '#1 Modality', sub: `${top3[0].percentage}% Match`, color: 'blue' },
+      { big: `${Math.round((sens / tot) * 100)}%`, label: 'Sensory', sub: '4 Modalities', color: 'green' },
+      { big: `${Math.round((env / tot) * 100)}%`, label: 'Environment', sub: '6 Modalities', color: 'indigo' },
+      { big: `${Math.round((mind / tot) * 100)}%`, label: 'Mindset', sub: '6 Modalities', color: 'amber' },
+    ],
+    macroSplit: [
+      { label: 'Sensory Preferences', percentage: Math.round((sens / tot) * 100), sub: `${sens} pts`, color: 'blue' },
+      { label: 'Environmental Preferences', percentage: Math.round((env / tot) * 100), sub: `${env} pts`, color: 'green' },
+      { label: 'Mindset Preferences', percentage: Math.round((mind / tot) * 100), sub: `${mind} pts`, color: 'amber' },
+    ],
+    radarData: ranked.slice(0, 8).map((r) => ({ label: r.label, value: r.percentage })),
+    rankedDimensions: ranked,
+    detailRows: ranked.map((r) => ({
+      name: r.label,
+      sub: r.subLabel || '',
+      scoreText: `${r.percentage}% (${r.rawScore}/20)`,
+      percentage: r.percentage,
+      badge: r.tier,
+      badgeColor: r.tierColor,
+      description: r.details || '',
+    })),
+    executiveSummary: `Maps ${student.name}'s 64 responses across 16 Sensory, Environmental, and Mindset learning preferences.`,
+    executiveTakeaway: `Peak retention occurs when studying through ${top3.map((x) => x.label).join(', ')}.`,
+    actionSteps: [
+      { title: 'Control Study Environment', desc: 'Align lighting, sound, seating, and timing with your top Environmental scores.' },
+      { title: 'Leverage Sensory Hooks', desc: `Translate chapters into ${top3[0].label} formats (mind maps, audio, or hands-on labs).` },
+      { title: 'Communicate Needs', desc: 'Share Structure and Collaboration preferences with teachers.' },
+    ],
+    finalVerdict: `${student.name} achieves peak retention by combining ${top3[0].label} and ${top3[1].label} study routines.`,
+  };
+}
+
+/* 6. MULTI-DIMENSIONAL TEST (Grade-Adaptive 60 Qs, 5 Dimensions) */
+function scoreMultiDimensional(
+  config: TestConfig,
+  student: StudentInfo,
+  questions: QuestionItem[],
+  answers: AnswerMap,
+  answeredCount: number
+): AssessmentResult {
+  const careerMap = config.metadata.careerMap as Record<string, string[]>;
+  const interps = config.metadata.interpretations as Record<string, { meaning: string; tips: string[] }>;
+  const secOrder = ['Natural Abilities', 'Interests', 'Personality', 'Career Motivators', 'Learning Styles'];
+  const bucket: Record<string, { total: number; count: number; sec: string }> = {};
+
+  questions.forEach((q) => {
+    if (!q.category) return;
+    if (!bucket[q.category]) bucket[q.category] = { total: 0, count: 0, sec: q.section };
+    const val = Number(answers[q.id]);
+    if (val >= 1 && val <= 5) {
+      bucket[q.category].total += val;
+      bucket[q.category].count++;
+    }
+  });
+
+  const ranked: ScoredDimension[] = Object.entries(bucket)
+    .map(([cat, b]) => {
+      const pct = b.count ? Math.round((b.total / (b.count * 5)) * 100) : 0;
+      const tier = pct >= 70 ? 'Dominant' : pct >= 45 ? 'Moderate' : 'Emerging';
+      return {
+        label: cat,
+        subLabel: b.sec,
+        rawScore: b.total,
+        maxScore: b.count * 5,
+        percentage: pct,
+        tier,
+        tierColor: (pct >= 70 ? 'green' : pct >= 45 ? 'amber' : 'rose') as 'green' | 'amber' | 'rose',
+        details: `${interps[cat]?.meaning || ''} ${careerMap[cat] ? 'Careers: ' + careerMap[cat].join(', ') : ''}`,
+      };
+    })
+    .sort((a, b) => b.percentage - a.percentage);
+
+  const radarData = secOrder.map((sec) => {
+    const items = ranked.filter((r) => r.subLabel === sec);
+    const avg = items.length ? Math.round(items.reduce((a, b) => a + b.percentage, 0) / items.length) : 0;
+    return { label: sec, value: avg };
+  });
+
+  const topAbility = ranked.find((r) => r.subLabel === 'Natural Abilities')?.label || '';
+  const topInterest = ranked.find((r) => r.subLabel === 'Interests')?.label || '';
+  const topMotivator = ranked.find((r) => r.subLabel === 'Career Motivators')?.label || '';
+
+  return {
+    testId: 'multi-dimensional',
+    testTitle: config.title,
+    ...buildHeaderMeta('MDA', questions.length),
+    student,
+    totalQuestions: questions.length,
+    answeredCount,
+    kpis: [
+      { big: topAbility.split('/')[0], label: 'Top Ability', sub: 'Natural Strength', color: 'blue' },
+      { big: topInterest, label: 'Top Interest', sub: 'Career Pull', color: 'green' },
+      { big: topMotivator.split('&')[0], label: 'Core Motivator', sub: 'Primary Driver', color: 'indigo' },
+      { big: student.grade || 'Student', label: 'Stage', sub: 'Grade-Adaptive', color: 'amber' },
+    ],
+    radarData,
+    rankedDimensions: ranked,
+    detailRows: ranked.slice(0, 12).map((r) => ({
+      name: r.label,
+      sub: r.subLabel || '',
+      scoreText: `${r.percentage}%`,
+      percentage: r.percentage,
+      badge: r.tier,
+      badgeColor: r.tierColor,
+      description: r.details || '',
+    })),
+    executiveSummary: `Grade-adaptive 5-dimensional psychometric profile for ${student.name} (${student.grade}) across Natural Abilities, Interests, Personality, Motivators, and Learning Styles.`,
+    executiveTakeaway: `Signature synergy: ${topAbility} + ${topInterest}, motivated by ${topMotivator}.`,
+    actionSteps: [
+      { title: 'Shortlist & Research', desc: `Explore careers bridging ${topAbility} and ${topInterest}.` },
+      { title: 'Optimize Study Habits', desc: 'Apply your dominant Learning Style to daily coursework.' },
+      { title: 'Practical Exposure', desc: 'Complete one project or shadowing day in your top interest area.' },
+    ],
+    finalVerdict: `${student.name} thrives in careers uniting ${topAbility} with ${topInterest}.`,
+  };
+}
+
+/* 7. MULTIPLE INTELLIGENCE (54 Qs, 1-7 Scale, 9 Intelligences + EI) */
+function scoreMultipleIntelligence(
+  config: TestConfig,
+  student: StudentInfo,
+  questions: QuestionItem[],
+  answers: AnswerMap,
+  answeredCount: number
+): AssessmentResult {
+  const intel = config.metadata.intelligences as Record<string, { name: string; short: string; careers: string[]; advice: string }>;
+  const sc: Record<string, number> = {};
+  Object.keys(intel).forEach((k) => (sc[k] = 0));
+
+  questions.forEach((q) => {
+    const val = Number(answers[q.id]);
+    if (val >= 1 && val <= 7 && q.category) sc[q.category] += val;
+  });
+
+  const ranked: ScoredDimension[] = Object.entries(sc)
+    .map(([k, s]) => {
+      const pct = Math.round((s / 42) * 100);
+      const tier = pct >= 80 ? 'Very High' : pct >= 65 ? 'High' : pct >= 50 ? 'Moderate' : 'Low';
+      return {
+        label: intel[k].name,
+        subLabel: intel[k].short,
+        rawScore: s,
+        maxScore: 42,
+        percentage: pct,
+        tier,
+        tierColor: (pct >= 65 ? 'green' : pct >= 50 ? 'amber' : 'rose') as 'green' | 'amber' | 'rose',
+        details: `Careers: ${intel[k].careers.slice(0, 4).join(', ')}`,
+      };
+    })
+    .sort((a, b) => b.percentage - a.percentage);
+
+  const ei = Math.round(((Math.round((sc.interpersonal / 42) * 100)) + (Math.round((sc.intrapersonal / 42) * 100))) / 2);
+  const top3 = ranked.slice(0, 3);
+
+  return {
+    testId: 'multiple-intelligence',
+    testTitle: config.title,
+    ...buildHeaderMeta('MIA', questions.length),
+    student,
+    totalQuestions: questions.length,
+    answeredCount,
+    kpis: [
+      { big: top3[0].subLabel || top3[0].label, label: '#1 Intelligence', sub: `${top3[0].percentage}%`, color: 'blue' },
+      { big: `${ei}%`, label: 'Emotional Intel (EI)', sub: 'Inter + Intra Blend', color: 'green' },
+      { big: `${Math.round(ranked.reduce((a, b) => a + b.percentage, 0) / 9)}%`, label: 'Overall Index', sub: '9 Intelligences Avg', color: 'indigo' },
+      { big: `${ranked.filter((r) => r.percentage >= 65).length}/9`, label: 'High Intelligences', sub: 'Core Strengths', color: 'amber' },
+    ],
+    radarData: ranked.map((r) => ({ label: r.subLabel || r.label, value: r.percentage })),
+    rankedDimensions: ranked,
+    detailRows: ranked.map((r) => ({
+      name: r.label,
+      sub: r.subLabel || '',
+      scoreText: `${r.percentage}% (${r.rawScore}/42)`,
+      percentage: r.percentage,
+      badge: r.tier,
+      badgeColor: r.tierColor,
+      description: r.details || '',
+    })),
+    executiveSummary: `Evaluates ${student.name} across Dr. Howard Gardner's 9 Multiple Intelligences on a 7-point scale, plus Emotional Intelligence (EI).`,
+    executiveTakeaway: `Dominant intelligences: ${top3.map((t) => t.subLabel).join(', ')} with ${ei}% Emotional Intelligence.`,
+    actionSteps: [
+      { title: 'Leverage Top Intelligences', desc: `Build projects around ${top3[0].label} and ${top3[1].label}.` },
+      { title: 'Boost Emotional Intelligence', desc: 'Practice active listening and structured self-reflection.' },
+      { title: 'Align Career Pathways', desc: `Explore careers mapped to ${top3[0].subLabel}.` },
+    ],
+    finalVerdict: `${student.name}'s cognitive architecture peaks in ${top3[0].label} and ${top3[1].label}.`,
+  };
+}
+
+/* 8. PERSONALITY / KEY TO SUCCESS (36 A/B Forced-Choice Qs, 16 MBTI Types) */
+function scorePersonality(
+  config: TestConfig,
+  student: StudentInfo,
+  questions: QuestionItem[],
+  answers: AnswerMap,
+  answeredCount: number
+): AssessmentResult {
+  const typeData = config.metadata.typeData as Record<
+    string,
+    { nick: string; profile: string; strengths: string[]; challenges: string[]; recs: string[]; careers: string[][] }
+  >;
+  const S: Record<string, number> = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
+
+  questions.forEach((q) => {
+    const ans = Number(answers[q.id]);
+    if ((ans === 1 || ans === 2) && q.abTraits) {
+      S[ans === 1 ? q.abTraits[0] : q.abTraits[1]]++;
+    }
+  });
+
+  const code = (S.E >= S.I ? 'E' : 'I') + (S.S >= S.N ? 'S' : 'N') + (S.T >= S.F ? 'T' : 'F') + (S.J >= S.P ? 'J' : 'P');
+  const d = typeData[code];
+  const pct = (a: number, b: number) => Math.round((100 * a) / (a + b || 1));
+
+  const divergentPairs = [
+    { leftLabel: 'Extraversion (E)', rightLabel: 'Introversion (I)', leftPct: pct(S.E, S.I), rightPct: pct(S.I, S.E) },
+    { leftLabel: 'Sensing (S)', rightLabel: 'Intuition (N)', leftPct: pct(S.S, S.N), rightPct: pct(S.N, S.S) },
+    { leftLabel: 'Thinking (T)', rightLabel: 'Feeling (F)', leftPct: pct(S.T, S.F), rightPct: pct(S.F, S.T) },
+    { leftLabel: 'Judging (J)', rightLabel: 'Perceiving (P)', leftPct: pct(S.J, S.P), rightPct: pct(S.P, S.J) },
+  ];
+
+  return {
+    testId: 'personality',
+    testTitle: config.title,
+    ...buildHeaderMeta('KTS', questions.length),
+    student,
+    totalQuestions: questions.length,
+    answeredCount,
+    heroBadge: { code, subtitle: d.nick },
+    kpis: [
+      { big: code[0], label: 'Energy', sub: code[0] === 'E' ? 'Extraversion' : 'Introversion', color: 'blue' },
+      { big: code[1], label: 'Perception', sub: code[1] === 'S' ? 'Sensing' : 'Intuition', color: 'green' },
+      { big: code[2], label: 'Decisions', sub: code[2] === 'T' ? 'Thinking' : 'Feeling', color: 'indigo' },
+      { big: code[3], label: 'Lifestyle', sub: code[3] === 'J' ? 'Judging' : 'Perceiving', color: 'amber' },
+    ],
+    divergentPairs,
+    rankedDimensions: divergentPairs.map((p) => ({
+      label: p.leftPct >= p.rightPct ? p.leftLabel : p.rightLabel,
+      subLabel: `${p.leftLabel} vs ${p.rightLabel}`,
+      rawScore: Math.max(p.leftPct, p.rightPct),
+      maxScore: 100,
+      percentage: Math.max(p.leftPct, p.rightPct),
+      tier: 'Dominant',
+      tierColor: 'blue',
+    })),
+    detailRows: d.careers.map((c) => ({
+      name: c[0],
+      sub: c[1],
+      scoreText: c[2],
+      percentage: 95,
+      badge: 'Top Fit',
+      badgeColor: 'green',
+      description: `Highly aligned with ${code} (${d.nick}) strengths: ${d.strengths.slice(0, 2).join(', ')}.`,
+    })),
+    executiveSummary: d.profile,
+    executiveTakeaway: `As an ${code} (${d.nick}), your strengths are ${d.strengths.slice(0, 3).join(', ')}.`,
+    actionSteps: d.recs.slice(0, 3).map((r, i) => ({ title: `Growth Step ${i + 1}`, desc: r })),
+    finalVerdict: `${student.name} (${code} - ${d.nick}) thrives in roles matching ${d.careers.map((c) => c[0]).join(', ')}.`,
+  };
+}
+
+/* 9. STREAM SELECTOR TEST (76 Qs, 4 Streams, Aptitude vs Interest Composite) */
+function scoreStreamSelector(
+  config: TestConfig,
+  student: StudentInfo,
+  questions: QuestionItem[],
+  answers: AnswerMap,
+  answeredCount: number
+): AssessmentResult {
+  const streams = config.metadata.streams as Record<string, { title: string; subtitle: string; courses: Array<{ name: string; duration: string }> }>;
+  const sc: Record<string, { apt: number; aptC: number; int: number; intC: number }> = {
+    sci_math: { apt: 0, aptC: 0, int: 0, intC: 0 },
+    commerce: { apt: 0, aptC: 0, int: 0, intC: 0 },
+    sci_bio: { apt: 0, aptC: 0, int: 0, intC: 0 },
+    humanities: { apt: 0, aptC: 0, int: 0, intC: 0 },
+  };
+
+  questions.forEach((q) => {
+    const ansIdx = Number(answers[q.id]);
+    if (Number.isNaN(ansIdx) || !q.streamDomain || !q.streamMetric) return;
+    let val = 50;
+    if (q.options.length === 3) {
+      val = ansIdx === 0 ? 100 : ansIdx === 2 ? 50 : 10;
+      if (q.streamMetric === 'interest_reverse') val = 110 - val;
+    } else {
+      val = ansIdx === 0 || ansIdx === 1 ? 90 : 30;
+    }
+    if (q.streamMetric.includes('interest')) {
+      sc[q.streamDomain].int += val;
+      sc[q.streamDomain].intC++;
+    } else {
+      sc[q.streamDomain].apt += val;
+      sc[q.streamDomain].aptC++;
+    }
+  });
+
+  const results = Object.keys(streams)
+    .map((k) => {
+      const apt = Math.min(98, Math.max(20, sc[k].aptC ? Math.round(sc[k].apt / sc[k].aptC) : 65));
+      const int = Math.min(98, Math.max(20, sc[k].intC ? Math.round(sc[k].int / sc[k].intC) : 65));
+      const composite = Math.round(apt * 0.5 + int * 0.5);
+      return { id: k, ...streams[k], apt, int, composite };
+    })
+    .sort((a, b) => b.composite - a.composite);
+
+  const ranked: ScoredDimension[] = results.map((r, i) => ({
+    label: r.title,
+    subLabel: `Aptitude ${r.apt}% · Interest ${r.int}%`,
+    rawScore: r.composite,
+    maxScore: 100,
+    percentage: r.composite,
+    tier: i === 0 ? 'Rank #1' : i === 1 ? 'Rank #2' : `Rank #${i + 1}`,
+    tierColor: i === 0 ? 'green' : i === 1 ? 'blue' : i === 2 ? 'amber' : 'rose',
+    details: `${r.subtitle} | Top Courses: ${r.courses.slice(0, 4).map((c) => c.name).join(', ')}`,
+  }));
+
+  return {
+    testId: 'stream-selector',
+    testTitle: config.title,
+    ...buildHeaderMeta('DSS', questions.length),
+    student,
+    totalQuestions: questions.length,
+    answeredCount,
+    kpis: [
+      { big: results[0].title, label: '#1 Stream', sub: `${results[0].composite}% Match`, color: 'blue' },
+      { big: results[1].title, label: '#2 Stream', sub: `${results[1].composite}% Match`, color: 'green' },
+      { big: `${results[0].apt}%`, label: 'Top Aptitude', sub: results[0].title, color: 'indigo' },
+      { big: `${results[0].int}%`, label: 'Top Interest', sub: results[0].title, color: 'amber' },
+    ],
+    macroSplit: results.map((r, i) => ({
+      label: r.title,
+      percentage: r.composite,
+      sub: `Apt ${r.apt}% / Int ${r.int}%`,
+      color: (['blue', 'green', 'amber', 'indigo'] as const)[i],
+    })),
+    radarData: results.map((r) => ({ label: r.title, value: r.composite })),
+    rankedDimensions: ranked,
+    detailRows: ranked.map((r) => ({
+      name: r.label,
+      sub: r.subLabel || '',
+      scoreText: `${r.percentage}% Composite`,
+      percentage: r.percentage,
+      badge: r.tier,
+      badgeColor: r.tierColor,
+      description: r.details || '',
+    })),
+    executiveSummary: `Evaluates ${student.name}'s Class 10 aptitude and behavioral interest across 76 diagnostic items to rank Science (PCM), Science (PCB), Commerce, and Humanities.`,
+    executiveTakeaway: `Optimal Class 11–12 stream: ${results[0].title} (${results[0].composite}%), with ${results[1].title} as secondary strength.`,
+    actionSteps: [
+      { title: 'Lock Primary Track', desc: `Register for ${results[0].title} (${results[0].subtitle}) in Class 11.` },
+      { title: 'Subject Optimization', desc: `Use ${results[1].title} to guide optional 5th/6th subject selection.` },
+      { title: 'Entrance Alignment', desc: `Review graduate courses and entrance exams for ${results[0].title}.` },
+    ],
+    finalVerdict: `${student.name} is best positioned for long-term success in ${results[0].title}.`,
+  };
+}
+4. Centralized pdf-lib Report Generator (src/pdf-generator/generateReportPdf.ts)Dynamically styles and builds a colorful, multi-page A4 PDF for any of the 9 tests using its ReportTemplateConfig and AssessmentResult.TypeScriptimport { PDFDocument, PDFPage, PDFFont, rgb, StandardFonts, PageSizes } from 'pdf-lib';
+import { AssessmentResult, BadgeColor, BrandingConfig, ReportTemplateConfig } from '@/types/assessment';
+
+const PALETTE = {
+  navy: rgb(0.06, 0.09, 0.16),
+  blue: rgb(0.15, 0.39, 0.92),
+  sky: rgb(0.05, 0.65, 0.91),
+  indigo: rgb(0.39, 0.4, 0.95),
+  green: rgb(0.06, 0.73, 0.51),
+  greenDark: rgb(0.02, 0.47, 0.34),
+  greenBg: rgb(0.93, 0.99, 0.96),
+  amber: rgb(0.96, 0.62, 0.04),
+  amberDark: rgb(0.71, 0.33, 0.04),
+  amberBg: rgb(1.0, 0.98, 0.92),
+  rose: rgb(0.88, 0.11, 0.28),
+  roseDark: rgb(0.75, 0.07, 0.24),
+  roseBg: rgb(1.0, 0.95, 0.96),
+  slate: rgb(0.2, 0.25, 0.33),
+  muted: rgb(0.39, 0.45, 0.55),
+  border: rgb(0.89, 0.85, 0.77),
+  cream: rgb(0.98, 0.97, 0.95),
+  softBlue: rgb(0.94, 0.96, 1.0),
+  white: rgb(1, 1, 1),
+};
+
+const W = PageSizes.A4[0];
+const H = PageSizes.A4[1];
+const M = 36;
+const CW = W - M * 2;
+
+const clean = (s: string) =>
+  s.replace(/[\u2013\u2014]/g, '-').replace(/[\u2018\u2019]/g, "'").replace(/[\u201C\u201D]/g, '"').replace(/[^\x20-\x7E]/g, ' ');
+
+function wrap(text: string, font: PDFFont, size: number, maxW: number): string[] {
+  const words = clean(text).split(/\s+/);
+  const lines: string[] = [];
+  let line = '';
+  for (const w of words) {
+    const test = line ? `${line} ${w}` : w;
+    if (font.widthOfTextAtSize(test, size) <= maxW) line = test;
+    else { if (line) lines.push(line); line = w; }
+  }
+  if (line) lines.push(line);
+  return lines;
+}
+
+function badgePalette(c: BadgeColor) {
+  if (c === 'green') return { fg: PALETTE.greenDark, bg: PALETTE.greenBg, bar: PALETTE.green };
+  if (c === 'blue' || c === 'sky') return { fg: PALETTE.blue, bg: PALETTE.softBlue, bar: PALETTE.blue };
+  if (c === 'amber') return { fg: PALETTE.amberDark, bg: PALETTE.amberBg, bar: PALETTE.amber };
+  if (c === 'rose') return { fg: PALETTE.roseDark, bg: PALETTE.roseBg, bar: PALETTE.rose };
+  return { fg: PALETTE.slate, bg: PALETTE.cream, bar: PALETTE.muted };
+}
+
+export async function generateUnifiedReportPdf(
+  result: AssessmentResult,
+  template: ReportTemplateConfig,
+  branding: BrandingConfig = {}
+): Promise<Uint8Array> {
+  const pdf = await PDFDocument.create();
+  const font = await pdf.embedFont(StandardFonts.Helvetica);
+  const fontBold = await pdf.embedFont(StandardFonts.HelveticaBold);
+  const serifBold = await pdf.embedFont(StandardFonts.TimesRomanBold);
+
+  const accent = rgb(...template.accentHex);
+  const clientName = clean(branding.clientName || template.reportTitle);
+  const pages: PDFPage[] = [];
+
+  const addPage = (sectionTitle?: string): { page: PDFPage; y: number } => {
+    const page = pdf.addPage(PageSizes.A4);
+    pages.push(page);
+    page.drawRectangle({ x: 0, y: H - 8, width: W * 0.65, height: 8, color: accent });
+    page.drawRectangle({ x: W * 0.65, y: H - 8, width: W * 0.35, height: 8, color: PALETTE.green });
+
+    if (!sectionTitle) return { page, y: H - 30 };
+
+    page.drawText(clean(`${clientName.toUpperCase()}  |  ${template.reportTitle.toUpperCase()}`), {
+      x: M, y: H - 28, size: 7.8, font: fontBold, color: accent,
+    });
+    page.drawText(clean(sectionTitle), { x: M, y: H - 48, size: 15.5, font: serifBold, color: PALETTE.navy });
+    page.drawText(clean(`Candidate: ${result.student.name}  |  Phone: ${result.student.phone}  |  Date: ${result.dateFormatted}`), {
+      x: M, y: H - 62, size: 8, font, color: PALETTE.muted,
+    });
+    page.drawLine({ start: { x: M, y: H - 70 }, end: { x: W - M, y: H - 70 }, thickness: 1.5, color: accent });
+    return { page, y: H - 90 };
+  };
+
+  const drawHeading = (page: PDFPage, y: number, title: string) => {
+    page.drawRectangle({ x: M, y: y - 3, width: 4, height: 14, color: accent });
+    page.drawText(clean(title), { x: M + 10, y, size: 12, font: serifBold, color: PALETTE.navy });
+    return y - 18;
+  };
+
+  const drawPara = (page: PDFPage, y: number, text: string, size = 9) => {
+    for (const l of wrap(text, font, size, CW)) {
+      page.drawText(l, { x: M, y, size, font, color: PALETTE.slate });
+      y -= size * 1.45;
+    }
+    return y - 4;
+  };
+
+  const drawInsight = (page: PDFPage, y: number, title: string, body: string) => {
+    const lines = wrap(body, font, 8.6, CW - 24);
+    const boxH = 26 + lines.length * 12;
+    page.drawRectangle({ x: M, y: y - boxH, width: CW, height: boxH, color: PALETTE.softBlue, borderColor: accent, borderWidth: 0.6 });
+    page.drawRectangle({ x: M, y: y - boxH, width: 4, height: boxH, color: accent });
+    page.drawText(clean(title), { x: M + 12, y: y - 14, size: 9.5, font: fontBold, color: accent });
+    let ty = y - 27;
+    lines.forEach((l) => { page.drawText(l, { x: M + 12, y: ty, size: 8.6, font, color: PALETTE.slate }); ty -= 12; });
+    return y - boxH - 12;
+  };
+
+  // ==================== PAGE 1: COVER & EXECUTIVE SUMMARY ====================
+  {
+    const { page, y: startY } = addPage();
+    let y = startY;
+
+    page.drawText(clientName, { x: M, y: y - 10, size: 20, font: serifBold, color: PALETTE.navy });
+    page.drawText(clean(template.reportSubtitle.toUpperCase()), { x: M, y: y - 24, size: 8.5, font: fontBold, color: accent });
+    page.drawText(`REPORT ID: ${result.reportId}`, {
+      x: W - M - fontBold.widthOfTextAtSize(`REPORT ID: ${result.reportId}`, 8), y: y - 12, size: 8, font: fontBold, color: PALETTE.muted,
+    });
+    page.drawLine({ start: { x: M, y: y - 34 }, end: { x: W - M, y: y - 34 }, thickness: 2, color: accent });
+    y -= 50;
+
+    // Candidate Card
+    page.drawRectangle({ x: M, y: y - 58, width: CW, height: 58, color: PALETTE.softBlue, borderColor: accent, borderWidth: 0.7 });
+    page.drawRectangle({ x: M, y: y - 58, width: 5, height: 58, color: accent });
+    page.drawText(clean(result.student.name), { x: M + 14, y: y - 22, size: 17, font: serifBold, color: PALETTE.navy });
+    page.drawText(
+      clean(`Date: ${result.dateFormatted}  |  Phone: ${result.student.phone}  |  Email: ${result.student.email}  |  Completed: ${result.answeredCount}/${result.totalQuestions}`),
+      { x: M + 14, y: y - 42, size: 8, font, color: PALETTE.slate }
+    );
+    y -= 76;
+
+    // Optional Hero Badge (e.g., MBTI INTJ)
+    if (result.heroBadge) {
+      page.drawRectangle({ x: M, y: y - 62, width: CW, height: 62, color: PALETTE.cream, borderColor: accent, borderWidth: 1 });
+      const cw = serifBold.widthOfTextAtSize(result.heroBadge.code, 26);
+      page.drawText(result.heroBadge.code, { x: W / 2 - cw / 2, y: y - 32, size: 26, font: serifBold, color: accent });
+      const sw = fontBold.widthOfTextAtSize(clean(result.heroBadge.subtitle), 11);
+      page.drawText(clean(result.heroBadge.subtitle), { x: W / 2 - sw / 2, y: y - 50, size: 11, font: fontBold, color: PALETTE.navy });
+      y -= 78;
+    }
+
+    y = drawHeading(page, y, 'Executive Assessment Summary');
+    y = drawPara(page, y, result.executiveSummary);
+    y -= 6;
+
+    // 4 Colorful KPI Cards
+    const cardW = (CW - 24) / 4;
+    const kpiColors = { blue: PALETTE.blue, green: PALETTE.green, indigo: PALETTE.indigo, amber: PALETTE.amber };
+    result.kpis.forEach((k, i) => {
+      const cx = M + i * (cardW + 8);
+      const col = kpiColors[k.color];
+      page.drawRectangle({ x: cx, y: y - 62, width: cardW, height: 62, color: PALETTE.cream, borderColor: PALETTE.border, borderWidth: 0.7 });
+      page.drawRectangle({ x: cx, y: y - 4, width: cardW, height: 4, color: col });
+      const bStr = clean(k.big.slice(0, 12));
+      const bw = fontBold.widthOfTextAtSize(bStr, 13.5);
+      page.drawText(bStr, { x: cx + (cardW - bw) / 2, y: y - 25, size: 13.5, font: fontBold, color: col });
+      const lw = fontBold.widthOfTextAtSize(clean(k.label.toUpperCase()), 6.3);
+      page.drawText(clean(k.label.toUpperCase()), { x: cx + (cardW - lw) / 2, y: y - 40, size: 6.3, font: fontBold, color: PALETTE.muted });
+      const sStr = clean(k.sub.slice(0, 18));
+      const sw = font.widthOfTextAtSize(sStr, 7);
+      page.drawText(sStr, { x: cx + (cardW - sw) / 2, y: y - 53, size: 7, font, color: PALETTE.slate });
+    });
+    y -= 80;
+
+    drawInsight(page, y, `Executive Takeaway for ${result.student.name}`, result.executiveTakeaway);
+  }
+
+  // ==================== PAGE 2: METHODOLOGY & VISUAL PROFILE ====================
+  {
+    const { page, y: startY } = addPage('Methodology & Core Visual Profile');
+    let y = startY;
+
+    y = drawHeading(page, y, 'Assessment Methodology');
+    const sw = (CW - 16) / Math.min(3, template.methodologySteps.length);
+    template.methodologySteps.slice(0, 3).forEach((s, i) => {
+      const sx = M + i * (sw + 8);
+      page.drawRectangle({ x: sx, y: y - 82, width: sw, height: 82, color: PALETTE.cream, borderColor: PALETTE.border, borderWidth: 0.7 });
+      page.drawRectangle({ x: sx, y: y - 4, width: sw, height: 4, color: accent });
+      page.drawText(clean(`${i + 1}. ${s.title}`), { x: sx + 8, y: y - 20, size: 8.8, font: fontBold, color: PALETTE.navy });
+      let dy = y - 34;
+      wrap(s.desc, font, 7.6, sw - 16).forEach((l) => {
+        page.drawText(l, { x: sx + 8, y: dy, size: 7.6, font, color: PALETTE.muted });
+        dy -= 10.5;
+      });
+    });
+    y -= 102;
+
+    // Render Divergent Bars (MBTI) OR Vector Radar Chart (all other tests)
+    if (result.divergentPairs && result.divergentPairs.length > 0) {
+      y = drawHeading(page, y, 'Four-Dimensional Cognitive Split');
+      result.divergentPairs.forEach((p) => {
+        page.drawText(clean(`${p.leftLabel} - ${p.leftPct}%`), { x: M, y, size: 8.5, font: fontBold, color: PALETTE.blue });
+        const rStr = clean(`${p.rightPct}% - ${p.rightLabel}`);
+        page.drawText(rStr, { x: W - M - fontBold.widthOfTextAtSize(rStr, 8.5), y, size: 8.5, font: fontBold, color: PALETTE.rose });
+        const lw = (CW * p.leftPct) / 100;
+        page.drawRectangle({ x: M, y: y - 16, width: lw, height: 11, color: PALETTE.blue });
+        page.drawRectangle({ x: M + lw, y: y - 16, width: CW - lw, height: 11, color: PALETTE.rose });
+        y -= 34;
+      });
+    } else if (result.radarData && result.radarData.length >= 3) {
+      y = drawHeading(page, y, 'Multidimensional Competency Radar');
+      const cx = W / 2;
+      const cy = y - 130;
+      const maxR = 92;
+      const n = result.radarData.length;
+
+      [0.25, 0.5, 0.75, 1.0].forEach((sc) => {
+        const r = maxR * sc;
+        for (let i = 0; i < n; i++) {
+          const a1 = (Math.PI * 2 * i) / n - Math.PI / 2;
+          const a2 = (Math.PI * 2 * ((i + 1) % n)) / n - Math.PI / 2;
+          page.drawLine({
+            start: { x: cx + r * Math.cos(a1), y: cy + r * Math.sin(a1) },
+            end: { x: cx + r * Math.cos(a2), y: cy + r * Math.sin(a2) },
+            thickness: 0.6, color: PALETTE.border,
+          });
+        }
+      });
+
+      const pts: Array<{ x: number; y: number }> = [];
+      result.radarData.forEach((d, i) => {
+        const angle = (Math.PI * 2 * i) / n - Math.PI / 2;
+        page.drawLine({ start: { x: cx, y: cy }, end: { x: cx + maxR * Math.cos(angle), y: cy + maxR * Math.sin(angle) }, thickness: 0.6, color: PALETTE.border });
+        const vr = maxR * (Math.min(100, d.value) / 100);
+        pts.push({ x: cx + vr * Math.cos(angle), y: cy + vr * Math.sin(angle) });
+        const lbl = clean(d.label.length > 18 ? d.label.slice(0, 16) + '..' : d.label);
+        const lw = fontBold.widthOfTextAtSize(lbl, 7.5);
+        page.drawText(lbl, { x: cx + (maxR + 18) * Math.cos(angle) - lw / 2, y: cy + (maxR + 14) * Math.sin(angle) - 3, size: 7.5, font: fontBold, color: PALETTE.navy });
+      });
+
+      for (let i = 0; i < pts.length; i++) {
+        page.drawLine({ start: pts[i], end: pts[(i + 1) % pts.length], thickness: 2.2, color: accent });
+      }
+      pts.forEach((p) => page.drawCircle({ x: p.x, y: p.y, size: 3.5, color: accent }));
+    }
+  }
+
+  // ==================== PAGE 3: COMPLETE RANKED SPECTRUM ====================
+  {
+    const { page, y: startY } = addPage('Dimension & Category Score Spectrum');
+    let y = drawHeading(page, startY, 'Color-Coded Ranking Spectrum');
+
+    result.rankedDimensions.slice(0, 19).forEach((d) => {
+      const col = badgePalette(d.tierColor);
+      page.drawText(clean(d.label), { x: M + 4, y, size: 8.2, font: fontBold, color: PALETTE.navy });
+      const sTxt = `${d.percentage}%  [${d.tier.toUpperCase()}]`;
+      page.drawText(clean(sTxt), { x: W - M - fontBold.widthOfTextAtSize(clean(sTxt), 7.8), y, size: 7.8, font: fontBold, color: col.fg });
+      page.drawRectangle({ x: M + 4, y: y - 10, width: CW - 8, height: 6.5, color: PALETTE.border });
+      page.drawRectangle({ x: M + 4, y: y - 10, width: Math.max(2, ((CW - 8) * d.percentage) / 100), height: 6.5, color: col.bar });
+      y -= 24;
+    });
+  }
+
+  // ==================== PAGE 4+: DETAILED TABLES & ACTION PLAN ====================
+  {
+    let { page, y } = addPage('Detailed Career Mappings & Action Plan');
+    y = drawHeading(page, y, 'Detailed Breakdown');
+
+    for (let i = 0; i < result.detailRows.length; i++) {
+      const r = result.detailRows[i];
+      const descLines = wrap(r.description, font, 7.6, CW - 165);
+      const rowH = Math.max(30, descLines.length * 10 + 12);
+
+      if (y - rowH < 65) {
+        ({ page, y } = addPage('Detailed Career Mappings (Continued)'));
+      }
+
+      const col = badgePalette(r.badgeColor);
+      page.drawRectangle({ x: M, y: y - rowH, width: CW, height: rowH, color: i % 2 === 1 ? PALETTE.cream : PALETTE.white, borderColor: PALETTE.border, borderWidth: 0.5 });
+      page.drawText(clean(r.name.slice(0, 26)), { x: M + 6, y: y - 12, size: 8, font: fontBold, color: PALETTE.navy });
+      page.drawText(clean(`${r.scoreText} | ${r.badge}`), { x: M + 6, y: y - 23, size: 7, font: fontBold, color: col.fg });
+
+      let dy = y - 11;
+      descLines.forEach((dl) => {
+        page.drawText(dl, { x: M + 158, y: dy, size: 7.6, font, color: PALETTE.slate });
+        dy -= 10;
+      });
+      y -= rowH;
+    }
+
+    if (y < 210) ({ page, y } = addPage('Actions & Next Steps'));
+    else y -= 16;
+
+    y = drawHeading(page, y, `Actions & Next Steps for ${result.student.name}`);
+    const aw = (CW - 16) / 3;
+    result.actionSteps.slice(0, 3).forEach((a, i) => {
+      const ax = M + i * (aw + 8);
+      page.drawRectangle({ x: ax, y: y - 80, width: aw, height: 80, color: PALETTE.cream, borderColor: PALETTE.border, borderWidth: 0.7 });
+      page.drawRectangle({ x: ax, y: y - 4, width: aw, height: 4, color: PALETTE.green });
+      page.drawText(clean(`${i + 1}. ${a.title}`), { x: ax + 8, y: y - 18, size: 8.3, font: fontBold, color: PALETTE.navy });
+      let dy = y - 32;
+      wrap(a.desc, font, 7.5, aw - 16).forEach((l) => {
+        page.drawText(l, { x: ax + 8, y: dy, size: 7.5, font, color: PALETTE.slate });
+        dy -= 10;
+      });
+    });
+    y -= 92;
+
+    drawInsight(page, y, 'Final Counselor Summary', result.finalVerdict);
+  }
+
+  // Stamp consistent footers & page numbering across all generated pages
+  const total = pages.length;
+  pages.forEach((p, idx) => {
+    p.drawLine({ start: { x: M, y: 36 }, end: { x: W - M, y: 36 }, thickness: 0.75, color: PALETTE.border });
+    p.drawText(clean(`${clientName} - Candidate: ${result.student.name}`), { x: M, y: 22, size: 7.8, font, color: PALETTE.muted });
+    const pgStr = `Page ${idx + 1} of ${total}`;
+    p.drawText(pgStr, { x: W - M - fontBold.widthOfTextAtSize(pgStr, 7.8), y: 22, size: 7.8, font: fontBold, color: PALETTE.navy });
+  });
+
+  return pdf.save();
+}
+5. Single Dynamic Backend Route (src/app/api/reports/[testId]/pdf/route.ts)TypeScriptimport { NextRequest, NextResponse } from 'next/server';
+import { getTestConfig } from '@/tests';
+import { getReportConfig } from '@/reports/reportConfigs';
+import { evaluateTest, AnswerMap } from '@/scoring/scoringEngine';
+import { generateUnifiedReportPdf } from '@/pdf-generator/generateReportPdf';
+import { BrandingConfig, StudentInfo, TestId } from '@/types/assessment';
+
+export async function POST(
+  req: NextRequest,
+  context: { params: Promise<{ testId: string }> }
+) {
+  try {
+    const { testId } = await context.params;
+    const config = getTestConfig(testId as TestId);
+    const template = getReportConfig(testId as TestId);
+
+    if (!config || !template) {
+      return NextResponse.json({ error: `Unknown testId: ${testId}` }, { status: 404 });
+    }
+
+    const body = (await req.json()) as {
+      student: StudentInfo;
+      answers: AnswerMap;
+      branding?: BrandingConfig;
+    };
+
+    if (!body?.student?.name || !body?.answers) {
+      return NextResponse.json({ error: 'student and answers are required.' }, { status: 400 });
+    }
+
+    const result = evaluateTest(config, body.student, body.answers);
+    const pdfBytes = await generateUnifiedReportPdf(result, template, body.branding);
+    const safeName = body.student.name.replace(/[^a-zA-Z0-9_-]/g, '_');
+
+    return new NextResponse(Buffer.from(pdfBytes), {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': `attachment; filename="${testId}_report_${safeName}.pdf"`,
+        'Cache-Control': 'no-store',
+      },
+    });
+  } catch (error) {
+    console.error('Unified PDF generation error:', error);
+    return NextResponse.json({ error: 'Failed to generate PDF report.' }, { status: 500 });
+  }
+}
+6. Reusable React + TypeScript TestRunner (src/components/TestRunner/TestRunner.tsx)Handles all 9 tests dynamically—including grade selection, reading passages, master codes, Likert 1–5/1–7, forced-choice A/B, anti-copy protection, real-time progress bar + milestone badges, and backend PDF download.TypeScript'use client';
+
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import confetti from 'canvas-confetti';
+import { ArrowLeft, Award, CheckCircle2, Download, ShieldCheck, Sparkles } from 'lucide-react';
+import { getTestConfig } from '@/tests';
+import { evaluateTest, AnswerMap } from '@/scoring/scoringEngine';
+import {
+  AssessmentResult,
+  BadgeColor,
+  BrandingConfig,
+  GradeLevel,
+  QuestionItem,
+  StudentInfo,
+  TestId,
+} from '@/types/assessment';
+
+interface TestRunnerProps {
+  testId: TestId;
+  branding?: BrandingConfig;
+  onComplete?: (result: AssessmentResult, answers: AnswerMap) => void;
+}
+
+const BADGE_CLASSES: Record<BadgeColor, string> = {
+  green: 'bg-emerald-50 text-emerald-700 border-emerald-500',
+  blue: 'bg-blue-50 text-blue-700 border-blue-500',
+  sky: 'bg-sky-50 text-sky-700 border-sky-500',
+  amber: 'bg-amber-50 text-amber-700 border-amber-500',
+  rose: 'bg-rose-50 text-rose-700 border-rose-500',
+  slate: 'bg-slate-100 text-slate-700 border-slate-400',
+};
+
+export default function TestRunner({ testId, branding, onComplete }: TestRunnerProps) {
+  const config = useMemo(() => getTestConfig(testId), [testId]);
+  const [screen, setScreen] = useState<'form' | 'quiz' | 'report'>('form');
+  const [student, setStudent] = useState<StudentInfo>({ name: '', email: '', phone: '', grade: 'Class 11 - 12' });
+  const [answers, setAnswers] = useState<AnswerMap>({});
+  const [qi, setQi] = useState(0);
+  const [busy, setBusy] = useState(false);
+  const [downloading, setDownloading] = useState(false);
+  const [result, setResult] = useState<AssessmentResult | null>(null);
+
+  const questions: QuestionItem[] = useMemo(() => {
+    if (!config) return [];
+    if (Array.isArray(config.questions)) return config.questions;
+    return config.questions[student.grade || 'Class 11 - 12'] || [];
+  }, [config, student.grade]);
+
+  const answeredCount = useMemo(
+    () => questions.filter((q) => answers[q.id] !== undefined).length,
+    [questions, answers]
+  );
+  const progressPct = questions.length ? Math.round((answeredCount / questions.length) * 100) : 0;
+
+  const finalize = useCallback(
+    (finalAnswers: AnswerMap) => {
+      if (!config) return;
+      const computed = evaluateTest(config, student, finalAnswers);
+      setResult(computed);
+      setScreen('report');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      confetti({ particleCount: 90, spread: 70, origin: { y: 0.6 } });
+      onComplete?.(computed, finalAnswers);
+    },
+    [config, student, onComplete]
+  );
+
+  const handleSelectOption = useCallback(
+    (q: QuestionItem, optIndex: number, optText: string) => {
+      if (busy) return;
+      // Store 1-based numeric value for Likert/AB, option text for MCQ/Ideal Career, or 0-based index for Stream Selector
+      const storedValue =
+        q.type === 'likert-5' || q.type === 'likert-7' || q.type === 'forced-choice-ab'
+          ? optIndex + 1
+          : testId === 'stream-selector'
+          ? optIndex
+          : optText;
+
+      const nextAnswers = { ...answers, [q.id]: storedValue };
+      setAnswers(nextAnswers);
+
+      if (config?.autoAdvanceOnSelect !== false) {
+        setBusy(true);
+        setTimeout(() => {
+          setBusy(false);
+          if (qi + 1 >= questions.length) finalize(nextAnswers);
+          else setQi((p) => p + 1);
+        }, 280);
+      }
+    },
+    [answers, busy, config, finalize, qi, questions.length, testId]
+  );
+
+  // Keyboard shortcuts & Anti-Copy
+  useEffect(() => {
+    if (screen !== 'quiz' || !questions[qi]) return;
+    const q = questions[qi];
+    const onKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && ['c', 'x', 'u', 's', 'a'].includes(e.key.toLowerCase())) {
+        e.preventDefault();
+        return;
+      }
+      const num = Number(e.key);
+      if (num >= 1 && num <= q.options.length) {
+        handleSelectOption(q, num - 1, q.options[num - 1]);
+      } else if (e.key === 'ArrowLeft' || e.key === 'Backspace') {
+        e.preventDefault();
+        if (qi > 0 && !busy) setQi((p) => p - 1);
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [screen, qi, questions, busy, handleSelectOption]);
+
+  const handleDownloadPdf = async () => {
+    setDownloading(true);
+    try {
+      const res = await fetch(`/api/reports/${testId}/pdf`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ student, answers, branding }),
+      });
+      if (!res.ok) throw new Error('PDF failed');
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${testId}_report_${student.name.replace(/\s+/g, '_')}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      alert('Failed to download PDF report.');
+    } finally {
+      setDownloading(false);
+    }
+  };
+
+  if (!config) return <div className="p-8 text-center text-rose-600 font-bold">Test configuration not found.</div>;
+
+  // 1. REGISTRATION FORM
+  if (screen === 'form') {
+    return (
+      <div className="min-h-screen bg-[#FAF5EC] py-10 px-4">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            setAnswers({});
+            setQi(0);
+            setScreen('quiz');
+          }}
+          className="max-w-2xl mx-auto bg-white rounded-3xl p-8 shadow-xl border border-[#E7E0D2]"
+        >
+          <h1 className="font-serif text-3xl font-bold text-slate-900">
+            {config.title}{' '}
+            <span className="bg-gradient-to-r from-blue-600 to-emerald-500 bg-clip-text text-transparent">
+              {config.highlightedTitle}
+            </span>
+          </h1>
+          <p className="text-slate-500 mt-2 mb-5 text-sm">{config.subtitle}</p>
+          <div className="flex flex-wrap gap-2 mb-6">
+            {config.badgeChips.map((c) => (
+              <span key={c} className="bg-blue-50 text-blue-700 border border-blue-200 text-xs font-semibold px-3 py-1 rounded-full">
+                {c}
+              </span>
+            ))}
+          </div>
+
+          <div className="space-y-4">
+            <input
+              required
+              placeholder="Student Full Name"
+              value={student.name}
+              onChange={(e) => setStudent({ ...student, name: e.target.value })}
+              className="w-full px-4 py-3 rounded-xl border-2 border-[#E7E0D2] focus:border-blue-600 outline-none"
+            />
+            <input
+              required
+              type="email"
+              placeholder="Email Address"
+              value={student.email}
+              onChange={(e) => setStudent({ ...student, email: e.target.value })}
+              className="w-full px-4 py-3 rounded-xl border-2 border-[#E7E0D2] focus:border-blue-600 outline-none"
+            />
+            <input
+              required
+              type="tel"
+              placeholder="Mobile Number"
+              value={student.phone}
+              onChange={(e) => setStudent({ ...student, phone: e.target.value })}
+              className="w-full px-4 py-3 rounded-xl border-2 border-[#E7E0D2] focus:border-blue-600 outline-none"
+            />
+            {config.requiresGrade && (
+              <select
+                required
+                value={student.grade}
+                onChange={(e) => setStudent({ ...student, grade: e.target.value as GradeLevel })}
+                className="w-full px-4 py-3 rounded-xl border-2 border-[#E7E0D2] focus:border-blue-600 outline-none"
+              >
+                <option value="Class 8 - 10">Class 8 - 10</option>
+                <option value="Class 11 - 12">Class 11 - 12</option>
+                <option value="Undergraduate">Undergraduate</option>
+                <option value="Postgraduate">Postgraduate</option>
+              </select>
+            )}
+          </div>
+
+          <button
+            type="submit"
+            className="mt-6 px-7 py-3.5 rounded-xl bg-gradient-to-r from-blue-600 to-sky-500 text-white font-semibold shadow-lg hover:-translate-y-0.5 transition"
+          >
+            Start Assessment →
+          </button>
+        </form>
+      </div>
+    );
+  }
+
+  // 2. QUIZ INTERFACE
+  if (screen === 'quiz') {
+    const q = questions[qi];
+    return (
+      <div
+        className="min-h-screen bg-[#FAF5EC] py-8 px-4 select-none"
+        onContextMenu={(e) => e.preventDefault()}
+        onCopy={(e) => e.preventDefault()}
+      >
+        <div className="max-w-3xl mx-auto">
+          <div className="bg-white rounded-2xl border border-[#E7E0D2] p-4 mb-5 shadow-sm">
+            <div className="flex justify-between text-xs font-bold text-slate-800 mb-2">
+              <span>{config.title} — Progress</span>
+              <span>
+                {progressPct}% ({answeredCount}/{questions.length})
+              </span>
+            </div>
+            <div className="w-full h-2.5 bg-[#EDE7DA] rounded-full overflow-hidden">
+              <div
+                className="h-full bg-gradient-to-r from-blue-600 via-sky-500 to-emerald-500 transition-all duration-300"
+                style={{ width: `${progressPct}%` }}
+              />
+            </div>
+            <div className="flex flex-wrap gap-2 mt-2.5 min-h-[22px]">
+              {progressPct >= 25 && <span className="inline-flex items-center gap-1 text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800"><Award className="w-3 h-3" /> 25%</span>}
+              {progressPct >= 50 && <span className="inline-flex items-center gap-1 text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800"><Award className="w-3 h-3" /> 50%</span>}
+              {progressPct >= 75 && <span className="inline-flex items-center gap-1 text-xs font-bold px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-800"><Award className="w-3 h-3" /> 75%</span>}
+              {progressPct === 100 && <span className="inline-flex items-center gap-1 text-xs font-bold px-2.5 py-0.5 rounded-full bg-green-100 text-green-800"><Sparkles className="w-3 h-3" /> 100%</span>}
+            </div>
+          </div>
+
+          <div className="bg-white rounded-3xl p-6 md:p-8 shadow-xl border border-white">
+            <div className="flex justify-between items-center mb-3">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-blue-700 bg-blue-50 border border-blue-200 px-3 py-1 rounded-full">
+                {q.section}
+              </span>
+              <span className="text-xs font-semibold text-slate-500">
+                Question {qi + 1} of {questions.length}
+              </span>
+            </div>
+
+            {q.passage && (
+              <div className="bg-slate-50 border-l-4 border-blue-600 p-4 rounded-lg text-xs text-slate-700 mb-4 whitespace-pre-line">
+                {q.passage}
+              </div>
+            )}
+            {q.codeDisplay && (
+              <div className="font-mono text-sm tracking-widest bg-slate-900 text-sky-400 px-4 py-2 rounded-lg inline-block mb-4">
+                {q.codeDisplay}
+              </div>
+            )}
+
+            <h2 className="font-serif text-xl font-semibold text-slate-900 mb-5">{q.text}</h2>
+
+            <div className="space-y-2.5">
+              {q.options.map((opt, idx) => {
+                const currentVal = answers[q.id];
+                const isSelected =
+                  currentVal === opt ||
+                  (typeof currentVal === 'number' &&
+                    (testId === 'stream-selector' ? currentVal === idx : currentVal === idx + 1));
+
+                return (
+                  <button
+                    key={opt}
+                    type="button"
+                    onClick={() => handleSelectOption(q, idx, opt)}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border-2 text-left font-semibold text-sm transition ${
+                      isSelected
+                        ? 'bg-gradient-to-r from-blue-600 to-sky-500 text-white border-transparent shadow-md'
+                        : 'bg-[#FDFBF7] border-[#E7E0D2] text-slate-700 hover:border-blue-500 hover:bg-blue-50'
+                    }`}
+                  >
+                    <span className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${isSelected ? 'bg-white/25 text-white' : 'bg-[#EDE7DA]'}`}>
+                      {idx + 1}
+                    </span>
+                    <span>{opt}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="flex justify-between items-center mt-6 pt-4 border-t border-slate-100">
+              <button
+                type="button"
+                disabled={qi === 0}
+                onClick={() => setQi((p) => p - 1)}
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border-2 border-[#E7E0D2] text-slate-600 font-semibold text-xs hover:border-blue-600 disabled:invisible"
+              >
+                <ArrowLeft className="w-4 h-4" /> Previous
+              </button>
+              <span className="text-xs text-slate-400 font-medium">Auto-advances on selection</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // 3. INTERACTIVE REPORT PREVIEW + BACKEND PDF DOWNLOAD
+  if (!result) return null;
+
+  return (
+    <div className="min-h-screen bg-[#FAF5EC] py-8 px-4 text-slate-800">
+      <div className="max-w-5xl mx-auto space-y-6">
+        <div className="sticky top-3 z-30 flex flex-wrap items-center justify-between gap-4 bg-white/95 backdrop-blur-md border border-[#E7E0D2] rounded-2xl px-5 py-3.5 shadow-lg">
+          <div className="flex items-center gap-3">
+            <ShieldCheck className="w-6 h-6 text-blue-600" />
+            <div>
+              <div className="font-bold text-slate-900 text-sm">{result.testTitle} — Complete Report</div>
+              <div className="text-xs text-slate-500">Report ID: {result.reportId} · Backend pdf-lib A4 Export</div>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={handleDownloadPdf}
+            disabled={downloading}
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-sky-500 text-white font-semibold text-sm shadow-md disabled:opacity-60"
+          >
+            <Download className="w-4 h-4" />
+            {downloading ? 'Generating PDF...' : 'Download Colorful A4 PDF'}
+          </button>
+        </div>
+
+        <section className="bg-white rounded-2xl border border-[#E7E0D2] p-6 md:p-8 shadow-sm space-y-5">
+          <div className="bg-gradient-to-r from-blue-50 to-slate-50 border border-blue-200 border-l-4 border-l-blue-600 rounded-xl p-5">
+            <h1 className="font-serif text-2xl font-bold text-slate-900">{result.student.name}</h1>
+            <p className="text-xs text-slate-500 font-semibold mt-1">
+              {result.dateFormatted} · {result.student.phone} · {result.answeredCount}/{result.totalQuestions} Questions
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {result.kpis.map((k) => (
+              <div key={k.label} className="bg-[#FAF8F2] border border-[#E7E0D2] border-t-4 border-t-blue-600 rounded-xl p-4 text-center">
+                <div className="font-serif text-xl font-bold text-blue-600 truncate">{k.big}</div>
+                <div className="text-[11px] font-bold uppercase text-slate-500 mt-1">{k.label}</div>
+                <div className="text-xs text-slate-600 truncate">{k.sub}</div>
+              </div>
+            ))}
+          </div>
+
+          <div className="space-y-3 pt-2">
+            <h2 className="font-serif text-lg font-bold text-slate-900 border-l-4 border-blue-600 pl-3">
+              Score Breakdown
+            </h2>
+            {result.rankedDimensions.map((d) => (
+              <div key={d.label}>
+                <div className="flex justify-between text-xs font-semibold mb-1">
+                  <span>{d.label}</span>
+                  <span className="flex items-center gap-2">
+                    <span>{d.percentage}%</span>
+                    <span className={`text-[10px] uppercase px-2 py-0.5 rounded-full border font-bold ${BADGE_CLASSES[d.tierColor]}`}>
+                      {d.tier}
+                    </span>
+                  </span>
+                </div>
+                <div className="w-full h-2 bg-[#EDE7DA] rounded-full overflow-hidden">
+                  <div className="h-full bg-gradient-to-r from-blue-600 to-emerald-500 rounded-full" style={{ width: `${d.percentage}%` }} />
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="bg-blue-50 border border-blue-200 border-l-4 border-l-blue-600 rounded-xl p-5 flex gap-3 items-start">
+            <CheckCircle2 className="w-6 h-6 text-blue-600 shrink-0 mt-0.5" />
+            <div>
+              <h3 className="font-bold text-blue-800 text-sm mb-1">Counselor Summary</h3>
+              <p className="text-sm text-slate-700">{result.finalVerdict}</p>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  );
+}
+7. Test Registry (src/tests/index.ts)TypeScriptimport { TestConfig, TestId } from '@/types/assessment';
+import { commerceConfig } from './commerce.config';
+import { engineeringConfig } from './engineering.config';
+import { humanitiesConfig } from './humanities.config';
+import { idealCareerConfig } from './idealCareer.config';
+import { learningStylesConfig } from './learningStyles.config';
+import { multiDimensionalConfig } from './multiDimensional.config';
+import { multipleIntelConfig } from './multipleIntel.config';
+import { personalityConfig } from './personality.config';
+import { streamSelectorConfig } from './streamSelector.config';
+
+export const TEST_REGISTRY: Record<TestId, TestConfig> = {
+  commerce: commerceConfig,
+  engineering: engineeringConfig,
+  humanities: humanitiesConfig,
+  'ideal-career': idealCareerConfig,
+  'learning-styles': learningStylesConfig,
+  'multi-dimensional': multiDimensionalConfig,
+  'multiple-intelligence': multipleIntelConfig,
+  personality: personalityConfig,
+  'stream-selector': streamSelectorConfig,
+};
+
+export function getTestConfig(testId: TestId): TestConfig | undefined {
+  return TEST_REGISTRY[testId];
+}
+Usage in Your Next.js PagesTo render any of the 9 tests on a dynamic route (e.g., src/app/tests/[testId]/page.tsx):TypeScriptimport TestRunner from '@/components/TestRunner/TestRunner';
+import { TestId } from '@/types/assessment';
+
+export default async function AssessmentPage({ params }: { params: Promise<{ testId: TestId }> }) {
+  const { testId } = await params;
+  return <TestRunner testId={testId} branding={{ clientName: 'EduCompass' }} />;
+}

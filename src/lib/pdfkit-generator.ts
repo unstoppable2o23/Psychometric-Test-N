@@ -98,6 +98,37 @@ export async function generateReportPdf(data: ReportPdfData, id: string): Promis
     return Buffer.from(bytes)
   }
 
+  // Unified colourful report for the assessments that previously fell through
+  // to the generic table renderer. The unified pipeline (configs + centralized
+  // scoring engine + pdf-lib generator) produces bespoke multi-page reports
+  // while auth/payment gating remains in the download route.
+  const UNIFIED_SLUGS: Record<string, 'humanities' | 'engineering' | 'ideal-career' | 'multi-dimensional'> = {
+    'humanities-branch': 'humanities',
+    'engineering-branch': 'engineering',
+    'ideal-career': 'ideal-career',
+    'multi-dimensional': 'multi-dimensional',
+  }
+  const unifiedTestId = UNIFIED_SLUGS[slug]
+  if (unifiedTestId && data.answers) {
+    const { getPlatformTestConfig } = await import('@/tests')
+    const { getReportConfig } = await import('@/reports/reportConfigs')
+    const { evaluateTest, toUnifiedAnswerMap } = await import('@/scoring/scoringEngine')
+    const { generateUnifiedReportPdf } = await import('@/pdf-generator/generateReportPdf')
+    const cfg = getPlatformTestConfig(unifiedTestId)
+    const tpl = getReportConfig(unifiedTestId)
+    if (cfg && tpl) {
+      const student = {
+        name: data.student.name || 'Candidate',
+        email: data.student.email || '',
+        phone: data.student.phone || '',
+      }
+      const answers = toUnifiedAnswerMap(cfg, student, data.answers)
+      const result = evaluateTest(cfg, student, answers)
+      const bytes = await generateUnifiedReportPdf(result, tpl, { clientName: data.platform || 'Psychometric Testing Platform' })
+      return Buffer.from(bytes)
+    }
+  }
+
   const doc = await PDFDocument.create()
   const font = await doc.embedFont(StandardFonts.Helvetica)
   const fontBold = await doc.embedFont(StandardFonts.HelveticaBold)
