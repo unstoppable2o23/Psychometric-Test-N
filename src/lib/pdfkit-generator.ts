@@ -78,6 +78,9 @@ export interface ReportPdfData {
   // Raw answers (question orderIndex -> selected option label) for assessments
   // whose bespoke PDF renderer recomputes from source (e.g. commerce-branch).
   answers?: Record<number, string>
+  // Optional client branding — clientName appears in PDF footers/headers and
+  // logoUrl (PNG/JPG) is embedded on the cover + every page header when set.
+  branding?: { clientName?: string; logoUrl?: string }
 }
 
 export async function generateReportPdf(data: ReportPdfData, id: string): Promise<Buffer> {
@@ -124,7 +127,10 @@ export async function generateReportPdf(data: ReportPdfData, id: string): Promis
       }
       const answers = toUnifiedAnswerMap(cfg, student, data.answers)
       const result = evaluateTest(cfg, student, answers)
-      const bytes = await generateUnifiedReportPdf(result, tpl, { clientName: data.platform || 'Psychometric Testing Platform' })
+      const bytes = await generateUnifiedReportPdf(result, tpl, {
+        clientName: data.branding?.clientName || data.platform || 'Psychometric Testing Platform',
+        logoUrl: data.branding?.logoUrl,
+      })
       return Buffer.from(bytes)
     }
   }

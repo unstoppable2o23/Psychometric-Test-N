@@ -858,8 +858,18 @@ export function toUnifiedAnswerMap(
 ): AnswerMap {
   const questions = getQuestionsForStudent(config, student);
   const out: AnswerMap = {};
-  for (const q of questions) {
-    const raw = labelAnswers[Number(q.id)];
+  for (let i = 0; i < questions.length; i++) {
+    const q = questions[i];
+    // Platform answers are keyed by questionOrder (= position in the question
+    // array). Prefer the numeric question id when it resolves to a stored
+    // answer, otherwise fall back to the positional index — configs like
+    // ideal-career use non-numeric ids ("q1", "q2", ...) which would
+    // otherwise silently drop every answer.
+    const numericId = Number(q.id);
+    const raw =
+      !Number.isNaN(numericId) && labelAnswers[numericId] !== undefined
+        ? labelAnswers[numericId]
+        : labelAnswers[i];
     if (raw === undefined || raw === null || raw === '') continue;
     if (typeof raw === 'number') { out[q.id] = raw; continue; }
     const idx = q.options.indexOf(raw);
