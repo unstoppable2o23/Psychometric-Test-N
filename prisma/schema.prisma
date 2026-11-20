@@ -1,10 +1,13 @@
 // ============================================================================
 // Psychometric Testing Platform — Prisma Schema
 // ----------------------------------------------------------------------------
-// DATABASE: PostgreSQL (Neon). The schema is provider-agnostic: all enum-like
-// fields use String and all "list" fields are stored as JSON strings, so it
-// maps cleanly to PostgreSQL. The DATABASE_URL is read from the environment
-// (.env locally, Vercel env var in production) — never committed to git.
+// DATABASE: Turso (libSQL — a cloud-native SQLite fork). Free tier: 500 DBs,
+// 9 GB storage, 1B row reads/mo, 25M row writes/mo. Integrates natively with
+// Vercel. Connection is via the Prisma libSQL driver adapter
+// (@prisma/adapter-libsql + @libsql/client), so the datasource provider stays
+// "sqlite" and all String/JSON columns map directly (no type changes from the
+// original SQLite schema). DATABASE_URL + DATABASE_AUTH_TOKEN come from the
+// environment (.env locally, Vercel env vars in production) — never committed.
 // ============================================================================
 
 generator client {
@@ -12,7 +15,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 

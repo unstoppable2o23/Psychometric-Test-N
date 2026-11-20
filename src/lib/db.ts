@@ -1,39 +1,48 @@
 import { PrismaClient } from '@prisma/client'
+import { PrismaLibSql } from '@prisma/adapter-libsql'
 import fs from 'fs'
 import path from 'path'
 
 // ---------------------------------------------------------------------------
-// DATABASE_URL resolution
+// Turso (libSQL) connection resolution
 // ---------------------------------------------------------------------------
 // Next.js's @next/env loader does NOT override variables already present in
-// process.env. In this sandbox the shell exports a SQLite DATABASE_URL at
-// session start, which would silently shadow the real connection string in
-// .env and point the app at a stale local file. To make .env the single
-// source of truth, we read it directly and patch process.env before the
-// PrismaClient is constructed (Prisma reads env("DATABASE_URL") at init).
-function resolveDatabaseUrl(): string | undefined {
-  // Prefer an already-set PostgreSQL URL (e.g. Vercel env var or inline export).
-  const shell = process.env.DATABASE_URL
-  if (shell && shell.startsWith('postgres')) return shell
-  // Otherwise load from .env (gitignored, contains the real Neon URL).
+// process.env. In this sandbox the shell exports a local file:// SQLite URL at
+// session start, which would shadow the real Turso URL in .env. To make .env
+// the source of truth for Turso credentials, we read it directly and promote
+// its libsql:// URL + token to process.env before constructing the client.
+function readEnvFile(): Record<string, string> {
   try {
     const envPath = path.join(process.cwd(), '.env')
-    const content = fs.readFileSync(envPath, 'utf8')
-    const match = content.match(/^DATABASE_URL=(.+)$/m)
-    if (match) {
-      const url = match[1].trim()
-      if (url.startsWith('postgres')) return url
+    const out: Record<string, string> = {}
+    for (const line of fs.readFileSync(envPath, 'utf8').split('\n')) {
+      const m = line.match(/^\s*([A-Z_][A-Z0-9_]*)\s*=\s*(.+?)\s*$/)
+      if (m) out[m[1]] = m[2]
     }
+    return out
   } catch {
-    // .env missing — fall through to whatever is set.
+    return {}
   }
-  return shell
 }
 
-const resolvedUrl = resolveDatabaseUrl()
-if (resolvedUrl && process.env.DATABASE_URL !== resolvedUrl) {
-  process.env.DATABASE_URL = resolvedUrl
-}
+const envFile = readEnvFile()
+// Promote Turso credentials from .env over any stale shell defaults.
+if (envFile.DATABASE_URL?.startsWith('libsql')) process.env.DATABASE_URL = envFile.DATABASE_URL
+if (envFile.DATABASE_AUTH_TOKEN) process.env.DATABASE_AUTH_TOKEN = envFile.DATABASE_AUTH_TOKEN
+
+// Resolve the final connection URL + token.
+//   1. A libsql:// URL (Turso cloud) — from process.env or .env
+//   2. Otherwise fall back to the local SQLite file (sandbox / offline dev)
+const tursoUrl =
+  process.env.DATABASE_URL?.startsWith('libsql')
+    ? process.env.DATABASE_URL
+    : process.env.DATABASE_URL?.startsWith('file:')
+      ? process.env.DATABASE_URL
+      : 'file:./db/custom.db'
+const tursoToken = process.env.DATABASE_AUTH_TOKEN
+
+const libsqlConfig = { url: tursoUrl, authToken: tursoToken }
+const adapter = new PrismaLibSql(libsqlConfig)
 
 // ---------------------------------------------------------------------------
 // Prisma client singleton (survives Next.js dev hot-reload)
@@ -45,6 +54,7 @@ const globalForPrisma = globalThis as unknown as {
 export const db =
   globalForPrisma.prisma ??
   new PrismaClient({
+    adapter,
     log: process.env.NODE_ENV === 'production' ? ['error'] : ['query'],
   })
 
