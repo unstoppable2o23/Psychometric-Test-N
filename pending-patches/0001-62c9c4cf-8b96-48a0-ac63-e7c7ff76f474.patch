@@ -1,0 +1,106 @@
+From cc03f7e39c03d748a438beaa95ad880eb9ef7ef1 Mon Sep 17 00:00:00 2001
+From: Z User <z@container>
+Date: Fri, 20 Nov 2026 06:21:04 +0000
+Subject: [PATCH 1/6] 62c9c4cf-8b96-48a0-ac63-e7c7ff76f474
+
+---
+ src/components/views/StudentDashboard.tsx | 42 +++++++++++------------
+ 1 file changed, 21 insertions(+), 21 deletions(-)
+
+diff --git a/src/components/views/StudentDashboard.tsx b/src/components/views/StudentDashboard.tsx
+index 3bb411a..7853de1 100755
+--- a/src/components/views/StudentDashboard.tsx
++++ b/src/components/views/StudentDashboard.tsx
+@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
+ import { Badge } from '@/components/ui/badge'
+ import { Progress } from '@/components/ui/progress'
+ import { Skeleton } from '@/components/ui/skeleton'
+-import { Play, RefreshCw, CheckCircle2, FileText, Clock, ListChecks, Trophy, Lock, BookOpen, ExternalLink } from 'lucide-react'
++import { Play, RefreshCw, CheckCircle2, FileText, Clock, ListChecks, Trophy, Lock, BookOpen } from 'lucide-react'
+ import { toast } from 'sonner'
+ 
+ export function StudentDashboard() {
+@@ -16,7 +16,6 @@ export function StudentDashboard() {
+   const [data, setData] = useState<{ student: any; assignments: any[] } | null>(null)
+   const [loading, setLoading] = useState(true)
+   const [starting, setStarting] = useState<string | null>(null)
+-  const [testLink, setTestLink] = useState<{ assignmentId: string; url: string; title: string } | null>(null)
+ 
+   const load = async () => {
+     setLoading(true)
+@@ -27,12 +26,23 @@ export function StudentDashboard() {
+ 
+   async function handleStart(assignmentId: string, title: string, slug?: string) {
+     setStarting(assignmentId)
++    // Open a blank tab synchronously within the user gesture so popup blockers don't block it.
++    // We then redirect it to the test URL once the token is ready.
++    const win = window.open('', '_blank')
++    if (!win) {
++      toast.error('Popup blocked. Please allow popups for this site to start your test.')
++      setStarting(null)
++      return
++    }
++    win.document.write('<html><head><title>Preparing your test…</title><style>body{font-family:system-ui,sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;color:#0f766e;background:#f0fdfa;} .s{display:flex;flex-direction:column;align-items:center;gap:14px;} .spin{width:36px;height:36px;border:4px solid #ccfbf1;border-top-color:#0d9488;border-radius:50%;animation:sp 0.8s linear infinite;} @keyframes sp{to{transform:rotate(360deg)}} p{color:#0f766e;font-weight:600;}</style></head><body><div class="s"><div class="spin"></div><p>Preparing your test…</p></div></body></html>')
++    win.document.close()
+     try {
+       // Use the platform TestRunner for all tests (supports resume, progress bar, badges)
+       const { token } = await api.startTest(assignmentId)
+-      setTestLink({ assignmentId, url: `/?test=${token}`, title })
+-      toast.success(`${title} is ready — click "Open Test" to begin`)
++      win.location.href = `/?test=${token}`
++      toast.success(`${title} is opening in a new tab…`)
+     } catch (e: any) {
++      win.close()
+       toast.error(e.message)
+     } finally { setStarting(null) }
+   }
+@@ -82,10 +92,8 @@ export function StudentDashboard() {
+               key={a.id}
+               a={a}
+               starting={starting === a.id}
+-              testLink={testLink?.assignmentId === a.id ? testLink : null}
+               onStart={() => handleStart(a.id, a.assessment.title, a.assessment.slug)}
+               onViewReport={() => a.reportId && viewReport(a.reportId)}
+-              onClearLink={() => setTestLink(null)}
+             />
+           ))}
+         </div>
+@@ -94,7 +102,7 @@ export function StudentDashboard() {
+   )
+ }
+ 
+-function AssignmentCard({ a, starting, testLink, onStart, onViewReport, onClearLink }: { a: any; starting: boolean; testLink: { url: string; title: string } | null; onStart: () => void; onViewReport: () => void; onClearLink: () => void }) {
++function AssignmentCard({ a, starting, onStart, onViewReport }: { a: any; starting: boolean; onStart: () => void; onViewReport: () => void }) {
+   const statusColors: Record<string, string> = {
+     ASSIGNED: 'bg-blue-50 text-blue-700 border-blue-200',
+     IN_PROGRESS: 'bg-amber-50 text-amber-700 border-amber-200',
+@@ -132,20 +140,12 @@ function AssignmentCard({ a, starting, testLink, onStart, onViewReport, onClearL
+           )}
+           {a.status === 'ASSIGNED' && <div className="flex-1 text-xs text-slate-400">Not started</div>}
+ 
+-          {testLink ? (
+-            <a href={testLink.url} target="_blank" rel="noreferrer">
+-              <Button className="bg-teal-600 hover:bg-teal-700 animate-pulse"><ExternalLink className="w-4 h-4" /> Open Test</Button>
+-            </a>
+-          ) : (
+-            <>
+-              {a.button === 'START' && <Button onClick={onStart} disabled={starting} className="bg-teal-600 hover:bg-teal-700"><Play className="w-4 h-4" /> {starting ? 'Preparing…' : 'Start Test'}</Button>}
+-              {a.button === 'CONTINUE' && <Button onClick={onStart} disabled={starting} className="bg-amber-600 hover:bg-amber-700"><RefreshCw className={`w-4 h-4 ${starting ? 'animate-spin' : ''}`} /> Continue</Button>}
+-              {a.button === 'COMPLETED' && <Button disabled variant="secondary"><CheckCircle2 className="w-4 h-4" /> Completed</Button>}
+-              {a.button === 'VIEW_REPORT' && <Button onClick={onViewReport} variant="default" className="bg-emerald-600 hover:bg-emerald-700"><FileText className="w-4 h-4" /> View Report</Button>}
+-              {a.status === 'COMPLETED' && a.reportAvailable && a.button !== 'VIEW_REPORT' && (
+-                <Button disabled variant="outline" className="text-slate-400"><Lock className="w-3.5 h-3.5" /> Report locked</Button>
+-              )}
+-            </>
++          {a.button === 'START' && <Button onClick={onStart} disabled={starting} className="bg-teal-600 hover:bg-teal-700"><Play className="w-4 h-4" /> {starting ? 'Opening…' : 'Start Test'}</Button>}
++          {a.button === 'CONTINUE' && <Button onClick={onStart} disabled={starting} className="bg-amber-600 hover:bg-amber-700"><RefreshCw className={`w-4 h-4 ${starting ? 'animate-spin' : ''}`} /> {starting ? 'Opening…' : 'Continue'}</Button>}
++          {a.button === 'COMPLETED' && <Button disabled variant="secondary"><CheckCircle2 className="w-4 h-4" /> Completed</Button>}
++          {a.button === 'VIEW_REPORT' && <Button onClick={onViewReport} variant="default" className="bg-emerald-600 hover:bg-emerald-700"><FileText className="w-4 h-4" /> View Report</Button>}
++          {a.status === 'COMPLETED' && a.reportAvailable && a.button !== 'VIEW_REPORT' && (
++            <Button disabled variant="outline" className="text-slate-400"><Lock className="w-3.5 h-3.5" /> Report locked</Button>
+           )}
+         </div>
+       </CardContent>
+-- 
+2.47.3
+

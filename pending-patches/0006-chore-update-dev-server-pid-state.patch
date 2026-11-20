@@ -1,0 +1,19 @@
+From bef64958f382fb0282fa8be0a2aaa2e0c4ed1c5d Mon Sep 17 00:00:00 2001
+From: Z User <z@container>
+Date: Fri, 20 Nov 2026 09:52:55 +0000
+Subject: [PATCH 6/6] chore: update dev server pid state
+
+---
+ .zscripts/dev.pid | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/.zscripts/dev.pid b/.zscripts/dev.pid
+index 669ca49..6d5177e 100755
+--- a/.zscripts/dev.pid
++++ b/.zscripts/dev.pid
+@@ -1 +1 @@
+-1087
++1082
+-- 
+2.47.3
+
