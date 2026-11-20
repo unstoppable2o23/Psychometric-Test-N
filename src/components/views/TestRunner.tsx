@@ -27,7 +27,18 @@ export function TestRunner() {
   const [milestone, setMilestone] = useState<typeof MILESTONES[number] | null>(null)
   const advancingRef = useRef(false)
 
-  const goDashboard = useCallback(() => { window.location.href = '/' }, [])
+  const goDashboard = useCallback(() => {
+    // Check if this is an anonymous link test — redirect to the anon report page
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search)
+      const anonToken = params.get('anon')
+      if (anonToken) {
+        window.location.href = `/anon/${anonToken}`
+        return
+      }
+    }
+    window.location.href = '/'
+  }, [])
 
   // --- Content Protection: discourage copying of test questions ---
   useEffect(() => {
@@ -143,7 +154,9 @@ export function TestRunner() {
   }
 
   if (done) {
-    return <CompletionScreen recommendation={done.recommendation} reportId={done.reportId} onViewDashboard={goDashboard} />
+    // Check if this is an anonymous link test
+    const anonToken = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('anon') : null
+    return <CompletionScreen recommendation={done.recommendation} reportId={done.reportId} onViewDashboard={goDashboard} isAnon={!!anonToken} />
   }
 
   if (!state) return null
@@ -313,7 +326,7 @@ export function TestRunner() {
   )
 }
 
-function CompletionScreen({ recommendation, reportId, onViewDashboard }: { recommendation?: string; reportId?: string; onViewDashboard: () => void }) {
+function CompletionScreen({ recommendation, reportId, onViewDashboard, isAnon }: { recommendation?: string; reportId?: string; onViewDashboard: () => void; isAnon?: boolean }) {
   const setView = useApp((s) => s.setView)
   return (
     <div className="min-h-[calc(100vh-3.5rem)] grid place-items-center px-4 relative overflow-hidden bg-gradient-to-br from-slate-50 to-teal-50/30">

@@ -11,7 +11,10 @@ const schema = z.object({
   phone: z.string().min(7, 'Invalid mobile number'),
 })
 
+const TOKEN_TTL_HOURS = 72
+
 // POST /api/anon/[token]/register — student registers via anonymous link
+// Creates student account + assignment + attempt + test token (for platform TestRunner)
 export const POST = apiHandler(async (req: NextRequest, { params }: { params: Promise<{ token: string }> }) => {
   const { token } = await params
   const link = await db.anonymousTestLink.findUnique({
@@ -43,6 +46,12 @@ export const POST = apiHandler(async (req: NextRequest, { params }: { params: Pr
     data: { assignmentId: assignment.id, studentId: student.id, assessmentId: link.assessmentId, status: 'IN_PROGRESS' },
   })
 
+  // Generate a platform test token (for the TestRunner — supports resume)
+  const testToken = generateSecureToken(24)
+  await db.accessToken.create({
+    data: { assignmentId: assignment.id, token: testToken, expiresAt: new Date(Date.now() + TOKEN_TTL_HOURS * 3600 * 1000) },
+  })
+
   // Update link status
   await db.anonymousTestLink.update({
     where: { token },
@@ -51,6 +60,7 @@ export const POST = apiHandler(async (req: NextRequest, { params }: { params: Pr
 
   await audit('ANON_LINK_REGISTERED', { actor: { id: student.id, role: 'STUDENT' }, targetType: 'ANON_LINK', targetId: link.id, metadata: { name, email } })
 
-  return json({ ok: true, studentId: student.id, attemptId: attempt.id, assessment: link.assessment })
+  // Return the test token so the frontend can redirect to the platform TestRunner
+  return json({ ok: true, studentId: student.id, testToken, assessment: link.assessment })
 })
 export const dynamic = 'force-dynamic'
