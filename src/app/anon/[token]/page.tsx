@@ -50,7 +50,7 @@ export default function AnonTestPage() {
     } catch { setErrorMsg('Failed to load'); setPhase('error') }
   }, [token])
 
-  useEffect(() => { loadLink() }, [loadLink])
+  useEffect(() => { loadLink() }, [loadLink]) // eslint-disable-line react-hooks/exhaustive-deps
 
   async function register(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
