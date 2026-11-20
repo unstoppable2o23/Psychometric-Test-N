@@ -46,6 +46,10 @@ export const POST = apiHandler(async () => {
     `CREATE TABLE IF NOT EXISTS "AuditLog" ("id" TEXT NOT NULL, "actorId" TEXT, "actorRole" TEXT, "action" TEXT NOT NULL, "targetType" TEXT, "targetId" TEXT, "metadata" TEXT, "ip" TEXT, "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP, CONSTRAINT "AuditLog_pkey" PRIMARY KEY ("id"))`,
     `CREATE INDEX IF NOT EXISTS "AuditLog_actorId_idx" ON "AuditLog"("actorId")`,
     `CREATE INDEX IF NOT EXISTS "AuditLog_action_idx" ON "AuditLog"("action")`,
+    // Anonymous Test Links table
+    `CREATE TABLE IF NOT EXISTS "AnonymousTestLink" ("id" TEXT NOT NULL, "token" TEXT NOT NULL, "assessmentId" TEXT NOT NULL, "createdById" TEXT NOT NULL, "studentId" TEXT, "assignmentId" TEXT, "reportId" TEXT, "status" TEXT NOT NULL DEFAULT 'UNUSED', "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP, "updatedAt" TIMESTAMP(3) NOT NULL, CONSTRAINT "AnonymousTestLink_pkey" PRIMARY KEY ("id"), CONSTRAINT "AnonymousTestLink_token_key" UNIQUE ("token"))`,
+    `CREATE INDEX IF NOT EXISTS "AnonymousTestLink_token_idx" ON "AnonymousTestLink"("token")`,
+    `CREATE INDEX IF NOT EXISTS "AnonymousTestLink_assessmentId_idx" ON "AnonymousTestLink"("assessmentId")`,
   ]
   for (const sql of tableSQL) {
     try { await db.$executeRawUnsafe(sql) } catch (e: any) { if (!e.message?.includes('already exists')) console.error('SQL:', e.message?.slice(0, 80)) }
