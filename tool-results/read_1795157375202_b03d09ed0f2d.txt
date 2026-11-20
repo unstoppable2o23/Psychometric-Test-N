@@ -1,0 +1,1549 @@
+     1→1. Shared Types (src/lib/tests/commerce/types.ts)
+     2→TypeScript
+     3→export type DomainType = 'Financial' | 'Non-Financial';
+     4→export type InterestLevel = 'High' | 'Medium' | 'Low';
+     5→
+     6→export interface StudentInfo {
+     7→  name: string;
+     8→  email: string;
+     9→  phone: string;
+    10→}
+    11→
+    12→export interface BrandingConfig {
+    13→  clientName?: string;
+    14→  logoUrl?: string;
+    15→}
+    16→
+    17→export interface CommerceQuestion {
+    18→  id: number;
+    19→  text: string;
+    20→  cluster: string;
+    21→}
+    22→
+    23→export interface ClusterResult {
+    24→  cluster: string;
+    25→  domain: DomainType;
+    26→  rawScore: number;      // Max 20 (4 questions x 5)
+    27→  percentage: number;    // 0 - 100
+    28→  level: InterestLevel;
+    29→  rank: number;          // 1 - 19
+    30→  roles: string[];
+    31→}
+    32→
+    33→export interface CommerceReportResult {
+    34→  student: StudentInfo;
+    35→  dateFormatted: string;
+    36→  reportId: string;
+    37→  totalQuestions: number;
+    38→  answeredCount: number;
+    39→  totalRawScore: number;
+    40→  overallIndexPct: number;
+    41→  financialRaw: number;
+    42→  nonFinancialRaw: number;
+    43→  financialPct: number;
+    44→  nonFinancialPct: number;
+    45→  preferredDomain: 'Financial Domain' | 'Non-Financial Domain';
+    46→  highCount: number;
+    47→  mediumCount: number;
+    48→  lowCount: number;
+    49→  sortedClusters: ClusterResult[];
+    50→  allClustersInOrder: ClusterResult[];
+    51→  top8: ClusterResult[];
+    52→  top5: ClusterResult[];
+    53→  top3: ClusterResult[];
+    54→  financialClusters: ClusterResult[];
+    55→  nonFinancialClusters: ClusterResult[];
+    56→}
+    57→2. Assessment Data (src/lib/tests/commerce/data.ts)
+    58→All 76 questions, 19 career clusters, 8 financial domains, and the 5-point Likert scale are preserved verbatim from the original assessment.
+    59→
+    60→TypeScript
+    61→import { CommerceQuestion } from './types';
+    62→
+    63→export const LIKERT_OPTIONS = [
+    64→  'Strongly Disagree',
+    65→  'Disagree',
+    66→  'Neutral',
+    67→  'Agree',
+    68→  'Strongly Agree',
+    69→] as const;
+    70→
+    71→export const FINANCIAL_CLUSTERS = new Set<string>([
+    72→  'Accounts/Taxation',
+    73→  'Analytics',
+    74→  'Financial Auditing and Investigation',
+    75→  'Credit Management',
+    76→  'Financial Banking and Investment',
+    77→  'Financial Management',
+    78→  'Monitoring and Evaluation Specialist',
+    79→  'Trading',
+    80→]);
+    81→
+    82→export const CLUSTERS: Record<string, string[]> = {
+    83→  'Accounts/Taxation': ['Accountant', 'Cost Accountant', 'Chartered Accountant', 'Tax Advisor/Tax Inspector'],
+    84→  'Analytics': ['Statistician', 'Business Analyst / Market Analyst'],
+    85→  'Communication and Media': [
+    86→    'Radio and TV Anchoring, News Reading, Theater',
+    87→    'Stage and Voice Over Artist, Public Relations',
+    88→    'Photography, Advertisement, Online Media, Video and Audio Editor, Camera and Light Professional',
+    89→    'Sound Technician etc.',
+    90→  ],
+    91→  'Computer Related Designing': ['Web Designer, Graphic Designer, Animator, Game Designer, Illustrator, Multimedia Designer'],
+    92→  'Financial Auditing and Investigation': ['Security Analyst', 'Financial Analyst', 'Investment Analyst', 'Fraud Management', 'Auditor, Actuary'],
+    93→  'Credit Management': ['Risk Management'],
+    94→  'Financial Banking and Investment': ['Actuary', 'Corporate/Personal Banker', 'Treasury Management', 'Insurance Specialist', 'Investment Banker'],
+    95→  'Financial Management': ['Real Estate / Property Management', 'Finance Management', 'Sale/Purchase Management', 'Wealth Management', 'Asset Management', 'Micro Finance Management', 'Financial Planner'],
+    96→  'Monitoring and Evaluation Specialist': ['Economist, Economic Advisor', 'Financial Planner', 'Budget Analyst', 'Financial Analyst'],
+    97→  'Hospitality and Tourism': ['Travel Agent, Tourism Manager, Logistics Manager', 'Transportation Support, Airhostess, Cabin Crew', 'Customer Service Manager, Travel Desk Officer', 'Event Manager'],
+    98→  'Hotel': ['Hotel Manager, Facility Maintenance, Chef, Food and Beverage Specialist, Cleaning and Housekeeping In Charges, Restaurant and Bar In Charge'],
+    99→  'Industrial Designing': ['Fashion Designer, Textile Designer, Knitwear Designer, Accessory Designer, Jewellery Designer, Interior Designer'],
+   100→  'Journalism': ['Journalist – Print or Electronic, Reporter, Editor', 'Copy Writer, Screen Play Writer, Content Writer'],
+   101→  'Languages': ['Linguist, Translator, Interpreter, News Reader', 'Bilingual Educator, Copy Writer and Editor, Grant and Proposal Writer, Professor, Teacher and Trainer, Public Relations, Publication, Research'],
+   102→  'Law': ['Corporate / Company Lawyer', 'Tax Lawyer', 'Banking Solicitor', 'Company Secretary'],
+   103→  'Management': ['Banking and Insurance Management', 'Finance Management', 'HR Management', 'Marketing and Sales Management', 'Operations Management', 'Rural Management', 'Export Management'],
+   104→  'Social Sciences': ['Teacher and Professor, Social Workers', 'Relationship Counselor, Career Counselor', 'Philosopher, Critic and Political Analyst', 'Activist, Reformer, Researcher'],
+   105→  'Teaching and Education': ['Nursery or Pre-Primary Teacher, Primary, Middle School, Secondary and Senior Secondary Teacher', 'Lecturer and Professor, Institute Trainer, Tutor', 'Coaching Centre Trainer, Academic Head or Principal'],
+   106→  'Trading': ['Stock Broker', 'Foreign Exchange Trader', 'Derivative Trader', 'Commodity Trader'],
+   107→};
+   108→
+   109→const RAW_QUESTIONS: Array<{ t: string; c: string }> = [
+   110→  { t: 'I enjoy maintaining ledger books and balancing accounts.', c: 'Accounts/Taxation' },
+   111→  { t: 'I am interested in learning about direct and indirect tax laws.', c: 'Accounts/Taxation' },
+   112→  { t: 'Auditing financial statements sounds like an interesting job.', c: 'Accounts/Taxation' },
+   113→  { t: 'I would like to help individuals and companies file their taxes.', c: 'Accounts/Taxation' },
+   114→  { t: 'I like working with statistical data to find trends.', c: 'Analytics' },
+   115→  { t: 'Using data to solve business problems excites me.', c: 'Analytics' },
+   116→  { t: 'I enjoy creating charts and graphs to represent data.', c: 'Analytics' },
+   117→  { t: 'Market research and consumer data analysis appeal to me.', c: 'Analytics' },
+   118→  { t: 'I am interested in working in radio or TV broadcasting.', c: 'Communication and Media' },
+   119→  { t: 'Public relations and managing corporate image interest me.', c: 'Communication and Media' },
+   120→  { t: 'I would enjoy operating cameras or editing video content.', c: 'Communication and Media' },
+   121→  { t: 'Advertisement and media production fascinate me.', c: 'Communication and Media' },
+   122→  { t: 'I enjoy designing websites and user interfaces.', c: 'Computer Related Designing' },
+   123→  { t: 'Graphic design and illustration are skills I want to develop.', c: 'Computer Related Designing' },
+   124→  { t: 'I am interested in animation and game design.', c: 'Computer Related Designing' },
+   125→  { t: 'Creating multimedia content feels like a great career path.', c: 'Computer Related Designing' },
+   126→  { t: 'Investigating financial frauds sounds exciting to me.', c: 'Financial Auditing and Investigation' },
+   127→  { t: 'I would like to analyze investment opportunities for clients.', c: 'Financial Auditing and Investigation' },
+   128→  { t: "Evaluating company securities is a career I'd enjoy.", c: 'Financial Auditing and Investigation' },
+   129→  { t: 'I am interested in actuarial science and risk calculation.', c: 'Financial Auditing and Investigation' },
+   130→  { t: 'Assessing creditworthiness of individuals sounds interesting.', c: 'Credit Management' },
+   131→  { t: 'I would like to manage risk in financial institutions.', c: 'Credit Management' },
+   132→  { t: 'Loan approval and credit analysis appeal to me.', c: 'Credit Management' },
+   133→  { t: 'I enjoy evaluating the financial stability of borrowers.', c: 'Credit Management' },
+   134→  { t: 'Working in a bank as a personal banker appeals to me.', c: 'Financial Banking and Investment' },
+   135→  { t: 'I am interested in treasury and foreign exchange management.', c: 'Financial Banking and Investment' },
+   136→  { t: 'Insurance and risk protection products interest me.', c: 'Financial Banking and Investment' },
+   137→  { t: 'I would enjoy a career in investment banking.', c: 'Financial Banking and Investment' },
+   138→  { t: 'I want to manage real estate properties and assets.', c: 'Financial Management' },
+   139→  { t: 'Wealth management for high-net-worth individuals sounds rewarding.', c: 'Financial Management' },
+   140→  { t: 'I am interested in managing micro-finance institutions.', c: 'Financial Management' },
+   141→  { t: 'Financial planning for families and businesses interests me.', c: 'Financial Management' },
+   142→  { t: 'I would like to work as an economic advisor.', c: 'Monitoring and Evaluation Specialist' },
+   143→  { t: 'Preparing budget analyses for organizations sounds interesting.', c: 'Monitoring and Evaluation Specialist' },
+   144→  { t: 'Monitoring project evaluations and outcomes appeals to me.', c: 'Monitoring and Evaluation Specialist' },
+   145→  { t: 'I enjoy analyzing economic indicators and policies.', c: 'Monitoring and Evaluation Specialist' },
+   146→  { t: 'I want to work in the travel and tourism industry.', c: 'Hospitality and Tourism' },
+   147→  { t: 'Managing logistics and transportation sounds like a good career.', c: 'Hospitality and Tourism' },
+   148→  { t: 'I would enjoy working as an event manager or travel agent.', c: 'Hospitality and Tourism' },
+   149→  { t: 'Working as cabin crew or customer service manager appeals to me.', c: 'Hospitality and Tourism' },
+   150→  { t: 'I am interested in hotel management and operations.', c: 'Hotel' },
+   151→  { t: 'Food and beverage service management excites me.', c: 'Hotel' },
+   152→  { t: 'I would like to work in housekeeping or facility maintenance.', c: 'Hotel' },
+   153→  { t: "Managing a restaurant or bar sounds like a career I'd enjoy.", c: 'Hotel' },
+   154→  { t: 'I have a keen interest in fashion and textile design.', c: 'Industrial Designing' },
+   155→  { t: 'Designing jewelry or accessories appeals to me.', c: 'Industrial Designing' },
+   156→  { t: 'I would enjoy working as an interior designer.', c: 'Industrial Designing' },
+   157→  { t: 'Creating industrial product designs is fascinating.', c: 'Industrial Designing' },
+   158→  { t: 'I want to work as a reporter for a newspaper or news channel.', c: 'Journalism' },
+   159→  { t: 'Editing and copywriting are skills I want to pursue.', c: 'Journalism' },
+   160→  { t: 'Writing screenplays or content for websites sounds exciting.', c: 'Journalism' },
+   161→  { t: 'Investigative journalism and news analysis interest me.', c: 'Journalism' },
+   162→  { t: 'I would love to work as a translator or interpreter.', c: 'Languages' },
+   163→  { t: 'Bilingual education and teaching languages appeal to me.', c: 'Languages' },
+   164→  { t: 'I am interested in writing grant proposals and publications.', c: 'Languages' },
+   165→  { t: 'Linguistics and language research fascinate me.', c: 'Languages' },
+   166→  { t: 'I am interested in corporate law and legal compliance.', c: 'Law' },
+   167→  { t: 'Working as a tax lawyer or banking solicitor appeals to me.', c: 'Law' },
+   168→  { t: 'Company secretarial and legal advisory roles interest me.', c: 'Law' },
+   169→  { t: 'I would like to represent companies in legal matters.', c: 'Law' },
+   170→  { t: 'I want to work in HR management and recruitment.', c: 'Management' },
+   171→  { t: 'Marketing and sales management excite me.', c: 'Management' },
+   172→  { t: 'Operations and supply chain management sound interesting.', c: 'Management' },
+   173→  { t: 'I would like to manage rural or export businesses.', c: 'Management' },
+   174→  { t: 'I want to work as a social worker or relationship counselor.', c: 'Social Sciences' },
+   175→  { t: 'Activism and social reform are causes I care about.', c: 'Social Sciences' },
+   176→  { t: 'Political analysis and criticism interest me.', c: 'Social Sciences' },
+   177→  { t: 'Conducting social research sounds like a fulfilling career.', c: 'Social Sciences' },
+   178→  { t: 'I would love to teach in a primary or secondary school.', c: 'Teaching and Education' },
+   179→  { t: 'Becoming a college professor or lecturer is my goal.', c: 'Teaching and Education' },
+   180→  { t: 'Working as a trainer in a coaching center appeals to me.', c: 'Teaching and Education' },
+   181→  { t: 'I am interested in academic administration and leadership.', c: 'Teaching and Education' },
+   182→  { t: 'I want to work as a stockbroker in the financial markets.', c: 'Trading' },
+   183→  { t: 'Foreign exchange and derivative trading excite me.', c: 'Trading' },
+   184→  { t: "Commodity trading is a career I'd like to explore.", c: 'Trading' },
+   185→  { t: 'I enjoy watching market fluctuations and making quick decisions.', c: 'Trading' },
+   186→];
+   187→
+   188→export const QUESTIONS: CommerceQuestion[] = RAW_QUESTIONS.map((q, idx) => ({
+   189→  id: idx + 1,
+   190→  text: q.t,
+   191→  cluster: q.c,
+   192→}));
+   193→
+   194→export const LEVEL_DESCRIPTORS = [
+   195→  {
+   196→    level: 'High' as const,
+   197→    label: 'High Level',
+   198→    description:
+   199→      'This level indicates High interest in the given Commerce Career Options with awareness and knowledge about the subject and career as well as enthusiasm to face the work life situations accepting its pros and cons. The student has deep understanding as well as interest to opt for given career options, and knows what kind of professional personality is required — so he or she has the zeal to develop as a professional accordingly. It is recommended to select career options from this level while maintaining motivation and dedicated study.',
+   200→  },
+   201→  {
+   202→    level: 'Medium' as const,
+   203→    label: 'Medium Level',
+   204→    description:
+   205→      'This level indicates Medium interest in the given Commerce Career Options — the student is moderately able and interested to enjoy the pros and cons of work life situations, with moderate understanding and average general awareness about the career. It is advisable that students selecting from this level develop optimum zeal, motivation and a dedicated study pattern to grow as a professional in the field.',
+   206→  },
+   207→  {
+   208→    level: 'Low' as const,
+   209→    label: 'Low Level',
+   210→    description:
+   211→      'This level indicates Low interest as well as lack of understanding, awareness and knowledge about the given Commerce Career Options. There is profound reluctance in utilizing skills for small-scale tasks in the given career option. It will be an uphill task to build knowledge in a career option one is not interested in.',
+   212→  },
+   213→];
+   214→3. Shared Scoring Engine (src/lib/tests/commerce/scoring.ts)
+   215→TypeScript
+   216→import { CLUSTERS, FINANCIAL_CLUSTERS, QUESTIONS } from './data';
+   217→import { ClusterResult, CommerceReportResult, InterestLevel, StudentInfo } from './types';
+   218→
+   219→export function calculateCommerceResults(
+   220→  student: StudentInfo,
+   221→  answers: Array<number | null>
+   222→): CommerceReportResult {
+   223→  const rawMap: Record<string, number> = {};
+   224→  Object.keys(CLUSTERS).forEach((c) => {
+   225→    rawMap[c] = 0;
+   226→  });
+   227→
+   228→  let answeredCount = 0;
+   229→  QUESTIONS.forEach((q, idx) => {
+   230→    const val = answers[idx];
+   231→    if (val !== null && val !== undefined && val >= 1 && val <= 5) {
+   232→      rawMap[q.cluster] += val;
+   233→      answeredCount++;
+   234→    }
+   235→  });
+   236→
+   237→  const sortedEntries = Object.entries(rawMap).sort((a, b) => b[1] - a[1]);
+   238→  const third = Math.floor(sortedEntries.length / 3); // 6 High, 6 Medium, 7 Low
+   239→
+   240→  const rankMap: Record<string, number> = {};
+   241→  const levelMap: Record<string, InterestLevel> = {};
+   242→
+   243→  sortedEntries.forEach(([cluster], idx) => {
+   244→    rankMap[cluster] = idx + 1;
+   245→    levelMap[cluster] = idx < third ? 'High' : idx < third * 2 ? 'Medium' : 'Low';
+   246→  });
+   247→
+   248→  let financialRaw = 0;
+   249→  let nonFinancialRaw = 0;
+   250→  sortedEntries.forEach(([cluster, score]) => {
+   251→    if (FINANCIAL_CLUSTERS.has(cluster)) financialRaw += score;
+   252→    else nonFinancialRaw += score;
+   253→  });
+   254→
+   255→  const totalRawScore = financialRaw + nonFinancialRaw;
+   256→  const denom = totalRawScore || 1;
+   257→  const financialPct = Math.round((100 * financialRaw) / denom);
+   258→  const nonFinancialPct = 100 - financialPct;
+   259→  const preferredDomain =
+   260→    financialRaw >= nonFinancialRaw ? 'Financial Domain' : 'Non-Financial Domain';
+   261→
+   262→  const toClusterResult = (cluster: string): ClusterResult => ({
+   263→    cluster,
+   264→    domain: FINANCIAL_CLUSTERS.has(cluster) ? 'Financial' : 'Non-Financial',
+   265→    rawScore: rawMap[cluster],
+   266→    percentage: Math.round((rawMap[cluster] / 20) * 100),
+   267→    level: levelMap[cluster],
+   268→    rank: rankMap[cluster],
+   269→    roles: CLUSTERS[cluster],
+   270→  });
+   271→
+   272→  const sortedClusters = sortedEntries.map(([c]) => toClusterResult(c));
+   273→  const allClustersInOrder = Object.keys(CLUSTERS).map(toClusterResult);
+   274→
+   275→  const now = new Date();
+   276→  const dateFormatted = now.toLocaleDateString('en-GB', {
+   277→    day: 'numeric',
+   278→    month: 'long',
+   279→    year: 'numeric',
+   280→  });
+   281→
+   282→  return {
+   283→    student,
+   284→    dateFormatted,
+   285→    reportId: `CCS-${now.getFullYear()}-${String(QUESTIONS.length).padStart(3, '0')}`,
+   286→    totalQuestions: QUESTIONS.length,
+   287→    answeredCount,
+   288→    totalRawScore,
+   289→    overallIndexPct: Math.round((totalRawScore / (19 * 20)) * 100),
+   290→    financialRaw,
+   291→    nonFinancialRaw,
+   292→    financialPct,
+   293→    nonFinancialPct,
+   294→    preferredDomain,
+   295→    highCount: sortedClusters.filter((c) => c.level === 'High').length,
+   296→    mediumCount: sortedClusters.filter((c) => c.level === 'Medium').length,
+   297→    lowCount: sortedClusters.filter((c) => c.level === 'Low').length,
+   298→    sortedClusters,
+   299→    allClustersInOrder,
+   300→    top8: sortedClusters.slice(0, 8),
+   301→    top5: sortedClusters.slice(0, 5),
+   302→    top3: sortedClusters.slice(0, 3),
+   303→    financialClusters: sortedClusters.filter((c) => c.domain === 'Financial'),
+   304→    nonFinancialClusters: sortedClusters.filter((c) => c.domain === 'Non-Financial'),
+   305→  };
+   306→}
+   307→4. Backend pdf-lib 10-Page Colorful PDF Generator (src/lib/tests/commerce/pdfGenerator.ts)
+   308→This generates a crisp, vector-drawn, 10-page A4 PDF entirely in TypeScript using pdf-lib—complete with vector bar charts, an 8-axis vector radar chart, color-coded badges, KPI cards, and zero text clipping.
+   309→
+   310→TypeScript
+   311→import { PDFDocument, PDFPage, PDFFont, rgb, StandardFonts, PageSizes } from 'pdf-lib';
+   312→import { LEVEL_DESCRIPTORS } from './data';
+   313→import { BrandingConfig, ClusterResult, CommerceReportResult, InterestLevel } from './types';
+   314→
+   315→// Palette (Modern Colorful Theme)
+   316→const C = {
+   317→  navy: rgb(0.06, 0.09, 0.16),      // #0F172A
+   318→  blue: rgb(0.15, 0.39, 0.92),      // #2563EB
+   319→  sky: rgb(0.05, 0.65, 0.91),       // #0EA5E9
+   320→  indigo: rgb(0.39, 0.4, 0.95),     // #6366F1
+   321→  green: rgb(0.06, 0.73, 0.51),     // #10B981
+   322→  greenDark: rgb(0.02, 0.47, 0.34), // #047857
+   323→  greenBg: rgb(0.93, 0.99, 0.96),
+   324→  amber: rgb(0.96, 0.62, 0.04),     // #F59E0B
+   325→  amberDark: rgb(0.71, 0.33, 0.04), // #B45309
+   326→  amberBg: rgb(1.0, 0.98, 0.92),
+   327→  rose: rgb(0.88, 0.11, 0.28),      // #E11D48
+   328→  roseDark: rgb(0.75, 0.07, 0.24),  // #BE123C
+   329→  roseBg: rgb(1.0, 0.95, 0.96),
+   330→  slate: rgb(0.2, 0.25, 0.33),      // #334155
+   331→  muted: rgb(0.39, 0.45, 0.55),     // #64748B
+   332→  border: rgb(0.89, 0.85, 0.77),    // #E2D9C5
+   333→  cream: rgb(0.98, 0.97, 0.95),     // #FAF8F2
+   334→  softBlue: rgb(0.94, 0.96, 1.0),   // #EFF6FF
+   335→  white: rgb(1, 1, 1),
+   336→};
+   337→
+   338→const W = PageSizes.A4[0]; // 595.28
+   339→const H = PageSizes.A4[1]; // 841.89
+   340→const M = 36;              // Margin
+   341→const CW = W - M * 2;      // Content width (523.28)
+   342→
+   343→// Sanitize strings for WinAnsi standard fonts
+   344→function clean(str: string): string {
+   345→  return str
+   346→    .replace(/[\u2013\u2014]/g, '-')
+   347→    .replace(/[\u2018\u2019]/g, "'")
+   348→    .replace(/[\u201C\u201D]/g, '"')
+   349→    .replace(/[^\x20-\x7E]/g, ' ');
+   350→}
+   351→
+   352→function wrapText(text: string, font: PDFFont, size: number, maxWidth: number): string[] {
+   353→  const words = clean(text).split(/\s+/);
+   354→  const lines: string[] = [];
+   355→  let line = '';
+   356→  for (const w of words) {
+   357→    const test = line ? `${line} ${w}` : w;
+   358→    if (font.widthOfTextAtSize(test, size) <= maxWidth) {
+   359→      line = test;
+   360→    } else {
+   361→      if (line) lines.push(line);
+   362→      line = w;
+   363→    }
+   364→  }
+   365→  if (line) lines.push(line);
+   366→  return lines;
+   367→}
+   368→
+   369→function levelColors(level: InterestLevel) {
+   370→  if (level === 'High') return { fg: C.greenDark, bg: C.greenBg, bar: C.green };
+   371→  if (level === 'Medium') return { fg: C.amberDark, bg: C.amberBg, bar: C.amber };
+   372→  return { fg: C.roseDark, bg: C.roseBg, bar: C.rose };
+   373→}
+   374→
+   375→export async function generateCommercePdf(
+   376→  report: CommerceReportResult,
+   377→  branding: BrandingConfig = {}
+   378→): Promise<Uint8Array> {
+   379→  const pdf = await PDFDocument.create();
+   380→  const font = await pdf.embedFont(StandardFonts.Helvetica);
+   381→  const fontBold = await pdf.embedFont(StandardFonts.HelveticaBold);
+   382→  const serifBold = await pdf.embedFont(StandardFonts.TimesRomanBold);
+   383→
+   384→  const clientTitle = clean(branding.clientName || 'Commerce Career Selector');
+   385→  const totalPages = 10;
+   386→
+   387→  // Helper: Draw Sub-page Header & Footer
+   388→  const initPage = (pageNum: number, sectionTitle?: string): { page: PDFPage; y: number } => {
+   389→    const page = pdf.addPage(PageSizes.A4);
+   390→
+   391→    // Top colorful accent strip
+   392→    page.drawRectangle({ x: 0, y: H - 8, width: W * 0.6, height: 8, color: C.blue });
+   393→    page.drawRectangle({ x: W * 0.6, y: H - 8, width: W * 0.4, height: 8, color: C.green });
+   394→
+   395→    // Footer
+   396→    page.drawLine({ start: { x: M, y: 38 }, end: { x: W - M, y: 38 }, thickness: 0.75, color: C.border });
+   397→    page.drawText(clean(`${clientTitle} - Candidate: ${report.student.name}`), {
+   398→      x: M, y: 24, size: 8, font, color: C.muted,
+   399→    });
+   400→    const pgLabel = `Page ${pageNum} of ${totalPages}`;
+   401→    page.drawText(pgLabel, {
+   402→      x: W - M - fontBold.widthOfTextAtSize(pgLabel, 8), y: 24, size: 8, font: fontBold, color: C.navy,
+   403→    });
+   404→
+   405→    if (!sectionTitle) {
+   406→      return { page, y: H - 32 };
+   407→    }
+   408→
+   409→    page.drawText(clean(`${clientTitle.toUpperCase()}  |  COMMERCE CAREER SELECTOR`), {
+   410→      x: M, y: H - 30, size: 8, font: fontBold, color: C.blue,
+   411→    });
+   412→    page.drawText(clean(sectionTitle), {
+   413→      x: M, y: H - 50, size: 16, font: serifBold, color: C.navy,
+   414→    });
+   415→    page.drawText(clean(`Candidate: ${report.student.name}   |   Phone: ${report.student.phone}   |   Date: ${report.dateFormatted}`), {
+   416→      x: M, y: H - 64, size: 8, font, color: C.muted,
+   417→    });
+   418→    page.drawLine({ start: { x: M, y: H - 72 }, end: { x: W - M, y: H - 72 }, thickness: 1.5, color: C.blue });
+   419→
+   420→    return { page, y: H - 92 };
+   421→  };
+   422→
+   423→  // Helper: Draw Section Heading with Left Accent Bar
+   424→  const drawHeading = (page: PDFPage, y: number, title: string): number => {
+   425→    page.drawRectangle({ x: M, y: y - 3, width: 4, height: 14, color: C.blue });
+   426→    page.drawText(clean(title), { x: M + 10, y, size: 12, font: serifBold, color: C.navy });
+   427→    return y - 18;
+   428→  };
+   429→
+   430→  // Helper: Draw Paragraph
+   431→  const drawPara = (page: PDFPage, y: number, text: string, size = 9.2, maxWidth = CW, x = M): number => {
+   432→    const lines = wrapText(text, font, size, maxWidth);
+   433→    for (const line of lines) {
+   434→      page.drawText(line, { x, y, size, font, color: C.slate });
+   435→      y -= size * 1.45;
+   436→    }
+   437→    return y - 4;
+   438→  };
+   439→
+   440→  // Helper: Draw Badge
+   441→  const drawBadge = (page: PDFPage, x: number, y: number, level: InterestLevel) => {
+   442→    const col = levelColors(level);
+   443→    const label = level.toUpperCase();
+   444→    const bw = 48;
+   445→    page.drawRectangle({ x, y: y - 3, width: bw, height: 13, color: col.bg, borderColor: col.fg, borderWidth: 0.7 });
+   446→    const tw = fontBold.widthOfTextAtSize(label, 7);
+   447→    page.drawText(label, { x: x + (bw - tw) / 2, y: y + 1, size: 7, font: fontBold, color: col.fg });
+   448→  };
+   449→
+   450→  // Helper: Draw Insight Callout Box
+   451→  const drawInsight = (page: PDFPage, y: number, title: string, body: string): number => {
+   452→    const lines = wrapText(body, font, 8.6, CW - 24);
+   453→    const boxH = 26 + lines.length * 12.5;
+   454→    page.drawRectangle({ x: M, y: y - boxH, width: CW, height: boxH, color: C.softBlue, borderColor: C.blue, borderWidth: 0.6 });
+   455→    page.drawRectangle({ x: M, y: y - boxH, width: 4, height: boxH, color: C.blue });
+   456→    page.drawText(clean(title), { x: M + 12, y: y - 14, size: 9.5, font: fontBold, color: C.blue });
+   457→    let ty = y - 28;
+   458→    for (const l of lines) {
+   459→      page.drawText(l, { x: M + 12, y: ty, size: 8.6, font, color: C.slate });
+   460→      ty -= 12.5;
+   461→    }
+   462→    return y - boxH - 12;
+   463→  };
+   464→
+   465→  // Helper: Draw Horizontal Bar Chart
+   466→  const drawHorizBars = (
+   467→    page: PDFPage,
+   468→    y: number,
+   469→    items: Array<{ label: string; pct: number; sub?: string; level?: InterestLevel; color?: ReturnType<typeof rgb> }>,
+   470→    barHeight = 9,
+   471→    rowGap = 24
+   472→  ): number => {
+   473→    const colors = [C.blue, C.sky, C.green, C.indigo, C.amber];
+   474→    items.forEach((item, idx) => {
+   475→      const col = item.color || (item.level ? levelColors(item.level).bar : colors[idx % colors.length]);
+   476→      page.drawText(clean(item.label), { x: M + 8, y, size: 8.5, font: fontBold, color: C.navy });
+   477→      const pctStr = item.sub ? `${item.pct}% (${item.sub})` : `${item.pct}%`;
+   478→      const rightOffset = item.level ? 62 : 8;
+   479→      page.drawText(clean(pctStr), {
+   480→        x: W - M - rightOffset - fontBold.widthOfTextAtSize(pctStr, 8.2),
+   481→        y, size: 8.2, font: fontBold, color: C.slate,
+   482→      });
+   483→      if (item.level) drawBadge(page, W - M - 56, y, item.level);
+   484→
+   485→      const trackY = y - barHeight - 3;
+   486→      const trackW = CW - 16;
+   487→      page.drawRectangle({ x: M + 8, y: trackY, width: trackW, height: barHeight, color: C.border });
+   488→      page.drawRectangle({ x: M + 8, y: trackY, width: Math.max(2, (trackW * item.pct) / 100), height: barHeight, color: col });
+   489→      y -= rowGap;
+   490→    });
+   491→    return y;
+   492→  };
+   493→
+   494→  // Helper: Draw Cluster Table (Pages 7-10)
+   495→  const drawClusterTable = (page: PDFPage, startY: number, clusters: ClusterResult[]): number => {
+   496→    let y = startY;
+   497→    const colW = [132, 92, 58, CW - 282];
+   498→    const headers = ['CAREER CLUSTER', 'AFFINITY SCORE', 'LEVEL', 'CAREER OPTIONS'];
+   499→
+   500→    // Header Row
+   501→    page.drawRectangle({ x: M, y: y - 20, width: CW, height: 20, color: C.navy });
+   502→    let cx = M;
+   503→    headers.forEach((h, i) => {
+   504→      page.drawText(h, { x: cx + 6, y: y - 13, size: 7.5, font: fontBold, color: C.white });
+   505→      cx += colW[i];
+   506→    });
+   507→    y -= 20;
+   508→
+   509→    clusters.forEach((c, idx) => {
+   510→      const roleLines = wrapText(c.roles.join(', '), font, 7.8, colW[3] - 10);
+   511→      const nameLines = wrapText(c.cluster, fontBold, 8.2, colW[0] - 10);
+   512→      const rowH = Math.max(38, Math.max(roleLines.length * 10.5 + 10, nameLines.length * 11 + 16));
+   513→
+   514→      page.drawRectangle({
+   515→        x: M, y: y - rowH, width: CW, height: rowH,
+   516→        color: idx % 2 === 1 ? C.cream : C.white,
+   517→        borderColor: C.border, borderWidth: 0.5,
+   518→      });
+   519→
+   520→      // Col 1: Name + Rank
+   521→      let ny = y - 12;
+   522→      nameLines.forEach((nl) => {
+   523→        page.drawText(nl, { x: M + 5, y: ny, size: 8.2, font: fontBold, color: C.navy });
+   524→        ny -= 10.5;
+   525→      });
+   526→      page.drawText(`Rank #${c.rank} | ${c.domain}`, { x: M + 5, y: ny, size: 6.8, font, color: C.muted });
+   527→
+   528→      // Col 2: Mini Bar + %
+   529→      const bx = M + colW[0] + 6;
+   530→      const by = y - rowH / 2 + 2;
+   531→      page.drawRectangle({ x: bx, y: by - 6, width: 46, height: 6, color: C.border });
+   532→      page.drawRectangle({ x: bx, y: by - 6, width: (46 * c.percentage) / 100, height: 6, color: levelColors(c.level).bar });
+   533→      page.drawText(`${c.percentage}%`, { x: bx + 51, y: by - 6, size: 7.8, font: fontBold, color: C.navy });
+   534→
+   535→      // Col 3: Level Badge
+   536→      drawBadge(page, M + colW[0] + colW[1] + 5, y - rowH / 2 - 2, c.level);
+   537→
+   538→      // Col 4: Roles
+   539→      let ry = y - 11;
+   540→      roleLines.forEach((rl) => {
+   541→        page.drawText(rl, { x: M + colW[0] + colW[1] + colW[2] + 5, y: ry, size: 7.8, font, color: C.slate });
+   542→        ry -= 10.5;
+   543→      });
+   544→
+   545→      y -= rowH;
+   546→    });
+   547→
+   548→    return y - 12;
+   549→  };
+   550→
+   551→  // ==================== PAGE 1: COVER & EXECUTIVE SUMMARY ====================
+   552→  {
+   553→    const { page, y: startY } = initPage(1);
+   554→    let y = startY;
+   555→
+   556→    // Cover Brand Header
+   557→    page.drawText(clientTitle, { x: M, y: y - 10, size: 20, font: serifBold, color: C.navy });
+   558→    page.drawText('PSYCHOMETRIC CAREER ASSESSMENT & COUNSELING REPORT', { x: M, y: y - 24, size: 8.5, font: fontBold, color: C.blue });
+   559→    page.drawText(`REPORT ID: ${report.reportId}`, {
+   560→      x: W - M - fontBold.widthOfTextAtSize(`REPORT ID: ${report.reportId}`, 8), y: y - 12, size: 8, font: fontBold, color: C.muted,
+   561→    });
+   562→    page.drawLine({ start: { x: M, y: y - 34 }, end: { x: W - M, y: y - 34 }, thickness: 2, color: C.blue });
+   563→    y -= 52;
+   564→
+   565→    // Candidate Banner
+   566→    page.drawRectangle({ x: M, y: y - 62, width: CW, height: 62, color: C.softBlue, borderColor: C.blue, borderWidth: 0.7 });
+   567→    page.drawRectangle({ x: M, y: y - 62, width: 5, height: 62, color: C.blue });
+   568→    page.drawText(clean(report.student.name), { x: M + 16, y: y - 24, size: 18, font: serifBold, color: C.navy });
+   569→    page.drawText(
+   570→      clean(`Date: ${report.dateFormatted}   |   Phone: ${report.student.phone}   |   Email: ${report.student.email}   |   Completed: ${report.answeredCount}/${report.totalQuestions}`),
+   571→      { x: M + 16, y: y - 46, size: 8.2, font, color: C.slate }
+   572→    );
+   573→    y -= 82;
+   574→
+   575→    y = drawHeading(page, y, 'Executive Assessment Summary');
+   576→    y = drawPara(
+   577→      page, y,
+   578→      `This psychometric report evaluates ${report.student.name}'s responses across 76 Commerce work-activity statements, mapping innate preferences across 19 specialized Career Clusters in both the Financial and Non-Financial domains.`
+   579→    );
+   580→    y -= 6;
+   581→
+   582→    // 4 KPI Stat Cards
+   583→    const kpis = [
+   584→      { big: report.preferredDomain.split(' ')[0], lbl: 'PREFERRED DOMAIN', sub: `${Math.max(report.financialPct, report.nonFinancialPct)}% Share`, col: C.blue },
+   585→      { big: `${report.top3[0].percentage}%`, lbl: 'PEAK AFFINITY', sub: report.top3[0].cluster.slice(0, 18), col: C.green },
+   586→      { big: `${report.overallIndexPct}%`, lbl: 'OVERALL INDEX', sub: `${report.totalRawScore} / 380 Pts`, col: C.indigo },
+   587→      { big: `${report.highCount} / 19`, lbl: 'HIGH-TIER CLUSTERS', sub: 'Primary Matches', col: C.amber },
+   588→    ];
+   589→    const cardW = (CW - 24) / 4;
+   590→    kpis.forEach((k, i) => {
+   591→      const cx = M + i * (cardW + 8);
+   592→      page.drawRectangle({ x: cx, y: y - 64, width: cardW, height: 64, color: C.cream, borderColor: C.border, borderWidth: 0.7 });
+   593→      page.drawRectangle({ x: cx, y: y - 4, width: cardW, height: 4, color: k.col });
+   594→      const bw = fontBold.widthOfTextAtSize(clean(k.big), 15);
+   595→      page.drawText(clean(k.big), { x: cx + (cardW - bw) / 2, y: y - 26, size: 15, font: fontBold, color: k.col });
+   596→      const lw = fontBold.widthOfTextAtSize(k.lbl, 6.5);
+   597→      page.drawText(k.lbl, { x: cx + (cardW - lw) / 2, y: y - 41, size: 6.5, font: fontBold, color: C.muted });
+   598→      const sw = font.widthOfTextAtSize(clean(k.sub), 7.2);
+   599→      page.drawText(clean(k.sub), { x: cx + (cardW - sw) / 2, y: y - 54, size: 7.2, font, color: C.slate });
+   600→    });
+   601→    y -= 84;
+   602→
+   603→    // Top 5 Bar Chart
+   604→    y = drawHeading(page, y, 'Top 5 Career Clusters Snapshot');
+   605→    y = drawHorizBars(
+   606→      page, y - 4,
+   607→      report.top5.map((c) => ({ label: `#${c.rank} ${c.cluster}`, pct: c.percentage, sub: `${c.rawScore}/20`, level: c.level })),
+   608→      10, 26
+   609→    );
+   610→    y -= 10;
+   611→
+   612→    drawInsight(
+   613→      page, y,
+   614→      `Executive Takeaway for ${report.student.name}`,
+   615→      `Your profile shows strongest alignment with ${report.top3.map((x) => x.cluster).join(', ')}, anchored within the ${report.preferredDomain}. Prioritize degree tracks and professional certifications that combine these top clusters.`
+   616→    );
+   617→  }
+   618→
+   619→  // ==================== PAGE 2: METHODOLOGY & TIER DISTRIBUTION ====================
+   620→  {
+   621→    const { page, y: startY } = initPage(2, 'What This Report Gives You & Methodology');
+   622→    let y = startY;
+   623→
+   624→    y = drawHeading(page, y, 'What This Report Gives You');
+   625→    const bullets = [
+   626→      'Brief knowledge about all available Commerce Careers, both in the financial and non-financial domain.',
+   627→      'An answer to which career option of Commerce you should opt for based on your innate inclinations.',
+   628→      'A scientifically designed psychometric analysis matching your activity choices with professional careers of Commerce.',
+   629→      'Results displayed in graphical forms - radar chart, domain analysis, interest level spectrum, and cluster tables.',
+   630→    ];
+   631→    bullets.forEach((b) => {
+   632→      y = drawPara(page, y, `>  ${b}`, 9, CW - 10, M + 6);
+   633→    });
+   634→    y -= 10;
+   635→
+   636→    y = drawHeading(page, y, 'Psychometric Evaluation Architecture');
+   637→    const steps = [
+   638→      { n: '1', t: '76 Situational Items', d: '4 targeted statements per cluster rated on a 5-point Likert scale (max 20 pts/cluster).' },
+   639→      { n: '2', t: 'Domain Classification', d: 'Measures macro inclination across 8 Financial clusters versus 11 Non-Financial clusters.' },
+   640→      { n: '3', t: 'Relative Norm Tiering', d: `Classifies all 19 clusters into High (${report.highCount}), Medium (${report.mediumCount}), and Low (${report.lowCount}) bands.` },
+   641→    ];
+   642→    const sw = (CW - 16) / 3;
+   643→    steps.forEach((s, i) => {
+   644→      const sx = M + i * (sw + 8);
+   645→      page.drawRectangle({ x: sx, y: y - 92, width: sw, height: 92, color: C.cream, borderColor: C.border, borderWidth: 0.7 });
+   646→      page.drawRectangle({ x: sx, y: y - 4, width: sw, height: 4, color: C.blue });
+   647→      page.drawCircle({ x: sx + sw / 2, y: y - 24, size: 12, color: C.softBlue, borderColor: C.blue, borderWidth: 1.2 });
+   648→      page.drawText(s.n, { x: sx + sw / 2 - 3, y: y - 28, size: 10, font: fontBold, color: C.blue });
+   649→      const tw = fontBold.widthOfTextAtSize(s.t, 9);
+   650→      page.drawText(s.t, { x: sx + (sw - tw) / 2, y: y - 48, size: 9, font: fontBold, color: C.navy });
+   651→      const dLines = wrapText(s.d, font, 7.6, sw - 14);
+   652→      let dy = y - 61;
+   653→      dLines.forEach((dl) => {
+   654→        const dw = font.widthOfTextAtSize(dl, 7.6);
+   655→        page.drawText(dl, { x: sx + (sw - dw) / 2, y: dy, size: 7.6, font, color: C.muted });
+   656→        dy -= 10;
+   657→      });
+   658→    });
+   659→    y -= 114;
+   660→
+   661→    y = drawHeading(page, y, 'Cluster Distribution Across Interest Tiers');
+   662→    y = drawHorizBars(
+   663→      page, y - 6,
+   664→      [
+   665→        { label: 'High Interest Tier (Primary Focus)', pct: Math.round((report.highCount / 19) * 100), sub: `${report.highCount} Clusters`, color: C.green },
+   666→        { label: 'Medium Interest Tier (Secondary / Electives)', pct: Math.round((report.mediumCount / 19) * 100), sub: `${report.mediumCount} Clusters`, color: C.amber },
+   667→        { label: 'Low Interest Tier (Avoid as Major)', pct: Math.round((report.lowCount / 19) * 100), sub: `${report.lowCount} Clusters`, color: C.rose },
+   668→      ],
+   669→      12, 30
+   670→    );
+   671→  }
+   672→
+   673→  // ==================== PAGE 3: PREFERRED DOMAIN ANALYSIS ====================
+   674→  {
+   675→    const { page, y: startY } = initPage(3, 'Your Preferred Domain - Financial vs. Non-Financial');
+   676→    let y = startY;
+   677→
+   678→    y = drawHeading(page, y, 'Macro Domain Inclination');
+   679→    y = drawPara(
+   680→      page, y,
+   681→      `${report.student.name}, the analysis indicates that your interests and aptitude are more inclined towards the ${report.preferredDomain}. Below is your comparative balance across both macro spheres of Commerce.`
+   682→    );
+   683→    y -= 6;
+   684→
+   685→    // Split Segmented Progress Graphic
+   686→    const finW = (CW * report.financialPct) / 100;
+   687→    page.drawRectangle({ x: M, y: y - 28, width: finW, height: 28, color: C.blue });
+   688→    page.drawRectangle({ x: M + finW, y: y - 28, width: CW - finW, height: 28, color: C.green });
+   689→    page.drawText(`FINANCIAL ${report.financialPct}%`, { x: M + 10, y: y - 18, size: 10, font: fontBold, color: C.white });
+   690→    const nfLbl = `NON-FINANCIAL ${report.nonFinancialPct}%`;
+   691→    page.drawText(nfLbl, { x: W - M - fontBold.widthOfTextAtSize(nfLbl, 10) - 10, y: y - 18, size: 10, font: fontBold, color: C.white });
+   692→    y -= 48;
+   693→
+   694→    // Financial Cluster Breakdown
+   695→    y = drawHeading(page, y, 'Financial Domain Cluster Breakdown (All 8 Clusters)');
+   696→    y = drawHorizBars(
+   697→      page, y - 4,
+   698→      report.financialClusters.map((c) => ({ label: c.cluster, pct: c.percentage, sub: `${c.rawScore}/20`, level: c.level, color: C.blue })),
+   699→      9, 25
+   700→    );
+   701→    y -= 10;
+   702→
+   703→    drawInsight(
+   704→      page, y,
+   705→      'Domain Synthesis',
+   706→      `Your top Financial cluster is ${report.financialClusters[0].cluster} (${report.financialClusters[0].percentage}%) and your top Non-Financial cluster is ${report.nonFinancialClusters[0].cluster} (${report.nonFinancialClusters[0].percentage}%). Combining these two areas creates a strong technocratic-managerial profile.`
+   707→    );
+   708→  }
+   709→
+   710→  // ==================== PAGE 4: VECTOR RADAR CHART (TOP 8) ====================
+   711→  {
+   712→    const { page, y: startY } = initPage(4, 'Interest Profile - Top 8 Clusters Radar');
+   713→    let y = startY;
+   714→
+   715→    y = drawHeading(page, y, 'Multidimensional Competency Radar');
+   716→    y = drawPara(page, y, 'The radar chart below maps your top eight scoring Commerce clusters simultaneously. Vertices extending furthest toward the perimeter represent your strongest natural career anchors.');
+   717→
+   718→    // Draw Vector Radar Chart
+   719→    const cx = W / 2;
+   720→    const cy = y - 135;
+   721→    const maxR = 98;
+   722→    const n = report.top8.length;
+   723→
+   724→    // Concentric grid rings (25%, 50%, 75%, 100%)
+   725→    [0.25, 0.5, 0.75, 1.0].forEach((scale) => {
+   726→      const r = maxR * scale;
+   727→      for (let i = 0; i < n; i++) {
+   728→        const a1 = (Math.PI * 2 * i) / n - Math.PI / 2;
+   729→        const a2 = (Math.PI * 2 * ((i + 1) % n)) / n - Math.PI / 2;
+   730→        page.drawLine({
+   731→          start: { x: cx + r * Math.cos(a1), y: cy + r * Math.sin(a1) },
+   732→          end: { x: cx + r * Math.cos(a2), y: cy + r * Math.sin(a2) },
+   733→          thickness: 0.6, color: C.border,
+   734→        });
+   735→      }
+   736→    });
+   737→
+   738→    // Axes & Labels
+   739→    const pts: Array<{ x: number; y: number }> = [];
+   740→    report.top8.forEach((c, i) => {
+   741→      const angle = (Math.PI * 2 * i) / n - Math.PI / 2;
+   742→      const ax = cx + maxR * Math.cos(angle);
+   743→      const ay = cy + maxR * Math.sin(angle);
+   744→      page.drawLine({ start: { x: cx, y: cy }, end: { x: ax, y: ay }, thickness: 0.6, color: C.border });
+   745→
+   746→      const vr = maxR * (c.percentage / 100);
+   747→      pts.push({ x: cx + vr * Math.cos(angle), y: cy + vr * Math.sin(angle) });
+   748→
+   749→      const lbl = clean(c.cluster.length > 20 ? c.cluster.slice(0, 18) + '..' : c.cluster);
+   750→      const lx = cx + (maxR + 18) * Math.cos(angle);
+   751→      const ly = cy + (maxR + 14) * Math.sin(angle);
+   752→      const lw = fontBold.widthOfTextAtSize(lbl, 7.5);
+   753→      page.drawText(lbl, { x: lx - lw / 2, y: ly - 3, size: 7.5, font: fontBold, color: C.navy });
+   754→    });
+   755→
+   756→    // Data Polygon Edges & Points
+   757→    for (let i = 0; i < pts.length; i++) {
+   758→      const p1 = pts[i];
+   759→      const p2 = pts[(i + 1) % pts.length];
+   760→      page.drawLine({ start: p1, end: p2, thickness: 2.2, color: C.blue });
+   761→    }
+   762→    pts.forEach((p) => {
+   763→      page.drawCircle({ x: p.x, y: p.y, size: 3.5, color: C.blue });
+   764→    });
+   765→
+   766→    y = cy - maxR - 36;
+   767→
+   768→    // Top 6 Vertex Summary Table
+   769→    y = drawHeading(page, y, 'Top 6 Radar Vertices Summary');
+   770→    y = drawClusterTable(page, y, report.top8.slice(0, 6));
+   771→  }
+   772→
+   773→  // ==================== PAGE 5: COMPLETE 19-CLUSTER SPECTRUM ====================
+   774→  {
+   775→    const { page, y: startY } = initPage(5, 'Interest Level Graph - Complete 19-Cluster Spectrum');
+   776→    let y = startY;
+   777→
+   778→    y = drawHeading(page, y, 'All 19 Commerce Clusters Ranked by Affinity');
+   779→    y = drawHorizBars(
+   780→      page, y - 4,
+   781→      report.sortedClusters.map((c) => ({
+   782→        label: `#${c.rank}  ${c.cluster} (${c.domain})`,
+   783→        pct: c.percentage,
+   784→        sub: `${c.rawScore}/20`,
+   785→        level: c.level,
+   786→      })),
+   787→      7.5, 22
+   788→    );
+   789→  }
+   790→
+   791→  // ==================== PAGE 6: DESCRIPTORS & NON-FINANCIAL BREAKDOWN ====================
+   792→  {
+   793→    const { page, y: startY } = initPage(6, 'Interest Level Descriptors & Non-Financial Analysis');
+   794→    let y = startY;
+   795→
+   796→    y = drawHeading(page, y, 'Interest Level Descriptors');
+   797→    LEVEL_DESCRIPTORS.forEach((d) => {
+   798→      const col = levelColors(d.level);
+   799→      const lines = wrapText(d.description, font, 8.2, CW - 92);
+   800→      const boxH = Math.max(44, lines.length * 11.5 + 14);
+   801→      page.drawRectangle({ x: M, y: y - boxH, width: CW, height: boxH, color: col.bg, borderColor: col.fg, borderWidth: 0.6 });
+   802→      drawBadge(page, M + 10, y - 22, d.level);
+   803→      let ty = y - 14;
+   804→      lines.forEach((l) => {
+   805→        page.drawText(l, { x: M + 74, y: ty, size: 8.2, font, color: C.slate });
+   806→        ty -= 11.5;
+   807→      });
+   808→      y -= boxH + 8;
+   809→    });
+   810→
+   811→    y -= 6;
+   812→    y = drawHeading(page, y, 'Non-Financial Domain Breakdown (Top 8 Clusters)');
+   813→    drawHorizBars(
+   814→      page, y - 4,
+   815→      report.nonFinancialClusters.slice(0, 8).map((c) => ({
+   816→        label: c.cluster, pct: c.percentage, sub: `${c.rawScore}/20`, level: c.level, color: C.green,
+   817→      })),
+   818→      8, 22
+   819→    );
+   820→  }
+   821→
+   822→  // ==================== PAGES 7-9: CLUSTER TABLES PARTS 1-3 ====================
+   823→  const pageConfigs = [
+   824→    {
+   825→      pg: 7,
+   826→      title: 'Career Clusters & Options (Part 1 of 4)',
+   827→      sub: 'Clusters 1 to 5 - Quantitative & Digital Foundations',
+   828→      slice: report.allClustersInOrder.slice(0, 5),
+   829→      noteTitle: 'Pathway Note - Quantitative vs. Digital Media',
+   830→      noteBody: 'Students scoring High in Accounts/Taxation and Financial Auditing thrive in Chartered Accountancy (CA), CMA, and Forensic Accounting, while high scorers in Analytics and Computer Designing excel in Business Intelligence and UI/UX Product roles.',
+   831→    },
+   832→    {
+   833→      pg: 8,
+   834→      title: 'Career Clusters & Options (Part 2 of 4)',
+   835→      sub: 'Clusters 6 to 10 - Institutional Finance & Service Operations',
+   836→      slice: report.allClustersInOrder.slice(5, 10),
+   837→      noteTitle: 'Pathway Note - Capital Markets & Institutional Finance',
+   838→      noteBody: 'High scores across Banking, Credit Management, and Financial Management align strongly with B.Com (Hons), BBA (Finance), BA (Hons) Economics, and global credentials such as CFA and FRM.',
+   839→    },
+   840→    {
+   841→      pg: 9,
+   842→      title: 'Career Clusters & Options (Part 3 of 4)',
+   843→      sub: 'Clusters 11 to 15 - Regulatory, Creative & Linguistic Tracks',
+   844→      slice: report.allClustersInOrder.slice(10, 15),
+   845→      noteTitle: 'Pathway Note - Law, Journalism & Design',
+   846→      noteBody: 'Commerce students with strong Law affinities frequently pair B.Com/BBA with LLB (5-year integrated law via CLAT) or pursue Company Secretaryship (CS) to lead corporate governance and regulatory compliance.',
+   847→    },
+   848→  ];
+   849→
+   850→  pageConfigs.forEach((cfg) => {
+   851→    const { page, y: startY } = initPage(cfg.pg, cfg.title);
+   852→    let y = startY;
+   853→    y = drawHeading(page, y, cfg.sub);
+   854→    y = drawClusterTable(page, y, cfg.slice);
+   855→    drawInsight(page, y - 4, cfg.noteTitle, cfg.noteBody);
+   856→  });
+   857→
+   858→  // ==================== PAGE 10: CLUSTERS PART 4 & ACTION PLAN ====================
+   859→  {
+   860→    const { page, y: startY } = initPage(10, 'Career Clusters (Part 4 of 4) & Action Plan');
+   861→    let y = startY;
+   862→
+   863→    y = drawHeading(page, y, 'Clusters 16 to 19 - Management, Social Sciences, Education & Trading');
+   864→    y = drawClusterTable(page, y, report.allClustersInOrder.slice(15, 19));
+   865→    y -= 4;
+   866→
+   867→    y = drawHeading(page, y, `Actions & Next Steps for ${report.student.name}`);
+   868→    y = drawPara(
+   869→      page, y,
+   870→      `Focus primarily on the clusters marked HIGH - specifically ${report.top3.map((x) => x.cluster).join(', ')}. Execute the three-step academic roadmap below:`
+   871→    );
+   872→    y -= 4;
+   873→
+   874→    const actions = [
+   875→      { n: '1', t: 'Shortlist Top Clusters', d: `Prioritize ${report.top3[0].cluster} (${report.top3[0].percentage}%) and ${report.top3[1].cluster} (${report.top3[1].percentage}%) for your UG specialization.` },
+   876→      { n: '2', t: 'Counselor Review', d: `Map entrance exams (CUET, IPMAT, CLAT, CA/CS Foundation) aligned with your ${report.preferredDomain}.` },
+   877→      { n: '3', t: 'Skill & Certifications', d: 'Pair your degree with practical internships and certifications targeting your High-level clusters.' },
+   878→    ];
+   879→    const aw = (CW - 16) / 3;
+   880→    actions.forEach((a, i) => {
+   881→      const ax = M + i * (aw + 8);
+   882→      page.drawRectangle({ x: ax, y: y - 82, width: aw, height: 82, color: C.cream, borderColor: C.border, borderWidth: 0.7 });
+   883→      page.drawRectangle({ x: ax, y: y - 4, width: aw, height: 4, color: C.green });
+   884→      page.drawText(`${a.n}. ${a.t}`, { x: ax + 8, y: y - 20, size: 8.5, font: fontBold, color: C.navy });
+   885→      const lines = wrapText(a.d, font, 7.6, aw - 16);
+   886→      let dy = y - 34;
+   887→      lines.forEach((l) => {
+   888→        page.drawText(l, { x: ax + 8, y: dy, size: 7.6, font, color: C.slate });
+   889→        dy -= 10.5;
+   890→      });
+   891→    });
+   892→    y -= 94;
+   893→
+   894→    drawInsight(
+   895→      page, y,
+   896→      'Final Counselor Summary',
+   897→      `${report.student.name}'s highest career sustainability lies at the intersection of ${report.top3[0].cluster} and ${report.top3[1].cluster}. Revisit this report every 6 months to track academic milestones.`
+   898→    );
+   899→  }
+   900→
+   901→  return pdf.save();
+   902→}
+   903→5. Backend API Route (src/app/api/reports/commerce-pdf/route.ts)
+   904→TypeScript
+   905→import { NextRequest, NextResponse } from 'next/server';
+   906→import { calculateCommerceResults } from '@/lib/tests/commerce/scoring';
+   907→import { generateCommercePdf } from '@/lib/tests/commerce/pdfGenerator';
+   908→import { BrandingConfig, StudentInfo } from '@/lib/tests/commerce/types';
+   909→
+   910→export async function POST(req: NextRequest) {
+   911→  try {
+   912→    const body = (await req.json()) as {
+   913→      student: StudentInfo;
+   914→      answers: Array<number | null>;
+   915→      branding?: BrandingConfig;
+   916→    };
+   917→
+   918→    if (!body?.student?.name || !Array.isArray(body?.answers)) {
+   919→      return NextResponse.json({ error: 'Invalid payload: student and answers are required.' }, { status: 400 });
+   920→    }
+   921→
+   922→    const report = calculateCommerceResults(body.student, body.answers);
+   923→    const pdfBytes = await generateCommercePdf(report, body.branding);
+   924→
+   925→    const safeName = body.student.name.replace(/[^a-zA-Z0-9_-]/g, '_');
+   926→
+   927→    return new NextResponse(Buffer.from(pdfBytes), {
+   928→      status: 200,
+   929→      headers: {
+   930→        'Content-Type': 'application/pdf',
+   931→        'Content-Disposition': `attachment; filename="Commerce_Career_Report_${safeName}.pdf"`,
+   932→        'Cache-Control': 'no-store',
+   933→      },
+   934→    });
+   935→  } catch (err) {
+   936→    console.error('PDF generation failed:', err);
+   937→    return NextResponse.json({ error: 'Failed to generate PDF report.' }, { status: 500 });
+   938→  }
+   939→}
+   940→6. React + TypeScript Frontend Component (src/components/tests/CommerceTestRunner.tsx)
+   941→TypeScript
+   942→'use client';
+   943→
+   944→import React, { useCallback, useEffect, useMemo, useState } from 'react';
+   945→import confetti from 'canvas-confetti';
+   946→import { Download, ArrowLeft, CheckCircle2, Award, Sparkles, ShieldCheck } from 'lucide-react';
+   947→import { LEVEL_DESCRIPTORS, LIKERT_OPTIONS, QUESTIONS } from '@/lib/tests/commerce/data';
+   948→import { calculateCommerceResults } from '@/lib/tests/commerce/scoring';
+   949→import { BrandingConfig, CommerceReportResult, InterestLevel, StudentInfo } from '@/lib/tests/commerce/types';
+   950→
+   951→interface CommerceTestRunnerProps {
+   952→  branding?: BrandingConfig;
+   953→  onComplete?: (result: CommerceReportResult, answers: number[]) => void;
+   954→}
+   955→
+   956→type ScreenState = 'form' | 'quiz' | 'report';
+   957→
+   958→const BADGE_STYLES: Record<InterestLevel, string> = {
+   959→  High: 'bg-emerald-50 text-emerald-700 border-emerald-500',
+   960→  Medium: 'bg-amber-50 text-amber-700 border-amber-500',
+   961→  Low: 'bg-rose-50 text-rose-700 border-rose-500',
+   962→};
+   963→
+   964→const BAR_GRADIENTS = [
+   965→  'from-blue-700 to-blue-500',
+   966→  'from-rose-700 to-rose-500',
+   967→  'from-amber-700 to-amber-500',
+   968→  'from-emerald-700 to-emerald-500',
+   969→];
+   970→
+   971→export default function CommerceTestRunner({ branding, onComplete }: CommerceTestRunnerProps) {
+   972→  const [screen, setScreen] = useState<ScreenState>('form');
+   973→  const [student, setStudent] = useState<StudentInfo>({ name: '', email: '', phone: '' });
+   974→  const [answers, setAnswers] = useState<Array<number | null>>(() => new Array(QUESTIONS.length).fill(null));
+   975→  const [qi, setQi] = useState(0);
+   976→  const [busy, setBusy] = useState(false);
+   977→  const [downloadingPdf, setDownloadingPdf] = useState(false);
+   978→  const [report, setReport] = useState<CommerceReportResult | null>(null);
+   979→
+   980→  const answeredCount = useMemo(() => answers.filter((a) => a !== null).length, [answers]);
+   981→  const progressPct = Math.round((answeredCount / QUESTIONS.length) * 100);
+   982→  const CIRC = 2 * Math.PI * 52;
+   983→
+   984→  const finalizeReport = useCallback(
+   985→    (stu: StudentInfo, finalAnswers: Array<number | null>) => {
+   986→      const res = calculateCommerceResults(stu, finalAnswers);
+   987→      setReport(res);
+   988→      setScreen('report');
+   989→      window.scrollTo({ top: 0, behavior: 'smooth' });
+   990→      confetti({ particleCount: 90, spread: 70, origin: { y: 0.6 }, colors: ['#2563EB', '#0EA5E9', '#10B981', '#F59E0B'] });
+   991→      if (onComplete) {
+   992→        onComplete(res, finalAnswers.map((a) => a ?? 0));
+   993→      }
+   994→    },
+   995→    [onComplete]
+   996→  );
+   997→
+   998→  const handleStart = (e: React.FormEvent) => {
+   999→    e.preventDefault();
+  1000→    if (!student.name.trim() || !student.email.trim() || !student.phone.trim()) {
+  1001→      alert('Please fill in your Name, Email, and Mobile Number.');
+  1002→      return;
+  1003→    }
+  1004→    setAnswers(new Array(QUESTIONS.length).fill(null));
+  1005→    setQi(0);
+  1006→    setScreen('quiz');
+  1007→    window.scrollTo(0, 0);
+  1008→  };
+  1009→
+  1010→  const handleSimulate = () => {
+  1011→    const simStudent: StudentInfo = {
+  1012→      name: student.name.trim() || 'Aarav Sharma',
+  1013→      email: student.email.trim() || 'aarav.sharma@example.com',
+  1014→      phone: student.phone.trim() || '98765 43210',
+  1015→    };
+  1016→    const pattern = [
+  1017→      5,4,5,4, 5,5,4,5, 2,3,2,3, 3,3,2,3, 4,5,4,4, 3,4,3,4, 5,4,4,5, 4,5,4,5,
+  1018→      3,4,4,3, 2,3,2,2, 2,2,3,2, 3,2,3,2, 3,4,3,3, 2,3,2,3, 4,5,4,5, 5,5,4,4,
+  1019→      3,4,3,3, 3,4,3,4, 4,5,4,5,
+  1020→    ];
+  1021→    const simAnswers = QUESTIONS.map((_, idx) => pattern[idx % pattern.length]);
+  1022→    setStudent(simStudent);
+  1023→    setAnswers(simAnswers);
+  1024→    finalizeReport(simStudent, simAnswers);
+  1025→  };
+  1026→
+  1027→  const handlePick = useCallback(
+  1028→    (optionIdx: number) => {
+  1029→      if (busy || qi >= QUESTIONS.length) return;
+  1030→      setBusy(true);
+  1031→      const nextAnswers = [...answers];
+  1032→      nextAnswers[qi] = optionIdx + 1;
+  1033→      setAnswers(nextAnswers);
+  1034→
+  1035→      setTimeout(() => {
+  1036→        setBusy(false);
+  1037→        if (qi + 1 >= QUESTIONS.length) {
+  1038→          finalizeReport(student, nextAnswers);
+  1039→        } else {
+  1040→          setQi((prev) => prev + 1);
+  1041→        }
+  1042→      }, 280);
+  1043→    },
+  1044→    [answers, busy, finalizeReport, qi, student]
+  1045→  );
+  1046→
+  1047→  const handleBack = useCallback(() => {
+  1048→    if (busy || qi === 0) return;
+  1049→    setQi((prev) => prev - 1);
+  1050→  }, [busy, qi]);
+  1051→
+  1052→  // Keyboard shortcuts (1-5 to answer, Left/Backspace to go back) + Anti-Copy
+  1053→  useEffect(() => {
+  1054→    if (screen !== 'quiz') return;
+  1055→    const onKeyDown = (e: KeyboardEvent) => {
+  1056→      if ((e.ctrlKey || e.metaKey) && ['c', 'x', 'u', 's', 'a'].includes(e.key.toLowerCase())) {
+  1057→        e.preventDefault();
+  1058→        return;
+  1059→      }
+  1060→      if (e.key >= '1' && e.key <= '5' && qi < QUESTIONS.length) {
+  1061→        handlePick(Number(e.key) - 1);
+  1062→      } else if (e.key === 'ArrowLeft' || e.key === 'Backspace') {
+  1063→        e.preventDefault();
+  1064→        handleBack();
+  1065→      }
+  1066→    };
+  1067→    window.addEventListener('keydown', onKeyDown);
+  1068→    return () => window.removeEventListener('keydown', onKeyDown);
+  1069→  }, [screen, qi, handlePick, handleBack]);
+  1070→
+  1071→  // Download Backend pdf-lib A4 PDF
+  1072→  const handleDownloadPdf = async () => {
+  1073→    setDownloadingPdf(true);
+  1074→    try {
+  1075→      const res = await fetch('/api/reports/commerce-pdf', {
+  1076→        method: 'POST',
+  1077→        headers: { 'Content-Type': 'application/json' },
+  1078→        body: JSON.stringify({ student, answers, branding }),
+  1079→      });
+  1080→      if (!res.ok) throw new Error('PDF generation failed');
+  1081→      const blob = await res.blob();
+  1082→      const url = URL.createObjectURL(blob);
+  1083→      const a = document.createElement('a');
+  1084→      a.href = url;
+  1085→      a.download = `Commerce_Career_Report_${student.name.replace(/\s+/g, '_')}.pdf`;
+  1086→      a.click();
+  1087→      URL.revokeObjectURL(url);
+  1088→    } catch {
+  1089→      alert('Could not download PDF. Please ensure /api/reports/commerce-pdf is running.');
+  1090→    } finally {
+  1091→      setDownloadingPdf(false);
+  1092→    }
+  1093→  };
+  1094→
+  1095→  // ==================== SCREEN 1: REGISTRATION ====================
+  1096→  if (screen === 'form') {
+  1097→    return (
+  1098→      <div className="min-h-screen bg-[#FAF5EC] py-10 px-4 text-slate-800">
+  1099→        <form
+  1100→          onSubmit={handleStart}
+  1101→          className="max-w-2xl mx-auto bg-white/95 backdrop-blur-md rounded-3xl p-8 md:p-10 shadow-xl border border-amber-100"
+  1102→        >
+  1103→          <h1 className="font-serif text-3xl md:text-4xl font-bold text-slate-900">
+  1104→            Commerce Career{' '}
+  1105→            <span className="bg-gradient-to-r from-blue-600 via-sky-500 to-emerald-500 bg-clip-text text-transparent">
+  1106→              Selector
+  1107→            </span>
+  1108→          </h1>
+  1109→          <div className="w-20 h-1.5 rounded-full bg-gradient-to-r from-blue-600 to-emerald-500 my-3" />
+  1110→          <p className="text-slate-500 mb-5">
+  1111→            Discover which Commerce career cluster — financial or non-financial — matches your interests best.
+  1112→          </p>
+  1113→
+  1114→          <div className="flex flex-wrap gap-2 mb-6">
+  1115→            {['76 Questions', '~20 Minutes', '19 Career Clusters', '10-Page A4 PDF Report'].map((chip) => (
+  1116→              <span
+  1117→                key={chip}
+  1118→                className="bg-blue-50 text-blue-700 border border-blue-200 text-xs font-semibold px-3 py-1 rounded-full"
+  1119→              >
+  1120→                {chip}
+  1121→              </span>
+  1122→            ))}
+  1123→          </div>
+  1124→
+  1125→          <div className="bg-[#FDFBF6] border border-[#E7E0D2] border-l-4 border-l-blue-600 rounded-xl p-4 mb-6 text-sm text-slate-700">
+  1126→            <strong className="block text-slate-900 mb-1">How to answer</strong>
+  1127→            Rate how strongly you agree with each statement from <strong>Strongly Disagree</strong> to{' '}
+  1128→            <strong>Strongly Agree</strong>. Selecting an option automatically saves and advances.
+  1129→          </div>
+  1130→
+  1131→          <div className="space-y-4">
+  1132→            <div>
+  1133→              <label className="block text-sm font-semibold text-slate-700 mb-1">Student Name</label>
+  1134→              <input
+  1135→                type="text"
+  1136→                required
+  1137→                value={student.name}
+  1138→                onChange={(e) => setStudent({ ...student, name: e.target.value })}
+  1139→                placeholder="e.g. Aarav Sharma"
+  1140→                className="w-full px-4 py-3 rounded-xl border-2 border-[#E7E0D2] focus:border-blue-600 focus:outline-none"
+  1141→              />
+  1142→            </div>
+  1143→            <div>
+  1144→              <label className="block text-sm font-semibold text-slate-700 mb-1">Email Address</label>
+  1145→              <input
+  1146→                type="email"
+  1147→                required
+  1148→                value={student.email}
+  1149→                onChange={(e) => setStudent({ ...student, email: e.target.value })}
+  1150→                placeholder="you@example.com"
+  1151→                className="w-full px-4 py-3 rounded-xl border-2 border-[#E7E0D2] focus:border-blue-600 focus:outline-none"
+  1152→              />
+  1153→            </div>
+  1154→            <div>
+  1155→              <label className="block text-sm font-semibold text-slate-700 mb-1">Mobile Number</label>
+  1156→              <input
+  1157→                type="tel"
+  1158→                required
+  1159→                value={student.phone}
+  1160→                onChange={(e) => setStudent({ ...student, phone: e.target.value })}
+  1161→                placeholder="e.g. 98765 43210"
+  1162→                className="w-full px-4 py-3 rounded-xl border-2 border-[#E7E0D2] focus:border-blue-600 focus:outline-none"
+  1163→              />
+  1164→            </div>
+  1165→          </div>
+  1166→
+  1167→          <div className="flex flex-wrap items-center justify-between gap-4 mt-7">
+  1168→            <button
+  1169→              type="submit"
+  1170→              className="px-7 py-3.5 rounded-xl bg-gradient-to-r from-blue-600 to-sky-500 text-white font-semibold shadow-lg hover:-translate-y-0.5 transition"
+  1171→            >
+  1172→              Start Assessment →
+  1173→            </button>
+  1174→            <button
+  1175→              type="button"
+  1176→              onClick={handleSimulate}
+  1177→              className="px-4 py-2.5 rounded-xl border border-dashed border-slate-400 text-slate-600 text-xs font-semibold hover:border-blue-600 hover:text-blue-600 transition"
+  1178→            >
+  1179→              Quick-Fill &amp; Test Report
+  1180→            </button>
+  1181→          </div>
+  1182→        </form>
+  1183→      </div>
+  1184→    );
+  1185→  }
+  1186→
+  1187→  // ==================== SCREEN 2: SEAMLESS QUIZ ====================
+  1188→  if (screen === 'quiz') {
+  1189→    const q = QUESTIONS[qi];
+  1190→    return (
+  1191→      <div
+  1192→        className="min-h-screen bg-[#FAF5EC] py-8 px-4 select-none"
+  1193→        onContextMenu={(e) => e.preventDefault()}
+  1194→        onCopy={(e) => e.preventDefault()}
+  1195→      >
+  1196→        <div className="max-w-3xl mx-auto">
+  1197→          {/* Header with Progress Ring */}
+  1198→          <div className="flex items-center gap-4 mb-4">
+  1199→            <div className="relative w-[72px] h-[72px] shrink-0">
+  1200→              <svg viewBox="0 0 120 120" className="w-full h-full -rotate-90">
+  1201→                <circle cx="60" cy="60" r="52" fill="none" stroke="#E7E0D2" strokeWidth="8" />
+  1202→                <circle
+  1203→                  cx="60"
+  1204→                  cy="60"
+  1205→                  r="52"
+  1206→                  fill="none"
+  1207→                  stroke="#2563EB"
+  1208→                  strokeWidth="8"
+  1209→                  strokeLinecap="round"
+  1210→                  strokeDasharray={CIRC}
+  1211→                  strokeDashoffset={CIRC * (1 - answeredCount / QUESTIONS.length)}
+  1212→                  className="transition-all duration-300"
+  1213→                />
+  1214→              </svg>
+  1215→              <div className="absolute inset-0 flex items-center justify-center font-bold text-sm text-slate-900">
+  1216→                {progressPct}%
+  1217→              </div>
+  1218→            </div>
+  1219→            <div className="flex-1">
+  1220→              <div className="font-serif font-bold text-lg text-slate-900">Commerce Aptitude Test</div>
+  1221→              <div className="text-sm text-slate-500">
+  1222→                {answeredCount} / {QUESTIONS.length} answered
+  1223→              </div>
+  1224→            </div>
+  1225→            <span className="hidden sm:inline-block bg-blue-50 text-blue-700 border border-blue-200 text-xs font-bold px-3.5 py-1.5 rounded-full">
+  1226→              {student.name}
+  1227→            </span>
+  1228→          </div>
+  1229→
+  1230→          {/* Real-Time Progress Bar & Milestone Badges */}
+  1231→          <div className="bg-white rounded-2xl border border-[#E7E0D2] p-4 mb-5 shadow-sm">
+  1232→            <div className="flex justify-between text-xs font-bold text-slate-800 mb-2">
+  1233→              <span>Test Completion Progress</span>
+  1234→              <span>
+  1235→                {progressPct}% Completed ({answeredCount}/{QUESTIONS.length})
+  1236→              </span>
+  1237→            </div>
+  1238→            <div className="w-full h-2.5 bg-[#EDE7DA] rounded-full overflow-hidden">
+  1239→              <div
+  1240→                className="h-full bg-gradient-to-r from-blue-600 via-sky-500 to-emerald-500 transition-all duration-300"
+  1241→                style={{ width: `${progressPct}%` }}
+  1242→              />
+  1243→            </div>
+  1244→            <div className="flex flex-wrap gap-2 mt-3 min-h-[24px]">
+  1245→              {progressPct >= 25 && (
+  1246→                <span className="inline-flex items-center gap-1 text-xs font-bold px-3 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+  1247→                  <Award className="w-3.5 h-3.5" /> Quarter Completed (25%)
+  1248→                </span>
+  1249→              )}
+  1250→              {progressPct >= 50 && (
+  1251→                <span className="inline-flex items-center gap-1 text-xs font-bold px-3 py-0.5 rounded-full bg-amber-100 text-amber-800">
+  1252→                  <Award className="w-3.5 h-3.5" /> Half Completed (50%)
+  1253→                </span>
+  1254→              )}
+  1255→              {progressPct >= 75 && (
+  1256→                <span className="inline-flex items-center gap-1 text-xs font-bold px-3 py-0.5 rounded-full bg-indigo-100 text-indigo-800">
+  1257→                  <Award className="w-3.5 h-3.5" /> Three-Quarter Completed (75%)
+  1258→                </span>
+  1259→              )}
+  1260→              {progressPct === 100 && (
+  1261→                <span className="inline-flex items-center gap-1 text-xs font-bold px-3 py-0.5 rounded-full bg-green-100 text-green-800">
+  1262→                  <Sparkles className="w-3.5 h-3.5" /> Test Completed (100%)
+  1263→                </span>
+  1264→              )}
+  1265→            </div>
+  1266→          </div>
+  1267→
+  1268→          {/* Question Card */}
+  1269→          <div className="bg-white/95 rounded-3xl p-6 md:p-9 shadow-xl border border-white">
+  1270→            <div className="flex justify-between items-center mb-4">
+  1271→              <span className="text-[11px] font-bold uppercase tracking-wider text-blue-700 bg-blue-50 border border-blue-200 px-3 py-1 rounded-full">
+  1272→                Rate Yourself
+  1273→              </span>
+  1274→              <span className="text-xs font-semibold text-slate-500">
+  1275→                Question {qi + 1} of {QUESTIONS.length}
+  1276→              </span>
+  1277→            </div>
+  1278→
+  1279→            <h2 className="font-serif text-xl md:text-2xl font-semibold text-slate-900 mb-6 leading-snug">
+  1280→              {q.text}
+  1281→            </h2>
+  1282→
+  1283→            <div className="space-y-2.5">
+  1284→              {LIKERT_OPTIONS.map((label, idx) => {
+  1285→                const selected = answers[qi] === idx + 1;
+  1286→                return (
+  1287→                  <button
+  1288→                    key={label}
+  1289→                    type="button"
+  1290→                    onClick={() => handlePick(idx)}
+  1291→                    className={`w-full flex items-center gap-3.5 px-4 py-3.5 rounded-2xl border-2 text-left font-semibold transition-all ${
+  1292→                      selected
+  1293→                        ? 'bg-gradient-to-r from-blue-600 to-sky-500 text-white border-transparent shadow-md translate-x-1.5'
+  1294→                        : 'bg-[#FDFBF7] border-[#E7E0D2] text-slate-700 hover:border-blue-500 hover:bg-blue-50 hover:text-blue-700'
+  1295→                    }`}
+  1296→                  >
+  1297→                    <span
+  1298→                      className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold shrink-0 ${
+  1299→                        selected ? 'bg-white/25 text-white' : 'bg-[#EDE7DA] text-slate-700'
+  1300→                      }`}
+  1301→                    >
+  1302→                      {idx + 1}
+  1303→                    </span>
+  1304→                    <span>{label}</span>
+  1305→                  </button>
+  1306→                );
+  1307→              })}
+  1308→            </div>
+  1309→
+  1310→            <div className="flex items-center justify-between mt-6 pt-4 border-t border-slate-100">
+  1311→              <button
+  1312→                type="button"
+  1313→                onClick={handleBack}
+  1314→                disabled={qi === 0}
+  1315→                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border-2 border-[#E7E0D2] text-slate-600 font-semibold text-sm hover:border-blue-600 hover:text-blue-600 disabled:invisible"
+  1316→              >
+  1317→                <ArrowLeft className="w-4 h-4" /> Previous
+  1318→              </button>
+  1319→              <span className="text-xs font-semibold text-slate-400">
+  1320→                Keys 1–5 to answer · Auto-advances on selection
+  1321→              </span>
+  1322→            </div>
+  1323→          </div>
+  1324→        </div>
+  1325→      </div>
+  1326→    );
+  1327→  }
+  1328→
+  1329→  // ==================== SCREEN 3: COLORFUL INTERACTIVE REPORT ====================
+  1330→  if (!report) return null;
+  1331→
+  1332→  return (
+  1333→    <div className="min-h-screen bg-[#FAF5EC] py-8 px-4 text-slate-800">
+  1334→      <div className="max-w-5xl mx-auto space-y-6">
+  1335→        {/* Sticky Download Toolbar */}
+  1336→        <div className="sticky top-3 z-30 flex flex-wrap items-center justify-between gap-4 bg-white/95 backdrop-blur-md border border-[#E7E0D2] rounded-2xl px-5 py-3.5 shadow-lg">
+  1337→          <div className="flex items-center gap-3">
+  1338→            <ShieldCheck className="w-6 h-6 text-blue-600" />
+  1339→            <div>
+  1340→              <div className="font-bold text-slate-900 text-sm md:text-base">
+  1341→                {branding?.clientName || 'Commerce Career Selector'} — Complete Report
+  1342→              </div>
+  1343→              <div className="text-xs text-slate-500">
+  1344→                10-Page A4 PDF generated via backend <code className="font-mono">pdf-lib</code>
+  1345→              </div>
+  1346→            </div>
+  1347→          </div>
+  1348→          <button
+  1349→            type="button"
+  1350→            onClick={handleDownloadPdf}
+  1351→            disabled={downloadingPdf}
+  1352→            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-sky-500 text-white font-semibold text-sm shadow-md hover:opacity-95 disabled:opacity-60 transition"
+  1353→          >
+  1354→            <Download className="w-4 h-4" />
+  1355→            {downloadingPdf ? 'Generating A4 PDF...' : 'Download 10-Page A4 PDF'}
+  1356→          </button>
+  1357→        </div>
+  1358→
+  1359→        {/* Section 1: Cover & Executive KPIs */}
+  1360→        <section className="bg-white rounded-2xl border border-[#E7E0D2] p-6 md:p-8 shadow-sm space-y-6">
+  1361→          <div className="flex flex-wrap items-center justify-between gap-4 border-b-2 border-blue-600 pb-4">
+  1362→            <div className="flex items-center gap-4">
+  1363→              {branding?.logoUrl && (
+  1364→                <img src={branding.logoUrl} alt="Client Logo" className="max-h-16 w-auto object-contain" />
+  1365→              )}
+  1366→              <div>
+  1367→                <div className="font-serif text-2xl font-bold text-slate-900">
+  1368→                  {branding?.clientName || 'Commerce Career Selector'}
+  1369→                </div>
+  1370→                <div className="text-xs font-bold uppercase tracking-wider text-blue-600">
+  1371→                  Psychometric Career Assessment &amp; Counseling Report
+  1372→                </div>
+  1373→              </div>
+  1374→            </div>
+  1375→            <div className="text-right text-xs font-semibold text-slate-500">
+  1376→              <div>REPORT ID: {report.reportId}</div>
+  1377→              <div className="text-blue-600">VALIDATED ASSESSMENT</div>
+  1378→            </div>
+  1379→          </div>
+  1380→
+  1381→          <div className="bg-gradient-to-r from-blue-50 to-slate-50 border border-blue-200 border-l-4 border-l-blue-600 rounded-xl p-5">
+  1382→            <h1 className="font-serif text-2xl md:text-3xl font-bold text-slate-900 mb-1">{report.student.name}</h1>
+  1383→            <div className="flex flex-wrap gap-x-6 gap-y-1 text-xs font-semibold text-slate-500">
+  1384→              <span>DATE: <strong className="text-slate-900">{report.dateFormatted}</strong></span>
+  1385→              <span>PHONE: <strong className="text-slate-900">{report.student.phone}</strong></span>
+  1386→              <span>EMAIL: <strong className="text-slate-900">{report.student.email}</strong></span>
+  1387→              <span>COMPLETED: <strong className="text-slate-900">{report.answeredCount}/{report.totalQuestions}</strong></span>
+  1388→            </div>
+  1389→          </div>
+  1390→
+  1391→          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+  1392→            <div className="bg-[#FAF8F2] border border-[#E7E0D2] border-t-4 border-t-blue-600 rounded-xl p-4 text-center">
+  1393→              <div className="font-serif text-2xl font-bold text-blue-600">{report.preferredDomain.split(' ')[0]}</div>
+  1394→              <div className="text-[11px] font-bold uppercase text-slate-500 mt-1">Preferred Domain</div>
+  1395→              <div className="text-xs text-slate-600">{Math.max(report.financialPct, report.nonFinancialPct)}% Share</div>
+  1396→            </div>
+  1397→            <div className="bg-[#FAF8F2] border border-[#E7E0D2] border-t-4 border-t-emerald-500 rounded-xl p-4 text-center">
+  1398→              <div className="font-serif text-2xl font-bold text-emerald-600">{report.top3[0].percentage}%</div>
+  1399→              <div className="text-[11px] font-bold uppercase text-slate-500 mt-1">Peak Cluster</div>
+  1400→              <div className="text-xs text-slate-600 truncate">{report.top3[0].cluster}</div>
+  1401→            </div>
+  1402→            <div className="bg-[#FAF8F2] border border-[#E7E0D2] border-t-4 border-t-indigo-500 rounded-xl p-4 text-center">
+  1403→              <div className="font-serif text-2xl font-bold text-indigo-600">{report.overallIndexPct}%</div>
+  1404→              <div className="text-[11px] font-bold uppercase text-slate-500 mt-1">Overall Index</div>
+  1405→              <div className="text-xs text-slate-600">{report.totalRawScore} / 380 Pts</div>
+  1406→            </div>
+  1407→            <div className="bg-[#FAF8F2] border border-[#E7E0D2] border-t-4 border-t-amber-500 rounded-xl p-4 text-center">
+  1408→              <div className="font-serif text-2xl font-bold text-amber-600">{report.highCount} / 19</div>
+  1409→              <div className="text-[11px] font-bold uppercase text-slate-500 mt-1">High-Tier Clusters</div>
+  1410→              <div className="text-xs text-slate-600">Primary Matches</div>
+  1411→            </div>
+  1412→          </div>
+  1413→        </section>
+  1414→
+  1415→        {/* Section 2: Financial vs Non-Financial Split */}
+  1416→        <section className="bg-white rounded-2xl border border-[#E7E0D2] p-6 md:p-8 shadow-sm space-y-5">
+  1417→          <h2 className="font-serif text-xl font-bold text-slate-900 border-l-4 border-blue-600 pl-3">
+  1418→            Your Preferred Domain — Financial vs. Non-Financial
+  1419→          </h2>
+  1420→          <div className="w-full h-10 rounded-xl overflow-hidden flex font-bold text-xs md:text-sm text-white shadow-inner">
+  1421→            <div
+  1422→              className="bg-blue-600 flex items-center justify-center transition-all"
+  1423→              style={{ width: `${report.financialPct}%` }}
+  1424→            >
+  1425→              Financial {report.financialPct}%
+  1426→            </div>
+  1427→            <div
+  1428→              className="bg-emerald-500 flex items-center justify-center transition-all"
+  1429→              style={{ width: `${report.nonFinancialPct}%` }}
+  1430→            >
+  1431→              Non-Financial {report.nonFinancialPct}%
+  1432→            </div>
+  1433→          </div>
+  1434→          <p className="text-sm text-slate-600">
+  1435→            <strong>{report.student.name}</strong>, your responses indicate primary alignment with the{' '}
+  1436→            <strong className="text-blue-700">{report.preferredDomain}</strong>.
+  1437→          </p>
+  1438→        </section>
+  1439→
+  1440→        {/* Section 3: Complete 19-Cluster Spectrum */}
+  1441→        <section className="bg-white rounded-2xl border border-[#E7E0D2] p-6 md:p-8 shadow-sm space-y-4">
+  1442→          <h2 className="font-serif text-xl font-bold text-slate-900 border-l-4 border-blue-600 pl-3">
+  1443→            Interest Level Spectrum — All 19 Clusters
+  1444→          </h2>
+  1445→          <div className="bg-[#FAF8F2] border border-[#EDE7DA] rounded-xl p-5 space-y-3">
+  1446→            {report.sortedClusters.map((c, idx) => (
+  1447→              <div key={c.cluster}>
+  1448→                <div className="flex justify-between items-center text-xs md:text-sm font-semibold mb-1">
+  1449→                  <span className="text-slate-800">
+  1450→                    #{c.rank} {c.cluster}{' '}
+  1451→                    <span className="text-slate-400 font-normal">({c.domain})</span>
+  1452→                  </span>
+  1453→                  <span className="flex items-center gap-2">
+  1454→                    <span>{c.percentage}%</span>
+  1455→                    <span className={`text-[10px] uppercase px-2 py-0.5 rounded-full border font-bold ${BADGE_STYLES[c.level]}`}>
+  1456→                      {c.level}
+  1457→                    </span>
+  1458→                  </span>
+  1459→                </div>
+  1460→                <div className="w-full h-2.5 bg-[#EDE7DA] rounded-full overflow-hidden">
+  1461→                  <div
+  1462→                    className={`h-full rounded-full bg-gradient-to-r ${BAR_GRADIENTS[idx % 4]}`}
+  1463→                    style={{ width: `${c.percentage}%` }}
+  1464→                  />
+  1465→                </div>
+  1466→              </div>
+  1467→            ))}
+  1468→          </div>
+  1469→        </section>
+  1470→
+  1471→        {/* Section 4: Interest Level Descriptors */}
+  1472→        <section className="bg-white rounded-2xl border border-[#E7E0D2] p-6 md:p-8 shadow-sm space-y-4">
+  1473→          <h2 className="font-serif text-xl font-bold text-slate-900 border-l-4 border-blue-600 pl-3">
+  1474→            Interest Level Descriptors
+  1475→          </h2>
+  1476→          <div className="space-y-3">
+  1477→            {LEVEL_DESCRIPTORS.map((d) => (
+  1478→              <div key={d.level} className="flex flex-col sm:flex-row gap-3 p-4 rounded-xl border border-[#E7E0D2] bg-[#FAF8F2]">
+  1479→                <div className="sm:w-32 shrink-0">
+  1480→                  <span className={`inline-block text-xs uppercase px-3 py-1 rounded-full border font-bold ${BADGE_STYLES[d.level]}`}>
+  1481→                    {d.label}
+  1482→                  </span>
+  1483→                </div>
+  1484→                <p className="text-sm text-slate-700 leading-relaxed">{d.description}</p>
+  1485→              </div>
+  1486→            ))}
+  1487→          </div>
+  1488→        </section>
+  1489→
+  1490→        {/* Section 5: Complete Career Clusters & Action Plan */}
+  1491→        <section className="bg-white rounded-2xl border border-[#E7E0D2] p-6 md:p-8 shadow-sm space-y-6">
+  1492→          <h2 className="font-serif text-xl font-bold text-slate-900 border-l-4 border-blue-600 pl-3">
+  1493→            Career Clusters &amp; Options
+  1494→          </h2>
+  1495→          <div className="overflow-x-auto">
+  1496→            <table className="w-full border-collapse text-sm">
+  1497→              <thead>
+  1498→                <tr className="bg-slate-900 text-white text-xs uppercase">
+  1499→                  <th className="p-3 text-left">Career Cluster</th>
+  1500→                  <th className="p-3 text-left">Score</th>
+  1501→                  <th className="p-3 text-center">Level</th>
+  1502→                  <th className="p-3 text-left">Career Options</th>
+  1503→                </tr>
+  1504→              </thead>
+  1505→              <tbody>
+  1506→                {report.allClustersInOrder.map((c, idx) => (
+  1507→                  <tr key={c.cluster} className={idx % 2 === 1 ? 'bg-[#FAF8F2]' : 'bg-white'}>
+  1508→                    <td className="p-3 border border-[#E7E0D2] font-semibold text-slate-900">
+  1509→                      {c.cluster}
+  1510→                      <div className="text-[11px] text-slate-500 font-normal">
+  1511→                        Rank #{c.rank} · {c.domain}
+  1512→                      </div>
+  1513→                    </td>
+  1514→                    <td className="p-3 border border-[#E7E0D2] font-bold text-slate-800 whitespace-nowrap">
+  1515→                      {c.percentage}% ({c.rawScore}/20)
+  1516→                    </td>
+  1517→                    <td className="p-3 border border-[#E7E0D2] text-center">
+  1518→                      <span className={`text-[10px] uppercase px-2.5 py-0.5 rounded-full border font-bold ${BADGE_STYLES[c.level]}`}>
+  1519→                        {c.level}
+  1520→                      </span>
+  1521→                    </td>
+  1522→                    <td className="p-3 border border-[#E7E0D2] text-slate-700">{c.roles.join(', ')}</td>
+  1523→                  </tr>
+  1524→                ))}
+  1525→              </tbody>
+  1526→            </table>
+  1527→          </div>
+  1528→
+  1529→          <div className="bg-blue-50 border border-blue-200 border-l-4 border-l-blue-600 rounded-xl p-5 flex gap-3 items-start">
+  1530→            <CheckCircle2 className="w-6 h-6 text-blue-600 shrink-0 mt-0.5" />
+  1531→            <div>
+  1532→              <h3 className="font-bold text-blue-800 text-sm mb-1">Actions &amp; Next Steps for {report.student.name}</h3>
+  1533→              <p className="text-sm text-slate-700">
+  1534→                Prioritize your High-level clusters — <strong>{report.top3.map((c) => c.cluster).join(', ')}</strong>.
+  1535→                Download the 10-page A4 PDF above to review your full radar geometry, domain breakdown, and 3-step counselor roadmap.
+  1536→              </p>
+  1537→            </div>
+  1538→          </div>
+  1539→        </section>
+  1540→      </div>
+  1541→    </div>
+  1542→  );
+  1543→}
+  1544→Key Architectural Advantages
+  1545→Single Source of Truth: calculateCommerceResults() in scoring.ts powers both the React UI and the pdf-lib backend, guaranteeing identical scores, rankings, and High/Medium/Low tiers.
+  1546→
+  1547→Zero Browser Print Issues: Because pdf-lib builds the 10-page A4 PDF directly on the backend with vector charts and exact point coordinates, there is zero risk of browser print-dialog clipping, blank spillover pages, or missing Canvas graphics.
+  1548→
+  1549→Lightweight on AWS EC2: Unlike Puppeteer/Playwright, pdf-lib requires no headless Chrome binary and uses minimal RAM, keeping your server costs at zero.

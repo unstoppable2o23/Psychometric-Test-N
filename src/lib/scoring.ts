@@ -3,6 +3,7 @@
 // and interpretations are released to authorised users.
 
 import { NormAssessment, ScoreResult, DimensionDef } from '@/lib/assessments/types'
+import { answersMapToLikertArray, calculateCommerceResults, commerceResultToScoreResult } from '@/lib/tests/commerce/scoring'
 
 function levelFromBands(pct: number, bands: DimensionDef['bands']): string {
   let level = bands[0]?.label || 'Low'
@@ -25,6 +26,19 @@ export function scoreAttempt(
   assessment: NormAssessment,
   answers: Record<number, string>,
 ): ScoreResult {
+  // Commerce Career Selector: use the bespoke commerce scoring engine which
+  // applies relative-norm tiering (6 High / 6 Medium / 7 Low) and computes the
+  // Financial vs Non-Financial domain split. The module consumes a 1-indexed
+  // Likert array, so we adapt the platform's label-based answer map first.
+  if (assessment.slug === 'commerce-branch') {
+    const arr = answersMapToLikertArray(answers)
+    const result = calculateCommerceResults(
+      { name: '', email: '', phone: '' },
+      arr,
+    )
+    return commerceResultToScoreResult(result)
+  }
+
   switch (assessment.scoringMethod) {
     case 'DOMAIN_STREAM':
       return scoreDomainStream(assessment, answers)

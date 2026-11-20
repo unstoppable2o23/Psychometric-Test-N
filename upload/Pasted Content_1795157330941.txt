@@ -1,0 +1,1549 @@
+1. Shared Types (src/lib/tests/commerce/types.ts)
+TypeScript
+export type DomainType = 'Financial' | 'Non-Financial';
+export type InterestLevel = 'High' | 'Medium' | 'Low';
+
+export interface StudentInfo {
+  name: string;
+  email: string;
+  phone: string;
+}
+
+export interface BrandingConfig {
+  clientName?: string;
+  logoUrl?: string;
+}
+
+export interface CommerceQuestion {
+  id: number;
+  text: string;
+  cluster: string;
+}
+
+export interface ClusterResult {
+  cluster: string;
+  domain: DomainType;
+  rawScore: number;      // Max 20 (4 questions x 5)
+  percentage: number;    // 0 - 100
+  level: InterestLevel;
+  rank: number;          // 1 - 19
+  roles: string[];
+}
+
+export interface CommerceReportResult {
+  student: StudentInfo;
+  dateFormatted: string;
+  reportId: string;
+  totalQuestions: number;
+  answeredCount: number;
+  totalRawScore: number;
+  overallIndexPct: number;
+  financialRaw: number;
+  nonFinancialRaw: number;
+  financialPct: number;
+  nonFinancialPct: number;
+  preferredDomain: 'Financial Domain' | 'Non-Financial Domain';
+  highCount: number;
+  mediumCount: number;
+  lowCount: number;
+  sortedClusters: ClusterResult[];
+  allClustersInOrder: ClusterResult[];
+  top8: ClusterResult[];
+  top5: ClusterResult[];
+  top3: ClusterResult[];
+  financialClusters: ClusterResult[];
+  nonFinancialClusters: ClusterResult[];
+}
+2. Assessment Data (src/lib/tests/commerce/data.ts)
+All 76 questions, 19 career clusters, 8 financial domains, and the 5-point Likert scale are preserved verbatim from the original assessment.
+
+TypeScript
+import { CommerceQuestion } from './types';
+
+export const LIKERT_OPTIONS = [
+  'Strongly Disagree',
+  'Disagree',
+  'Neutral',
+  'Agree',
+  'Strongly Agree',
+] as const;
+
+export const FINANCIAL_CLUSTERS = new Set<string>([
+  'Accounts/Taxation',
+  'Analytics',
+  'Financial Auditing and Investigation',
+  'Credit Management',
+  'Financial Banking and Investment',
+  'Financial Management',
+  'Monitoring and Evaluation Specialist',
+  'Trading',
+]);
+
+export const CLUSTERS: Record<string, string[]> = {
+  'Accounts/Taxation': ['Accountant', 'Cost Accountant', 'Chartered Accountant', 'Tax Advisor/Tax Inspector'],
+  'Analytics': ['Statistician', 'Business Analyst / Market Analyst'],
+  'Communication and Media': [
+    'Radio and TV Anchoring, News Reading, Theater',
+    'Stage and Voice Over Artist, Public Relations',
+    'Photography, Advertisement, Online Media, Video and Audio Editor, Camera and Light Professional',
+    'Sound Technician etc.',
+  ],
+  'Computer Related Designing': ['Web Designer, Graphic Designer, Animator, Game Designer, Illustrator, Multimedia Designer'],
+  'Financial Auditing and Investigation': ['Security Analyst', 'Financial Analyst', 'Investment Analyst', 'Fraud Management', 'Auditor, Actuary'],
+  'Credit Management': ['Risk Management'],
+  'Financial Banking and Investment': ['Actuary', 'Corporate/Personal Banker', 'Treasury Management', 'Insurance Specialist', 'Investment Banker'],
+  'Financial Management': ['Real Estate / Property Management', 'Finance Management', 'Sale/Purchase Management', 'Wealth Management', 'Asset Management', 'Micro Finance Management', 'Financial Planner'],
+  'Monitoring and Evaluation Specialist': ['Economist, Economic Advisor', 'Financial Planner', 'Budget Analyst', 'Financial Analyst'],
+  'Hospitality and Tourism': ['Travel Agent, Tourism Manager, Logistics Manager', 'Transportation Support, Airhostess, Cabin Crew', 'Customer Service Manager, Travel Desk Officer', 'Event Manager'],
+  'Hotel': ['Hotel Manager, Facility Maintenance, Chef, Food and Beverage Specialist, Cleaning and Housekeeping In Charges, Restaurant and Bar In Charge'],
+  'Industrial Designing': ['Fashion Designer, Textile Designer, Knitwear Designer, Accessory Designer, Jewellery Designer, Interior Designer'],
+  'Journalism': ['Journalist – Print or Electronic, Reporter, Editor', 'Copy Writer, Screen Play Writer, Content Writer'],
+  'Languages': ['Linguist, Translator, Interpreter, News Reader', 'Bilingual Educator, Copy Writer and Editor, Grant and Proposal Writer, Professor, Teacher and Trainer, Public Relations, Publication, Research'],
+  'Law': ['Corporate / Company Lawyer', 'Tax Lawyer', 'Banking Solicitor', 'Company Secretary'],
+  'Management': ['Banking and Insurance Management', 'Finance Management', 'HR Management', 'Marketing and Sales Management', 'Operations Management', 'Rural Management', 'Export Management'],
+  'Social Sciences': ['Teacher and Professor, Social Workers', 'Relationship Counselor, Career Counselor', 'Philosopher, Critic and Political Analyst', 'Activist, Reformer, Researcher'],
+  'Teaching and Education': ['Nursery or Pre-Primary Teacher, Primary, Middle School, Secondary and Senior Secondary Teacher', 'Lecturer and Professor, Institute Trainer, Tutor', 'Coaching Centre Trainer, Academic Head or Principal'],
+  'Trading': ['Stock Broker', 'Foreign Exchange Trader', 'Derivative Trader', 'Commodity Trader'],
+};
+
+const RAW_QUESTIONS: Array<{ t: string; c: string }> = [
+  { t: 'I enjoy maintaining ledger books and balancing accounts.', c: 'Accounts/Taxation' },
+  { t: 'I am interested in learning about direct and indirect tax laws.', c: 'Accounts/Taxation' },
+  { t: 'Auditing financial statements sounds like an interesting job.', c: 'Accounts/Taxation' },
+  { t: 'I would like to help individuals and companies file their taxes.', c: 'Accounts/Taxation' },
+  { t: 'I like working with statistical data to find trends.', c: 'Analytics' },
+  { t: 'Using data to solve business problems excites me.', c: 'Analytics' },
+  { t: 'I enjoy creating charts and graphs to represent data.', c: 'Analytics' },
+  { t: 'Market research and consumer data analysis appeal to me.', c: 'Analytics' },
+  { t: 'I am interested in working in radio or TV broadcasting.', c: 'Communication and Media' },
+  { t: 'Public relations and managing corporate image interest me.', c: 'Communication and Media' },
+  { t: 'I would enjoy operating cameras or editing video content.', c: 'Communication and Media' },
+  { t: 'Advertisement and media production fascinate me.', c: 'Communication and Media' },
+  { t: 'I enjoy designing websites and user interfaces.', c: 'Computer Related Designing' },
+  { t: 'Graphic design and illustration are skills I want to develop.', c: 'Computer Related Designing' },
+  { t: 'I am interested in animation and game design.', c: 'Computer Related Designing' },
+  { t: 'Creating multimedia content feels like a great career path.', c: 'Computer Related Designing' },
+  { t: 'Investigating financial frauds sounds exciting to me.', c: 'Financial Auditing and Investigation' },
+  { t: 'I would like to analyze investment opportunities for clients.', c: 'Financial Auditing and Investigation' },
+  { t: "Evaluating company securities is a career I'd enjoy.", c: 'Financial Auditing and Investigation' },
+  { t: 'I am interested in actuarial science and risk calculation.', c: 'Financial Auditing and Investigation' },
+  { t: 'Assessing creditworthiness of individuals sounds interesting.', c: 'Credit Management' },
+  { t: 'I would like to manage risk in financial institutions.', c: 'Credit Management' },
+  { t: 'Loan approval and credit analysis appeal to me.', c: 'Credit Management' },
+  { t: 'I enjoy evaluating the financial stability of borrowers.', c: 'Credit Management' },
+  { t: 'Working in a bank as a personal banker appeals to me.', c: 'Financial Banking and Investment' },
+  { t: 'I am interested in treasury and foreign exchange management.', c: 'Financial Banking and Investment' },
+  { t: 'Insurance and risk protection products interest me.', c: 'Financial Banking and Investment' },
+  { t: 'I would enjoy a career in investment banking.', c: 'Financial Banking and Investment' },
+  { t: 'I want to manage real estate properties and assets.', c: 'Financial Management' },
+  { t: 'Wealth management for high-net-worth individuals sounds rewarding.', c: 'Financial Management' },
+  { t: 'I am interested in managing micro-finance institutions.', c: 'Financial Management' },
+  { t: 'Financial planning for families and businesses interests me.', c: 'Financial Management' },
+  { t: 'I would like to work as an economic advisor.', c: 'Monitoring and Evaluation Specialist' },
+  { t: 'Preparing budget analyses for organizations sounds interesting.', c: 'Monitoring and Evaluation Specialist' },
+  { t: 'Monitoring project evaluations and outcomes appeals to me.', c: 'Monitoring and Evaluation Specialist' },
+  { t: 'I enjoy analyzing economic indicators and policies.', c: 'Monitoring and Evaluation Specialist' },
+  { t: 'I want to work in the travel and tourism industry.', c: 'Hospitality and Tourism' },
+  { t: 'Managing logistics and transportation sounds like a good career.', c: 'Hospitality and Tourism' },
+  { t: 'I would enjoy working as an event manager or travel agent.', c: 'Hospitality and Tourism' },
+  { t: 'Working as cabin crew or customer service manager appeals to me.', c: 'Hospitality and Tourism' },
+  { t: 'I am interested in hotel management and operations.', c: 'Hotel' },
+  { t: 'Food and beverage service management excites me.', c: 'Hotel' },
+  { t: 'I would like to work in housekeeping or facility maintenance.', c: 'Hotel' },
+  { t: "Managing a restaurant or bar sounds like a career I'd enjoy.", c: 'Hotel' },
+  { t: 'I have a keen interest in fashion and textile design.', c: 'Industrial Designing' },
+  { t: 'Designing jewelry or accessories appeals to me.', c: 'Industrial Designing' },
+  { t: 'I would enjoy working as an interior designer.', c: 'Industrial Designing' },
+  { t: 'Creating industrial product designs is fascinating.', c: 'Industrial Designing' },
+  { t: 'I want to work as a reporter for a newspaper or news channel.', c: 'Journalism' },
+  { t: 'Editing and copywriting are skills I want to pursue.', c: 'Journalism' },
+  { t: 'Writing screenplays or content for websites sounds exciting.', c: 'Journalism' },
+  { t: 'Investigative journalism and news analysis interest me.', c: 'Journalism' },
+  { t: 'I would love to work as a translator or interpreter.', c: 'Languages' },
+  { t: 'Bilingual education and teaching languages appeal to me.', c: 'Languages' },
+  { t: 'I am interested in writing grant proposals and publications.', c: 'Languages' },
+  { t: 'Linguistics and language research fascinate me.', c: 'Languages' },
+  { t: 'I am interested in corporate law and legal compliance.', c: 'Law' },
+  { t: 'Working as a tax lawyer or banking solicitor appeals to me.', c: 'Law' },
+  { t: 'Company secretarial and legal advisory roles interest me.', c: 'Law' },
+  { t: 'I would like to represent companies in legal matters.', c: 'Law' },
+  { t: 'I want to work in HR management and recruitment.', c: 'Management' },
+  { t: 'Marketing and sales management excite me.', c: 'Management' },
+  { t: 'Operations and supply chain management sound interesting.', c: 'Management' },
+  { t: 'I would like to manage rural or export businesses.', c: 'Management' },
+  { t: 'I want to work as a social worker or relationship counselor.', c: 'Social Sciences' },
+  { t: 'Activism and social reform are causes I care about.', c: 'Social Sciences' },
+  { t: 'Political analysis and criticism interest me.', c: 'Social Sciences' },
+  { t: 'Conducting social research sounds like a fulfilling career.', c: 'Social Sciences' },
+  { t: 'I would love to teach in a primary or secondary school.', c: 'Teaching and Education' },
+  { t: 'Becoming a college professor or lecturer is my goal.', c: 'Teaching and Education' },
+  { t: 'Working as a trainer in a coaching center appeals to me.', c: 'Teaching and Education' },
+  { t: 'I am interested in academic administration and leadership.', c: 'Teaching and Education' },
+  { t: 'I want to work as a stockbroker in the financial markets.', c: 'Trading' },
+  { t: 'Foreign exchange and derivative trading excite me.', c: 'Trading' },
+  { t: "Commodity trading is a career I'd like to explore.", c: 'Trading' },
+  { t: 'I enjoy watching market fluctuations and making quick decisions.', c: 'Trading' },
+];
+
+export const QUESTIONS: CommerceQuestion[] = RAW_QUESTIONS.map((q, idx) => ({
+  id: idx + 1,
+  text: q.t,
+  cluster: q.c,
+}));
+
+export const LEVEL_DESCRIPTORS = [
+  {
+    level: 'High' as const,
+    label: 'High Level',
+    description:
+      'This level indicates High interest in the given Commerce Career Options with awareness and knowledge about the subject and career as well as enthusiasm to face the work life situations accepting its pros and cons. The student has deep understanding as well as interest to opt for given career options, and knows what kind of professional personality is required — so he or she has the zeal to develop as a professional accordingly. It is recommended to select career options from this level while maintaining motivation and dedicated study.',
+  },
+  {
+    level: 'Medium' as const,
+    label: 'Medium Level',
+    description:
+      'This level indicates Medium interest in the given Commerce Career Options — the student is moderately able and interested to enjoy the pros and cons of work life situations, with moderate understanding and average general awareness about the career. It is advisable that students selecting from this level develop optimum zeal, motivation and a dedicated study pattern to grow as a professional in the field.',
+  },
+  {
+    level: 'Low' as const,
+    label: 'Low Level',
+    description:
+      'This level indicates Low interest as well as lack of understanding, awareness and knowledge about the given Commerce Career Options. There is profound reluctance in utilizing skills for small-scale tasks in the given career option. It will be an uphill task to build knowledge in a career option one is not interested in.',
+  },
+];
+3. Shared Scoring Engine (src/lib/tests/commerce/scoring.ts)
+TypeScript
+import { CLUSTERS, FINANCIAL_CLUSTERS, QUESTIONS } from './data';
+import { ClusterResult, CommerceReportResult, InterestLevel, StudentInfo } from './types';
+
+export function calculateCommerceResults(
+  student: StudentInfo,
+  answers: Array<number | null>
+): CommerceReportResult {
+  const rawMap: Record<string, number> = {};
+  Object.keys(CLUSTERS).forEach((c) => {
+    rawMap[c] = 0;
+  });
+
+  let answeredCount = 0;
+  QUESTIONS.forEach((q, idx) => {
+    const val = answers[idx];
+    if (val !== null && val !== undefined && val >= 1 && val <= 5) {
+      rawMap[q.cluster] += val;
+      answeredCount++;
+    }
+  });
+
+  const sortedEntries = Object.entries(rawMap).sort((a, b) => b[1] - a[1]);
+  const third = Math.floor(sortedEntries.length / 3); // 6 High, 6 Medium, 7 Low
+
+  const rankMap: Record<string, number> = {};
+  const levelMap: Record<string, InterestLevel> = {};
+
+  sortedEntries.forEach(([cluster], idx) => {
+    rankMap[cluster] = idx + 1;
+    levelMap[cluster] = idx < third ? 'High' : idx < third * 2 ? 'Medium' : 'Low';
+  });
+
+  let financialRaw = 0;
+  let nonFinancialRaw = 0;
+  sortedEntries.forEach(([cluster, score]) => {
+    if (FINANCIAL_CLUSTERS.has(cluster)) financialRaw += score;
+    else nonFinancialRaw += score;
+  });
+
+  const totalRawScore = financialRaw + nonFinancialRaw;
+  const denom = totalRawScore || 1;
+  const financialPct = Math.round((100 * financialRaw) / denom);
+  const nonFinancialPct = 100 - financialPct;
+  const preferredDomain =
+    financialRaw >= nonFinancialRaw ? 'Financial Domain' : 'Non-Financial Domain';
+
+  const toClusterResult = (cluster: string): ClusterResult => ({
+    cluster,
+    domain: FINANCIAL_CLUSTERS.has(cluster) ? 'Financial' : 'Non-Financial',
+    rawScore: rawMap[cluster],
+    percentage: Math.round((rawMap[cluster] / 20) * 100),
+    level: levelMap[cluster],
+    rank: rankMap[cluster],
+    roles: CLUSTERS[cluster],
+  });
+
+  const sortedClusters = sortedEntries.map(([c]) => toClusterResult(c));
+  const allClustersInOrder = Object.keys(CLUSTERS).map(toClusterResult);
+
+  const now = new Date();
+  const dateFormatted = now.toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+
+  return {
+    student,
+    dateFormatted,
+    reportId: `CCS-${now.getFullYear()}-${String(QUESTIONS.length).padStart(3, '0')}`,
+    totalQuestions: QUESTIONS.length,
+    answeredCount,
+    totalRawScore,
+    overallIndexPct: Math.round((totalRawScore / (19 * 20)) * 100),
+    financialRaw,
+    nonFinancialRaw,
+    financialPct,
+    nonFinancialPct,
+    preferredDomain,
+    highCount: sortedClusters.filter((c) => c.level === 'High').length,
+    mediumCount: sortedClusters.filter((c) => c.level === 'Medium').length,
+    lowCount: sortedClusters.filter((c) => c.level === 'Low').length,
+    sortedClusters,
+    allClustersInOrder,
+    top8: sortedClusters.slice(0, 8),
+    top5: sortedClusters.slice(0, 5),
+    top3: sortedClusters.slice(0, 3),
+    financialClusters: sortedClusters.filter((c) => c.domain === 'Financial'),
+    nonFinancialClusters: sortedClusters.filter((c) => c.domain === 'Non-Financial'),
+  };
+}
+4. Backend pdf-lib 10-Page Colorful PDF Generator (src/lib/tests/commerce/pdfGenerator.ts)
+This generates a crisp, vector-drawn, 10-page A4 PDF entirely in TypeScript using pdf-lib—complete with vector bar charts, an 8-axis vector radar chart, color-coded badges, KPI cards, and zero text clipping.
+
+TypeScript
+import { PDFDocument, PDFPage, PDFFont, rgb, StandardFonts, PageSizes } from 'pdf-lib';
+import { LEVEL_DESCRIPTORS } from './data';
+import { BrandingConfig, ClusterResult, CommerceReportResult, InterestLevel } from './types';
+
+// Palette (Modern Colorful Theme)
+const C = {
+  navy: rgb(0.06, 0.09, 0.16),      // #0F172A
+  blue: rgb(0.15, 0.39, 0.92),      // #2563EB
+  sky: rgb(0.05, 0.65, 0.91),       // #0EA5E9
+  indigo: rgb(0.39, 0.4, 0.95),     // #6366F1
+  green: rgb(0.06, 0.73, 0.51),     // #10B981
+  greenDark: rgb(0.02, 0.47, 0.34), // #047857
+  greenBg: rgb(0.93, 0.99, 0.96),
+  amber: rgb(0.96, 0.62, 0.04),     // #F59E0B
+  amberDark: rgb(0.71, 0.33, 0.04), // #B45309
+  amberBg: rgb(1.0, 0.98, 0.92),
+  rose: rgb(0.88, 0.11, 0.28),      // #E11D48
+  roseDark: rgb(0.75, 0.07, 0.24),  // #BE123C
+  roseBg: rgb(1.0, 0.95, 0.96),
+  slate: rgb(0.2, 0.25, 0.33),      // #334155
+  muted: rgb(0.39, 0.45, 0.55),     // #64748B
+  border: rgb(0.89, 0.85, 0.77),    // #E2D9C5
+  cream: rgb(0.98, 0.97, 0.95),     // #FAF8F2
+  softBlue: rgb(0.94, 0.96, 1.0),   // #EFF6FF
+  white: rgb(1, 1, 1),
+};
+
+const W = PageSizes.A4[0]; // 595.28
+const H = PageSizes.A4[1]; // 841.89
+const M = 36;              // Margin
+const CW = W - M * 2;      // Content width (523.28)
+
+// Sanitize strings for WinAnsi standard fonts
+function clean(str: string): string {
+  return str
+    .replace(/[\u2013\u2014]/g, '-')
+    .replace(/[\u2018\u2019]/g, "'")
+    .replace(/[\u201C\u201D]/g, '"')
+    .replace(/[^\x20-\x7E]/g, ' ');
+}
+
+function wrapText(text: string, font: PDFFont, size: number, maxWidth: number): string[] {
+  const words = clean(text).split(/\s+/);
+  const lines: string[] = [];
+  let line = '';
+  for (const w of words) {
+    const test = line ? `${line} ${w}` : w;
+    if (font.widthOfTextAtSize(test, size) <= maxWidth) {
+      line = test;
+    } else {
+      if (line) lines.push(line);
+      line = w;
+    }
+  }
+  if (line) lines.push(line);
+  return lines;
+}
+
+function levelColors(level: InterestLevel) {
+  if (level === 'High') return { fg: C.greenDark, bg: C.greenBg, bar: C.green };
+  if (level === 'Medium') return { fg: C.amberDark, bg: C.amberBg, bar: C.amber };
+  return { fg: C.roseDark, bg: C.roseBg, bar: C.rose };
+}
+
+export async function generateCommercePdf(
+  report: CommerceReportResult,
+  branding: BrandingConfig = {}
+): Promise<Uint8Array> {
+  const pdf = await PDFDocument.create();
+  const font = await pdf.embedFont(StandardFonts.Helvetica);
+  const fontBold = await pdf.embedFont(StandardFonts.HelveticaBold);
+  const serifBold = await pdf.embedFont(StandardFonts.TimesRomanBold);
+
+  const clientTitle = clean(branding.clientName || 'Commerce Career Selector');
+  const totalPages = 10;
+
+  // Helper: Draw Sub-page Header & Footer
+  const initPage = (pageNum: number, sectionTitle?: string): { page: PDFPage; y: number } => {
+    const page = pdf.addPage(PageSizes.A4);
+
+    // Top colorful accent strip
+    page.drawRectangle({ x: 0, y: H - 8, width: W * 0.6, height: 8, color: C.blue });
+    page.drawRectangle({ x: W * 0.6, y: H - 8, width: W * 0.4, height: 8, color: C.green });
+
+    // Footer
+    page.drawLine({ start: { x: M, y: 38 }, end: { x: W - M, y: 38 }, thickness: 0.75, color: C.border });
+    page.drawText(clean(`${clientTitle} - Candidate: ${report.student.name}`), {
+      x: M, y: 24, size: 8, font, color: C.muted,
+    });
+    const pgLabel = `Page ${pageNum} of ${totalPages}`;
+    page.drawText(pgLabel, {
+      x: W - M - fontBold.widthOfTextAtSize(pgLabel, 8), y: 24, size: 8, font: fontBold, color: C.navy,
+    });
+
+    if (!sectionTitle) {
+      return { page, y: H - 32 };
+    }
+
+    page.drawText(clean(`${clientTitle.toUpperCase()}  |  COMMERCE CAREER SELECTOR`), {
+      x: M, y: H - 30, size: 8, font: fontBold, color: C.blue,
+    });
+    page.drawText(clean(sectionTitle), {
+      x: M, y: H - 50, size: 16, font: serifBold, color: C.navy,
+    });
+    page.drawText(clean(`Candidate: ${report.student.name}   |   Phone: ${report.student.phone}   |   Date: ${report.dateFormatted}`), {
+      x: M, y: H - 64, size: 8, font, color: C.muted,
+    });
+    page.drawLine({ start: { x: M, y: H - 72 }, end: { x: W - M, y: H - 72 }, thickness: 1.5, color: C.blue });
+
+    return { page, y: H - 92 };
+  };
+
+  // Helper: Draw Section Heading with Left Accent Bar
+  const drawHeading = (page: PDFPage, y: number, title: string): number => {
+    page.drawRectangle({ x: M, y: y - 3, width: 4, height: 14, color: C.blue });
+    page.drawText(clean(title), { x: M + 10, y, size: 12, font: serifBold, color: C.navy });
+    return y - 18;
+  };
+
+  // Helper: Draw Paragraph
+  const drawPara = (page: PDFPage, y: number, text: string, size = 9.2, maxWidth = CW, x = M): number => {
+    const lines = wrapText(text, font, size, maxWidth);
+    for (const line of lines) {
+      page.drawText(line, { x, y, size, font, color: C.slate });
+      y -= size * 1.45;
+    }
+    return y - 4;
+  };
+
+  // Helper: Draw Badge
+  const drawBadge = (page: PDFPage, x: number, y: number, level: InterestLevel) => {
+    const col = levelColors(level);
+    const label = level.toUpperCase();
+    const bw = 48;
+    page.drawRectangle({ x, y: y - 3, width: bw, height: 13, color: col.bg, borderColor: col.fg, borderWidth: 0.7 });
+    const tw = fontBold.widthOfTextAtSize(label, 7);
+    page.drawText(label, { x: x + (bw - tw) / 2, y: y + 1, size: 7, font: fontBold, color: col.fg });
+  };
+
+  // Helper: Draw Insight Callout Box
+  const drawInsight = (page: PDFPage, y: number, title: string, body: string): number => {
+    const lines = wrapText(body, font, 8.6, CW - 24);
+    const boxH = 26 + lines.length * 12.5;
+    page.drawRectangle({ x: M, y: y - boxH, width: CW, height: boxH, color: C.softBlue, borderColor: C.blue, borderWidth: 0.6 });
+    page.drawRectangle({ x: M, y: y - boxH, width: 4, height: boxH, color: C.blue });
+    page.drawText(clean(title), { x: M + 12, y: y - 14, size: 9.5, font: fontBold, color: C.blue });
+    let ty = y - 28;
+    for (const l of lines) {
+      page.drawText(l, { x: M + 12, y: ty, size: 8.6, font, color: C.slate });
+      ty -= 12.5;
+    }
+    return y - boxH - 12;
+  };
+
+  // Helper: Draw Horizontal Bar Chart
+  const drawHorizBars = (
+    page: PDFPage,
+    y: number,
+    items: Array<{ label: string; pct: number; sub?: string; level?: InterestLevel; color?: ReturnType<typeof rgb> }>,
+    barHeight = 9,
+    rowGap = 24
+  ): number => {
+    const colors = [C.blue, C.sky, C.green, C.indigo, C.amber];
+    items.forEach((item, idx) => {
+      const col = item.color || (item.level ? levelColors(item.level).bar : colors[idx % colors.length]);
+      page.drawText(clean(item.label), { x: M + 8, y, size: 8.5, font: fontBold, color: C.navy });
+      const pctStr = item.sub ? `${item.pct}% (${item.sub})` : `${item.pct}%`;
+      const rightOffset = item.level ? 62 : 8;
+      page.drawText(clean(pctStr), {
+        x: W - M - rightOffset - fontBold.widthOfTextAtSize(pctStr, 8.2),
+        y, size: 8.2, font: fontBold, color: C.slate,
+      });
+      if (item.level) drawBadge(page, W - M - 56, y, item.level);
+
+      const trackY = y - barHeight - 3;
+      const trackW = CW - 16;
+      page.drawRectangle({ x: M + 8, y: trackY, width: trackW, height: barHeight, color: C.border });
+      page.drawRectangle({ x: M + 8, y: trackY, width: Math.max(2, (trackW * item.pct) / 100), height: barHeight, color: col });
+      y -= rowGap;
+    });
+    return y;
+  };
+
+  // Helper: Draw Cluster Table (Pages 7-10)
+  const drawClusterTable = (page: PDFPage, startY: number, clusters: ClusterResult[]): number => {
+    let y = startY;
+    const colW = [132, 92, 58, CW - 282];
+    const headers = ['CAREER CLUSTER', 'AFFINITY SCORE', 'LEVEL', 'CAREER OPTIONS'];
+
+    // Header Row
+    page.drawRectangle({ x: M, y: y - 20, width: CW, height: 20, color: C.navy });
+    let cx = M;
+    headers.forEach((h, i) => {
+      page.drawText(h, { x: cx + 6, y: y - 13, size: 7.5, font: fontBold, color: C.white });
+      cx += colW[i];
+    });
+    y -= 20;
+
+    clusters.forEach((c, idx) => {
+      const roleLines = wrapText(c.roles.join(', '), font, 7.8, colW[3] - 10);
+      const nameLines = wrapText(c.cluster, fontBold, 8.2, colW[0] - 10);
+      const rowH = Math.max(38, Math.max(roleLines.length * 10.5 + 10, nameLines.length * 11 + 16));
+
+      page.drawRectangle({
+        x: M, y: y - rowH, width: CW, height: rowH,
+        color: idx % 2 === 1 ? C.cream : C.white,
+        borderColor: C.border, borderWidth: 0.5,
+      });
+
+      // Col 1: Name + Rank
+      let ny = y - 12;
+      nameLines.forEach((nl) => {
+        page.drawText(nl, { x: M + 5, y: ny, size: 8.2, font: fontBold, color: C.navy });
+        ny -= 10.5;
+      });
+      page.drawText(`Rank #${c.rank} | ${c.domain}`, { x: M + 5, y: ny, size: 6.8, font, color: C.muted });
+
+      // Col 2: Mini Bar + %
+      const bx = M + colW[0] + 6;
+      const by = y - rowH / 2 + 2;
+      page.drawRectangle({ x: bx, y: by - 6, width: 46, height: 6, color: C.border });
+      page.drawRectangle({ x: bx, y: by - 6, width: (46 * c.percentage) / 100, height: 6, color: levelColors(c.level).bar });
+      page.drawText(`${c.percentage}%`, { x: bx + 51, y: by - 6, size: 7.8, font: fontBold, color: C.navy });
+
+      // Col 3: Level Badge
+      drawBadge(page, M + colW[0] + colW[1] + 5, y - rowH / 2 - 2, c.level);
+
+      // Col 4: Roles
+      let ry = y - 11;
+      roleLines.forEach((rl) => {
+        page.drawText(rl, { x: M + colW[0] + colW[1] + colW[2] + 5, y: ry, size: 7.8, font, color: C.slate });
+        ry -= 10.5;
+      });
+
+      y -= rowH;
+    });
+
+    return y - 12;
+  };
+
+  // ==================== PAGE 1: COVER & EXECUTIVE SUMMARY ====================
+  {
+    const { page, y: startY } = initPage(1);
+    let y = startY;
+
+    // Cover Brand Header
+    page.drawText(clientTitle, { x: M, y: y - 10, size: 20, font: serifBold, color: C.navy });
+    page.drawText('PSYCHOMETRIC CAREER ASSESSMENT & COUNSELING REPORT', { x: M, y: y - 24, size: 8.5, font: fontBold, color: C.blue });
+    page.drawText(`REPORT ID: ${report.reportId}`, {
+      x: W - M - fontBold.widthOfTextAtSize(`REPORT ID: ${report.reportId}`, 8), y: y - 12, size: 8, font: fontBold, color: C.muted,
+    });
+    page.drawLine({ start: { x: M, y: y - 34 }, end: { x: W - M, y: y - 34 }, thickness: 2, color: C.blue });
+    y -= 52;
+
+    // Candidate Banner
+    page.drawRectangle({ x: M, y: y - 62, width: CW, height: 62, color: C.softBlue, borderColor: C.blue, borderWidth: 0.7 });
+    page.drawRectangle({ x: M, y: y - 62, width: 5, height: 62, color: C.blue });
+    page.drawText(clean(report.student.name), { x: M + 16, y: y - 24, size: 18, font: serifBold, color: C.navy });
+    page.drawText(
+      clean(`Date: ${report.dateFormatted}   |   Phone: ${report.student.phone}   |   Email: ${report.student.email}   |   Completed: ${report.answeredCount}/${report.totalQuestions}`),
+      { x: M + 16, y: y - 46, size: 8.2, font, color: C.slate }
+    );
+    y -= 82;
+
+    y = drawHeading(page, y, 'Executive Assessment Summary');
+    y = drawPara(
+      page, y,
+      `This psychometric report evaluates ${report.student.name}'s responses across 76 Commerce work-activity statements, mapping innate preferences across 19 specialized Career Clusters in both the Financial and Non-Financial domains.`
+    );
+    y -= 6;
+
+    // 4 KPI Stat Cards
+    const kpis = [
+      { big: report.preferredDomain.split(' ')[0], lbl: 'PREFERRED DOMAIN', sub: `${Math.max(report.financialPct, report.nonFinancialPct)}% Share`, col: C.blue },
+      { big: `${report.top3[0].percentage}%`, lbl: 'PEAK AFFINITY', sub: report.top3[0].cluster.slice(0, 18), col: C.green },
+      { big: `${report.overallIndexPct}%`, lbl: 'OVERALL INDEX', sub: `${report.totalRawScore} / 380 Pts`, col: C.indigo },
+      { big: `${report.highCount} / 19`, lbl: 'HIGH-TIER CLUSTERS', sub: 'Primary Matches', col: C.amber },
+    ];
+    const cardW = (CW - 24) / 4;
+    kpis.forEach((k, i) => {
+      const cx = M + i * (cardW + 8);
+      page.drawRectangle({ x: cx, y: y - 64, width: cardW, height: 64, color: C.cream, borderColor: C.border, borderWidth: 0.7 });
+      page.drawRectangle({ x: cx, y: y - 4, width: cardW, height: 4, color: k.col });
+      const bw = fontBold.widthOfTextAtSize(clean(k.big), 15);
+      page.drawText(clean(k.big), { x: cx + (cardW - bw) / 2, y: y - 26, size: 15, font: fontBold, color: k.col });
+      const lw = fontBold.widthOfTextAtSize(k.lbl, 6.5);
+      page.drawText(k.lbl, { x: cx + (cardW - lw) / 2, y: y - 41, size: 6.5, font: fontBold, color: C.muted });
+      const sw = font.widthOfTextAtSize(clean(k.sub), 7.2);
+      page.drawText(clean(k.sub), { x: cx + (cardW - sw) / 2, y: y - 54, size: 7.2, font, color: C.slate });
+    });
+    y -= 84;
+
+    // Top 5 Bar Chart
+    y = drawHeading(page, y, 'Top 5 Career Clusters Snapshot');
+    y = drawHorizBars(
+      page, y - 4,
+      report.top5.map((c) => ({ label: `#${c.rank} ${c.cluster}`, pct: c.percentage, sub: `${c.rawScore}/20`, level: c.level })),
+      10, 26
+    );
+    y -= 10;
+
+    drawInsight(
+      page, y,
+      `Executive Takeaway for ${report.student.name}`,
+      `Your profile shows strongest alignment with ${report.top3.map((x) => x.cluster).join(', ')}, anchored within the ${report.preferredDomain}. Prioritize degree tracks and professional certifications that combine these top clusters.`
+    );
+  }
+
+  // ==================== PAGE 2: METHODOLOGY & TIER DISTRIBUTION ====================
+  {
+    const { page, y: startY } = initPage(2, 'What This Report Gives You & Methodology');
+    let y = startY;
+
+    y = drawHeading(page, y, 'What This Report Gives You');
+    const bullets = [
+      'Brief knowledge about all available Commerce Careers, both in the financial and non-financial domain.',
+      'An answer to which career option of Commerce you should opt for based on your innate inclinations.',
+      'A scientifically designed psychometric analysis matching your activity choices with professional careers of Commerce.',
+      'Results displayed in graphical forms - radar chart, domain analysis, interest level spectrum, and cluster tables.',
+    ];
+    bullets.forEach((b) => {
+      y = drawPara(page, y, `>  ${b}`, 9, CW - 10, M + 6);
+    });
+    y -= 10;
+
+    y = drawHeading(page, y, 'Psychometric Evaluation Architecture');
+    const steps = [
+      { n: '1', t: '76 Situational Items', d: '4 targeted statements per cluster rated on a 5-point Likert scale (max 20 pts/cluster).' },
+      { n: '2', t: 'Domain Classification', d: 'Measures macro inclination across 8 Financial clusters versus 11 Non-Financial clusters.' },
+      { n: '3', t: 'Relative Norm Tiering', d: `Classifies all 19 clusters into High (${report.highCount}), Medium (${report.mediumCount}), and Low (${report.lowCount}) bands.` },
+    ];
+    const sw = (CW - 16) / 3;
+    steps.forEach((s, i) => {
+      const sx = M + i * (sw + 8);
+      page.drawRectangle({ x: sx, y: y - 92, width: sw, height: 92, color: C.cream, borderColor: C.border, borderWidth: 0.7 });
+      page.drawRectangle({ x: sx, y: y - 4, width: sw, height: 4, color: C.blue });
+      page.drawCircle({ x: sx + sw / 2, y: y - 24, size: 12, color: C.softBlue, borderColor: C.blue, borderWidth: 1.2 });
+      page.drawText(s.n, { x: sx + sw / 2 - 3, y: y - 28, size: 10, font: fontBold, color: C.blue });
+      const tw = fontBold.widthOfTextAtSize(s.t, 9);
+      page.drawText(s.t, { x: sx + (sw - tw) / 2, y: y - 48, size: 9, font: fontBold, color: C.navy });
+      const dLines = wrapText(s.d, font, 7.6, sw - 14);
+      let dy = y - 61;
+      dLines.forEach((dl) => {
+        const dw = font.widthOfTextAtSize(dl, 7.6);
+        page.drawText(dl, { x: sx + (sw - dw) / 2, y: dy, size: 7.6, font, color: C.muted });
+        dy -= 10;
+      });
+    });
+    y -= 114;
+
+    y = drawHeading(page, y, 'Cluster Distribution Across Interest Tiers');
+    y = drawHorizBars(
+      page, y - 6,
+      [
+        { label: 'High Interest Tier (Primary Focus)', pct: Math.round((report.highCount / 19) * 100), sub: `${report.highCount} Clusters`, color: C.green },
+        { label: 'Medium Interest Tier (Secondary / Electives)', pct: Math.round((report.mediumCount / 19) * 100), sub: `${report.mediumCount} Clusters`, color: C.amber },
+        { label: 'Low Interest Tier (Avoid as Major)', pct: Math.round((report.lowCount / 19) * 100), sub: `${report.lowCount} Clusters`, color: C.rose },
+      ],
+      12, 30
+    );
+  }
+
+  // ==================== PAGE 3: PREFERRED DOMAIN ANALYSIS ====================
+  {
+    const { page, y: startY } = initPage(3, 'Your Preferred Domain - Financial vs. Non-Financial');
+    let y = startY;
+
+    y = drawHeading(page, y, 'Macro Domain Inclination');
+    y = drawPara(
+      page, y,
+      `${report.student.name}, the analysis indicates that your interests and aptitude are more inclined towards the ${report.preferredDomain}. Below is your comparative balance across both macro spheres of Commerce.`
+    );
+    y -= 6;
+
+    // Split Segmented Progress Graphic
+    const finW = (CW * report.financialPct) / 100;
+    page.drawRectangle({ x: M, y: y - 28, width: finW, height: 28, color: C.blue });
+    page.drawRectangle({ x: M + finW, y: y - 28, width: CW - finW, height: 28, color: C.green });
+    page.drawText(`FINANCIAL ${report.financialPct}%`, { x: M + 10, y: y - 18, size: 10, font: fontBold, color: C.white });
+    const nfLbl = `NON-FINANCIAL ${report.nonFinancialPct}%`;
+    page.drawText(nfLbl, { x: W - M - fontBold.widthOfTextAtSize(nfLbl, 10) - 10, y: y - 18, size: 10, font: fontBold, color: C.white });
+    y -= 48;
+
+    // Financial Cluster Breakdown
+    y = drawHeading(page, y, 'Financial Domain Cluster Breakdown (All 8 Clusters)');
+    y = drawHorizBars(
+      page, y - 4,
+      report.financialClusters.map((c) => ({ label: c.cluster, pct: c.percentage, sub: `${c.rawScore}/20`, level: c.level, color: C.blue })),
+      9, 25
+    );
+    y -= 10;
+
+    drawInsight(
+      page, y,
+      'Domain Synthesis',
+      `Your top Financial cluster is ${report.financialClusters[0].cluster} (${report.financialClusters[0].percentage}%) and your top Non-Financial cluster is ${report.nonFinancialClusters[0].cluster} (${report.nonFinancialClusters[0].percentage}%). Combining these two areas creates a strong technocratic-managerial profile.`
+    );
+  }
+
+  // ==================== PAGE 4: VECTOR RADAR CHART (TOP 8) ====================
+  {
+    const { page, y: startY } = initPage(4, 'Interest Profile - Top 8 Clusters Radar');
+    let y = startY;
+
+    y = drawHeading(page, y, 'Multidimensional Competency Radar');
+    y = drawPara(page, y, 'The radar chart below maps your top eight scoring Commerce clusters simultaneously. Vertices extending furthest toward the perimeter represent your strongest natural career anchors.');
+
+    // Draw Vector Radar Chart
+    const cx = W / 2;
+    const cy = y - 135;
+    const maxR = 98;
+    const n = report.top8.length;
+
+    // Concentric grid rings (25%, 50%, 75%, 100%)
+    [0.25, 0.5, 0.75, 1.0].forEach((scale) => {
+      const r = maxR * scale;
+      for (let i = 0; i < n; i++) {
+        const a1 = (Math.PI * 2 * i) / n - Math.PI / 2;
+        const a2 = (Math.PI * 2 * ((i + 1) % n)) / n - Math.PI / 2;
+        page.drawLine({
+          start: { x: cx + r * Math.cos(a1), y: cy + r * Math.sin(a1) },
+          end: { x: cx + r * Math.cos(a2), y: cy + r * Math.sin(a2) },
+          thickness: 0.6, color: C.border,
+        });
+      }
+    });
+
+    // Axes & Labels
+    const pts: Array<{ x: number; y: number }> = [];
+    report.top8.forEach((c, i) => {
+      const angle = (Math.PI * 2 * i) / n - Math.PI / 2;
+      const ax = cx + maxR * Math.cos(angle);
+      const ay = cy + maxR * Math.sin(angle);
+      page.drawLine({ start: { x: cx, y: cy }, end: { x: ax, y: ay }, thickness: 0.6, color: C.border });
+
+      const vr = maxR * (c.percentage / 100);
+      pts.push({ x: cx + vr * Math.cos(angle), y: cy + vr * Math.sin(angle) });
+
+      const lbl = clean(c.cluster.length > 20 ? c.cluster.slice(0, 18) + '..' : c.cluster);
+      const lx = cx + (maxR + 18) * Math.cos(angle);
+      const ly = cy + (maxR + 14) * Math.sin(angle);
+      const lw = fontBold.widthOfTextAtSize(lbl, 7.5);
+      page.drawText(lbl, { x: lx - lw / 2, y: ly - 3, size: 7.5, font: fontBold, color: C.navy });
+    });
+
+    // Data Polygon Edges & Points
+    for (let i = 0; i < pts.length; i++) {
+      const p1 = pts[i];
+      const p2 = pts[(i + 1) % pts.length];
+      page.drawLine({ start: p1, end: p2, thickness: 2.2, color: C.blue });
+    }
+    pts.forEach((p) => {
+      page.drawCircle({ x: p.x, y: p.y, size: 3.5, color: C.blue });
+    });
+
+    y = cy - maxR - 36;
+
+    // Top 6 Vertex Summary Table
+    y = drawHeading(page, y, 'Top 6 Radar Vertices Summary');
+    y = drawClusterTable(page, y, report.top8.slice(0, 6));
+  }
+
+  // ==================== PAGE 5: COMPLETE 19-CLUSTER SPECTRUM ====================
+  {
+    const { page, y: startY } = initPage(5, 'Interest Level Graph - Complete 19-Cluster Spectrum');
+    let y = startY;
+
+    y = drawHeading(page, y, 'All 19 Commerce Clusters Ranked by Affinity');
+    y = drawHorizBars(
+      page, y - 4,
+      report.sortedClusters.map((c) => ({
+        label: `#${c.rank}  ${c.cluster} (${c.domain})`,
+        pct: c.percentage,
+        sub: `${c.rawScore}/20`,
+        level: c.level,
+      })),
+      7.5, 22
+    );
+  }
+
+  // ==================== PAGE 6: DESCRIPTORS & NON-FINANCIAL BREAKDOWN ====================
+  {
+    const { page, y: startY } = initPage(6, 'Interest Level Descriptors & Non-Financial Analysis');
+    let y = startY;
+
+    y = drawHeading(page, y, 'Interest Level Descriptors');
+    LEVEL_DESCRIPTORS.forEach((d) => {
+      const col = levelColors(d.level);
+      const lines = wrapText(d.description, font, 8.2, CW - 92);
+      const boxH = Math.max(44, lines.length * 11.5 + 14);
+      page.drawRectangle({ x: M, y: y - boxH, width: CW, height: boxH, color: col.bg, borderColor: col.fg, borderWidth: 0.6 });
+      drawBadge(page, M + 10, y - 22, d.level);
+      let ty = y - 14;
+      lines.forEach((l) => {
+        page.drawText(l, { x: M + 74, y: ty, size: 8.2, font, color: C.slate });
+        ty -= 11.5;
+      });
+      y -= boxH + 8;
+    });
+
+    y -= 6;
+    y = drawHeading(page, y, 'Non-Financial Domain Breakdown (Top 8 Clusters)');
+    drawHorizBars(
+      page, y - 4,
+      report.nonFinancialClusters.slice(0, 8).map((c) => ({
+        label: c.cluster, pct: c.percentage, sub: `${c.rawScore}/20`, level: c.level, color: C.green,
+      })),
+      8, 22
+    );
+  }
+
+  // ==================== PAGES 7-9: CLUSTER TABLES PARTS 1-3 ====================
+  const pageConfigs = [
+    {
+      pg: 7,
+      title: 'Career Clusters & Options (Part 1 of 4)',
+      sub: 'Clusters 1 to 5 - Quantitative & Digital Foundations',
+      slice: report.allClustersInOrder.slice(0, 5),
+      noteTitle: 'Pathway Note - Quantitative vs. Digital Media',
+      noteBody: 'Students scoring High in Accounts/Taxation and Financial Auditing thrive in Chartered Accountancy (CA), CMA, and Forensic Accounting, while high scorers in Analytics and Computer Designing excel in Business Intelligence and UI/UX Product roles.',
+    },
+    {
+      pg: 8,
+      title: 'Career Clusters & Options (Part 2 of 4)',
+      sub: 'Clusters 6 to 10 - Institutional Finance & Service Operations',
+      slice: report.allClustersInOrder.slice(5, 10),
+      noteTitle: 'Pathway Note - Capital Markets & Institutional Finance',
+      noteBody: 'High scores across Banking, Credit Management, and Financial Management align strongly with B.Com (Hons), BBA (Finance), BA (Hons) Economics, and global credentials such as CFA and FRM.',
+    },
+    {
+      pg: 9,
+      title: 'Career Clusters & Options (Part 3 of 4)',
+      sub: 'Clusters 11 to 15 - Regulatory, Creative & Linguistic Tracks',
+      slice: report.allClustersInOrder.slice(10, 15),
+      noteTitle: 'Pathway Note - Law, Journalism & Design',
+      noteBody: 'Commerce students with strong Law affinities frequently pair B.Com/BBA with LLB (5-year integrated law via CLAT) or pursue Company Secretaryship (CS) to lead corporate governance and regulatory compliance.',
+    },
+  ];
+
+  pageConfigs.forEach((cfg) => {
+    const { page, y: startY } = initPage(cfg.pg, cfg.title);
+    let y = startY;
+    y = drawHeading(page, y, cfg.sub);
+    y = drawClusterTable(page, y, cfg.slice);
+    drawInsight(page, y - 4, cfg.noteTitle, cfg.noteBody);
+  });
+
+  // ==================== PAGE 10: CLUSTERS PART 4 & ACTION PLAN ====================
+  {
+    const { page, y: startY } = initPage(10, 'Career Clusters (Part 4 of 4) & Action Plan');
+    let y = startY;
+
+    y = drawHeading(page, y, 'Clusters 16 to 19 - Management, Social Sciences, Education & Trading');
+    y = drawClusterTable(page, y, report.allClustersInOrder.slice(15, 19));
+    y -= 4;
+
+    y = drawHeading(page, y, `Actions & Next Steps for ${report.student.name}`);
+    y = drawPara(
+      page, y,
+      `Focus primarily on the clusters marked HIGH - specifically ${report.top3.map((x) => x.cluster).join(', ')}. Execute the three-step academic roadmap below:`
+    );
+    y -= 4;
+
+    const actions = [
+      { n: '1', t: 'Shortlist Top Clusters', d: `Prioritize ${report.top3[0].cluster} (${report.top3[0].percentage}%) and ${report.top3[1].cluster} (${report.top3[1].percentage}%) for your UG specialization.` },
+      { n: '2', t: 'Counselor Review', d: `Map entrance exams (CUET, IPMAT, CLAT, CA/CS Foundation) aligned with your ${report.preferredDomain}.` },
+      { n: '3', t: 'Skill & Certifications', d: 'Pair your degree with practical internships and certifications targeting your High-level clusters.' },
+    ];
+    const aw = (CW - 16) / 3;
+    actions.forEach((a, i) => {
+      const ax = M + i * (aw + 8);
+      page.drawRectangle({ x: ax, y: y - 82, width: aw, height: 82, color: C.cream, borderColor: C.border, borderWidth: 0.7 });
+      page.drawRectangle({ x: ax, y: y - 4, width: aw, height: 4, color: C.green });
+      page.drawText(`${a.n}. ${a.t}`, { x: ax + 8, y: y - 20, size: 8.5, font: fontBold, color: C.navy });
+      const lines = wrapText(a.d, font, 7.6, aw - 16);
+      let dy = y - 34;
+      lines.forEach((l) => {
+        page.drawText(l, { x: ax + 8, y: dy, size: 7.6, font, color: C.slate });
+        dy -= 10.5;
+      });
+    });
+    y -= 94;
+
+    drawInsight(
+      page, y,
+      'Final Counselor Summary',
+      `${report.student.name}'s highest career sustainability lies at the intersection of ${report.top3[0].cluster} and ${report.top3[1].cluster}. Revisit this report every 6 months to track academic milestones.`
+    );
+  }
+
+  return pdf.save();
+}
+5. Backend API Route (src/app/api/reports/commerce-pdf/route.ts)
+TypeScript
+import { NextRequest, NextResponse } from 'next/server';
+import { calculateCommerceResults } from '@/lib/tests/commerce/scoring';
+import { generateCommercePdf } from '@/lib/tests/commerce/pdfGenerator';
+import { BrandingConfig, StudentInfo } from '@/lib/tests/commerce/types';
+
+export async function POST(req: NextRequest) {
+  try {
+    const body = (await req.json()) as {
+      student: StudentInfo;
+      answers: Array<number | null>;
+      branding?: BrandingConfig;
+    };
+
+    if (!body?.student?.name || !Array.isArray(body?.answers)) {
+      return NextResponse.json({ error: 'Invalid payload: student and answers are required.' }, { status: 400 });
+    }
+
+    const report = calculateCommerceResults(body.student, body.answers);
+    const pdfBytes = await generateCommercePdf(report, body.branding);
+
+    const safeName = body.student.name.replace(/[^a-zA-Z0-9_-]/g, '_');
+
+    return new NextResponse(Buffer.from(pdfBytes), {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': `attachment; filename="Commerce_Career_Report_${safeName}.pdf"`,
+        'Cache-Control': 'no-store',
+      },
+    });
+  } catch (err) {
+    console.error('PDF generation failed:', err);
+    return NextResponse.json({ error: 'Failed to generate PDF report.' }, { status: 500 });
+  }
+}
+6. React + TypeScript Frontend Component (src/components/tests/CommerceTestRunner.tsx)
+TypeScript
+'use client';
+
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import confetti from 'canvas-confetti';
+import { Download, ArrowLeft, CheckCircle2, Award, Sparkles, ShieldCheck } from 'lucide-react';
+import { LEVEL_DESCRIPTORS, LIKERT_OPTIONS, QUESTIONS } from '@/lib/tests/commerce/data';
+import { calculateCommerceResults } from '@/lib/tests/commerce/scoring';
+import { BrandingConfig, CommerceReportResult, InterestLevel, StudentInfo } from '@/lib/tests/commerce/types';
+
+interface CommerceTestRunnerProps {
+  branding?: BrandingConfig;
+  onComplete?: (result: CommerceReportResult, answers: number[]) => void;
+}
+
+type ScreenState = 'form' | 'quiz' | 'report';
+
+const BADGE_STYLES: Record<InterestLevel, string> = {
+  High: 'bg-emerald-50 text-emerald-700 border-emerald-500',
+  Medium: 'bg-amber-50 text-amber-700 border-amber-500',
+  Low: 'bg-rose-50 text-rose-700 border-rose-500',
+};
+
+const BAR_GRADIENTS = [
+  'from-blue-700 to-blue-500',
+  'from-rose-700 to-rose-500',
+  'from-amber-700 to-amber-500',
+  'from-emerald-700 to-emerald-500',
+];
+
+export default function CommerceTestRunner({ branding, onComplete }: CommerceTestRunnerProps) {
+  const [screen, setScreen] = useState<ScreenState>('form');
+  const [student, setStudent] = useState<StudentInfo>({ name: '', email: '', phone: '' });
+  const [answers, setAnswers] = useState<Array<number | null>>(() => new Array(QUESTIONS.length).fill(null));
+  const [qi, setQi] = useState(0);
+  const [busy, setBusy] = useState(false);
+  const [downloadingPdf, setDownloadingPdf] = useState(false);
+  const [report, setReport] = useState<CommerceReportResult | null>(null);
+
+  const answeredCount = useMemo(() => answers.filter((a) => a !== null).length, [answers]);
+  const progressPct = Math.round((answeredCount / QUESTIONS.length) * 100);
+  const CIRC = 2 * Math.PI * 52;
+
+  const finalizeReport = useCallback(
+    (stu: StudentInfo, finalAnswers: Array<number | null>) => {
+      const res = calculateCommerceResults(stu, finalAnswers);
+      setReport(res);
+      setScreen('report');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      confetti({ particleCount: 90, spread: 70, origin: { y: 0.6 }, colors: ['#2563EB', '#0EA5E9', '#10B981', '#F59E0B'] });
+      if (onComplete) {
+        onComplete(res, finalAnswers.map((a) => a ?? 0));
+      }
+    },
+    [onComplete]
+  );
+
+  const handleStart = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!student.name.trim() || !student.email.trim() || !student.phone.trim()) {
+      alert('Please fill in your Name, Email, and Mobile Number.');
+      return;
+    }
+    setAnswers(new Array(QUESTIONS.length).fill(null));
+    setQi(0);
+    setScreen('quiz');
+    window.scrollTo(0, 0);
+  };
+
+  const handleSimulate = () => {
+    const simStudent: StudentInfo = {
+      name: student.name.trim() || 'Aarav Sharma',
+      email: student.email.trim() || 'aarav.sharma@example.com',
+      phone: student.phone.trim() || '98765 43210',
+    };
+    const pattern = [
+      5,4,5,4, 5,5,4,5, 2,3,2,3, 3,3,2,3, 4,5,4,4, 3,4,3,4, 5,4,4,5, 4,5,4,5,
+      3,4,4,3, 2,3,2,2, 2,2,3,2, 3,2,3,2, 3,4,3,3, 2,3,2,3, 4,5,4,5, 5,5,4,4,
+      3,4,3,3, 3,4,3,4, 4,5,4,5,
+    ];
+    const simAnswers = QUESTIONS.map((_, idx) => pattern[idx % pattern.length]);
+    setStudent(simStudent);
+    setAnswers(simAnswers);
+    finalizeReport(simStudent, simAnswers);
+  };
+
+  const handlePick = useCallback(
+    (optionIdx: number) => {
+      if (busy || qi >= QUESTIONS.length) return;
+      setBusy(true);
+      const nextAnswers = [...answers];
+      nextAnswers[qi] = optionIdx + 1;
+      setAnswers(nextAnswers);
+
+      setTimeout(() => {
+        setBusy(false);
+        if (qi + 1 >= QUESTIONS.length) {
+          finalizeReport(student, nextAnswers);
+        } else {
+          setQi((prev) => prev + 1);
+        }
+      }, 280);
+    },
+    [answers, busy, finalizeReport, qi, student]
+  );
+
+  const handleBack = useCallback(() => {
+    if (busy || qi === 0) return;
+    setQi((prev) => prev - 1);
+  }, [busy, qi]);
+
+  // Keyboard shortcuts (1-5 to answer, Left/Backspace to go back) + Anti-Copy
+  useEffect(() => {
+    if (screen !== 'quiz') return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && ['c', 'x', 'u', 's', 'a'].includes(e.key.toLowerCase())) {
+        e.preventDefault();
+        return;
+      }
+      if (e.key >= '1' && e.key <= '5' && qi < QUESTIONS.length) {
+        handlePick(Number(e.key) - 1);
+      } else if (e.key === 'ArrowLeft' || e.key === 'Backspace') {
+        e.preventDefault();
+        handleBack();
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [screen, qi, handlePick, handleBack]);
+
+  // Download Backend pdf-lib A4 PDF
+  const handleDownloadPdf = async () => {
+    setDownloadingPdf(true);
+    try {
+      const res = await fetch('/api/reports/commerce-pdf', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ student, answers, branding }),
+      });
+      if (!res.ok) throw new Error('PDF generation failed');
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Commerce_Career_Report_${student.name.replace(/\s+/g, '_')}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      alert('Could not download PDF. Please ensure /api/reports/commerce-pdf is running.');
+    } finally {
+      setDownloadingPdf(false);
+    }
+  };
+
+  // ==================== SCREEN 1: REGISTRATION ====================
+  if (screen === 'form') {
+    return (
+      <div className="min-h-screen bg-[#FAF5EC] py-10 px-4 text-slate-800">
+        <form
+          onSubmit={handleStart}
+          className="max-w-2xl mx-auto bg-white/95 backdrop-blur-md rounded-3xl p-8 md:p-10 shadow-xl border border-amber-100"
+        >
+          <h1 className="font-serif text-3xl md:text-4xl font-bold text-slate-900">
+            Commerce Career{' '}
+            <span className="bg-gradient-to-r from-blue-600 via-sky-500 to-emerald-500 bg-clip-text text-transparent">
+              Selector
+            </span>
+          </h1>
+          <div className="w-20 h-1.5 rounded-full bg-gradient-to-r from-blue-600 to-emerald-500 my-3" />
+          <p className="text-slate-500 mb-5">
+            Discover which Commerce career cluster — financial or non-financial — matches your interests best.
+          </p>
+
+          <div className="flex flex-wrap gap-2 mb-6">
+            {['76 Questions', '~20 Minutes', '19 Career Clusters', '10-Page A4 PDF Report'].map((chip) => (
+              <span
+                key={chip}
+                className="bg-blue-50 text-blue-700 border border-blue-200 text-xs font-semibold px-3 py-1 rounded-full"
+              >
+                {chip}
+              </span>
+            ))}
+          </div>
+
+          <div className="bg-[#FDFBF6] border border-[#E7E0D2] border-l-4 border-l-blue-600 rounded-xl p-4 mb-6 text-sm text-slate-700">
+            <strong className="block text-slate-900 mb-1">How to answer</strong>
+            Rate how strongly you agree with each statement from <strong>Strongly Disagree</strong> to{' '}
+            <strong>Strongly Agree</strong>. Selecting an option automatically saves and advances.
+          </div>
+
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-1">Student Name</label>
+              <input
+                type="text"
+                required
+                value={student.name}
+                onChange={(e) => setStudent({ ...student, name: e.target.value })}
+                placeholder="e.g. Aarav Sharma"
+                className="w-full px-4 py-3 rounded-xl border-2 border-[#E7E0D2] focus:border-blue-600 focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-1">Email Address</label>
+              <input
+                type="email"
+                required
+                value={student.email}
+                onChange={(e) => setStudent({ ...student, email: e.target.value })}
+                placeholder="you@example.com"
+                className="w-full px-4 py-3 rounded-xl border-2 border-[#E7E0D2] focus:border-blue-600 focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-1">Mobile Number</label>
+              <input
+                type="tel"
+                required
+                value={student.phone}
+                onChange={(e) => setStudent({ ...student, phone: e.target.value })}
+                placeholder="e.g. 98765 43210"
+                className="w-full px-4 py-3 rounded-xl border-2 border-[#E7E0D2] focus:border-blue-600 focus:outline-none"
+              />
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center justify-between gap-4 mt-7">
+            <button
+              type="submit"
+              className="px-7 py-3.5 rounded-xl bg-gradient-to-r from-blue-600 to-sky-500 text-white font-semibold shadow-lg hover:-translate-y-0.5 transition"
+            >
+              Start Assessment →
+            </button>
+            <button
+              type="button"
+              onClick={handleSimulate}
+              className="px-4 py-2.5 rounded-xl border border-dashed border-slate-400 text-slate-600 text-xs font-semibold hover:border-blue-600 hover:text-blue-600 transition"
+            >
+              Quick-Fill &amp; Test Report
+            </button>
+          </div>
+        </form>
+      </div>
+    );
+  }
+
+  // ==================== SCREEN 2: SEAMLESS QUIZ ====================
+  if (screen === 'quiz') {
+    const q = QUESTIONS[qi];
+    return (
+      <div
+        className="min-h-screen bg-[#FAF5EC] py-8 px-4 select-none"
+        onContextMenu={(e) => e.preventDefault()}
+        onCopy={(e) => e.preventDefault()}
+      >
+        <div className="max-w-3xl mx-auto">
+          {/* Header with Progress Ring */}
+          <div className="flex items-center gap-4 mb-4">
+            <div className="relative w-[72px] h-[72px] shrink-0">
+              <svg viewBox="0 0 120 120" className="w-full h-full -rotate-90">
+                <circle cx="60" cy="60" r="52" fill="none" stroke="#E7E0D2" strokeWidth="8" />
+                <circle
+                  cx="60"
+                  cy="60"
+                  r="52"
+                  fill="none"
+                  stroke="#2563EB"
+                  strokeWidth="8"
+                  strokeLinecap="round"
+                  strokeDasharray={CIRC}
+                  strokeDashoffset={CIRC * (1 - answeredCount / QUESTIONS.length)}
+                  className="transition-all duration-300"
+                />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center font-bold text-sm text-slate-900">
+                {progressPct}%
+              </div>
+            </div>
+            <div className="flex-1">
+              <div className="font-serif font-bold text-lg text-slate-900">Commerce Aptitude Test</div>
+              <div className="text-sm text-slate-500">
+                {answeredCount} / {QUESTIONS.length} answered
+              </div>
+            </div>
+            <span className="hidden sm:inline-block bg-blue-50 text-blue-700 border border-blue-200 text-xs font-bold px-3.5 py-1.5 rounded-full">
+              {student.name}
+            </span>
+          </div>
+
+          {/* Real-Time Progress Bar & Milestone Badges */}
+          <div className="bg-white rounded-2xl border border-[#E7E0D2] p-4 mb-5 shadow-sm">
+            <div className="flex justify-between text-xs font-bold text-slate-800 mb-2">
+              <span>Test Completion Progress</span>
+              <span>
+                {progressPct}% Completed ({answeredCount}/{QUESTIONS.length})
+              </span>
+            </div>
+            <div className="w-full h-2.5 bg-[#EDE7DA] rounded-full overflow-hidden">
+              <div
+                className="h-full bg-gradient-to-r from-blue-600 via-sky-500 to-emerald-500 transition-all duration-300"
+                style={{ width: `${progressPct}%` }}
+              />
+            </div>
+            <div className="flex flex-wrap gap-2 mt-3 min-h-[24px]">
+              {progressPct >= 25 && (
+                <span className="inline-flex items-center gap-1 text-xs font-bold px-3 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                  <Award className="w-3.5 h-3.5" /> Quarter Completed (25%)
+                </span>
+              )}
+              {progressPct >= 50 && (
+                <span className="inline-flex items-center gap-1 text-xs font-bold px-3 py-0.5 rounded-full bg-amber-100 text-amber-800">
+                  <Award className="w-3.5 h-3.5" /> Half Completed (50%)
+                </span>
+              )}
+              {progressPct >= 75 && (
+                <span className="inline-flex items-center gap-1 text-xs font-bold px-3 py-0.5 rounded-full bg-indigo-100 text-indigo-800">
+                  <Award className="w-3.5 h-3.5" /> Three-Quarter Completed (75%)
+                </span>
+              )}
+              {progressPct === 100 && (
+                <span className="inline-flex items-center gap-1 text-xs font-bold px-3 py-0.5 rounded-full bg-green-100 text-green-800">
+                  <Sparkles className="w-3.5 h-3.5" /> Test Completed (100%)
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Question Card */}
+          <div className="bg-white/95 rounded-3xl p-6 md:p-9 shadow-xl border border-white">
+            <div className="flex justify-between items-center mb-4">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-blue-700 bg-blue-50 border border-blue-200 px-3 py-1 rounded-full">
+                Rate Yourself
+              </span>
+              <span className="text-xs font-semibold text-slate-500">
+                Question {qi + 1} of {QUESTIONS.length}
+              </span>
+            </div>
+
+            <h2 className="font-serif text-xl md:text-2xl font-semibold text-slate-900 mb-6 leading-snug">
+              {q.text}
+            </h2>
+
+            <div className="space-y-2.5">
+              {LIKERT_OPTIONS.map((label, idx) => {
+                const selected = answers[qi] === idx + 1;
+                return (
+                  <button
+                    key={label}
+                    type="button"
+                    onClick={() => handlePick(idx)}
+                    className={`w-full flex items-center gap-3.5 px-4 py-3.5 rounded-2xl border-2 text-left font-semibold transition-all ${
+                      selected
+                        ? 'bg-gradient-to-r from-blue-600 to-sky-500 text-white border-transparent shadow-md translate-x-1.5'
+                        : 'bg-[#FDFBF7] border-[#E7E0D2] text-slate-700 hover:border-blue-500 hover:bg-blue-50 hover:text-blue-700'
+                    }`}
+                  >
+                    <span
+                      className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold shrink-0 ${
+                        selected ? 'bg-white/25 text-white' : 'bg-[#EDE7DA] text-slate-700'
+                      }`}
+                    >
+                      {idx + 1}
+                    </span>
+                    <span>{label}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="flex items-center justify-between mt-6 pt-4 border-t border-slate-100">
+              <button
+                type="button"
+                onClick={handleBack}
+                disabled={qi === 0}
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border-2 border-[#E7E0D2] text-slate-600 font-semibold text-sm hover:border-blue-600 hover:text-blue-600 disabled:invisible"
+              >
+                <ArrowLeft className="w-4 h-4" /> Previous
+              </button>
+              <span className="text-xs font-semibold text-slate-400">
+                Keys 1–5 to answer · Auto-advances on selection
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ==================== SCREEN 3: COLORFUL INTERACTIVE REPORT ====================
+  if (!report) return null;
+
+  return (
+    <div className="min-h-screen bg-[#FAF5EC] py-8 px-4 text-slate-800">
+      <div className="max-w-5xl mx-auto space-y-6">
+        {/* Sticky Download Toolbar */}
+        <div className="sticky top-3 z-30 flex flex-wrap items-center justify-between gap-4 bg-white/95 backdrop-blur-md border border-[#E7E0D2] rounded-2xl px-5 py-3.5 shadow-lg">
+          <div className="flex items-center gap-3">
+            <ShieldCheck className="w-6 h-6 text-blue-600" />
+            <div>
+              <div className="font-bold text-slate-900 text-sm md:text-base">
+                {branding?.clientName || 'Commerce Career Selector'} — Complete Report
+              </div>
+              <div className="text-xs text-slate-500">
+                10-Page A4 PDF generated via backend <code className="font-mono">pdf-lib</code>
+              </div>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={handleDownloadPdf}
+            disabled={downloadingPdf}
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-sky-500 text-white font-semibold text-sm shadow-md hover:opacity-95 disabled:opacity-60 transition"
+          >
+            <Download className="w-4 h-4" />
+            {downloadingPdf ? 'Generating A4 PDF...' : 'Download 10-Page A4 PDF'}
+          </button>
+        </div>
+
+        {/* Section 1: Cover & Executive KPIs */}
+        <section className="bg-white rounded-2xl border border-[#E7E0D2] p-6 md:p-8 shadow-sm space-y-6">
+          <div className="flex flex-wrap items-center justify-between gap-4 border-b-2 border-blue-600 pb-4">
+            <div className="flex items-center gap-4">
+              {branding?.logoUrl && (
+                <img src={branding.logoUrl} alt="Client Logo" className="max-h-16 w-auto object-contain" />
+              )}
+              <div>
+                <div className="font-serif text-2xl font-bold text-slate-900">
+                  {branding?.clientName || 'Commerce Career Selector'}
+                </div>
+                <div className="text-xs font-bold uppercase tracking-wider text-blue-600">
+                  Psychometric Career Assessment &amp; Counseling Report
+                </div>
+              </div>
+            </div>
+            <div className="text-right text-xs font-semibold text-slate-500">
+              <div>REPORT ID: {report.reportId}</div>
+              <div className="text-blue-600">VALIDATED ASSESSMENT</div>
+            </div>
+          </div>
+
+          <div className="bg-gradient-to-r from-blue-50 to-slate-50 border border-blue-200 border-l-4 border-l-blue-600 rounded-xl p-5">
+            <h1 className="font-serif text-2xl md:text-3xl font-bold text-slate-900 mb-1">{report.student.name}</h1>
+            <div className="flex flex-wrap gap-x-6 gap-y-1 text-xs font-semibold text-slate-500">
+              <span>DATE: <strong className="text-slate-900">{report.dateFormatted}</strong></span>
+              <span>PHONE: <strong className="text-slate-900">{report.student.phone}</strong></span>
+              <span>EMAIL: <strong className="text-slate-900">{report.student.email}</strong></span>
+              <span>COMPLETED: <strong className="text-slate-900">{report.answeredCount}/{report.totalQuestions}</strong></span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="bg-[#FAF8F2] border border-[#E7E0D2] border-t-4 border-t-blue-600 rounded-xl p-4 text-center">
+              <div className="font-serif text-2xl font-bold text-blue-600">{report.preferredDomain.split(' ')[0]}</div>
+              <div className="text-[11px] font-bold uppercase text-slate-500 mt-1">Preferred Domain</div>
+              <div className="text-xs text-slate-600">{Math.max(report.financialPct, report.nonFinancialPct)}% Share</div>
+            </div>
+            <div className="bg-[#FAF8F2] border border-[#E7E0D2] border-t-4 border-t-emerald-500 rounded-xl p-4 text-center">
+              <div className="font-serif text-2xl font-bold text-emerald-600">{report.top3[0].percentage}%</div>
+              <div className="text-[11px] font-bold uppercase text-slate-500 mt-1">Peak Cluster</div>
+              <div className="text-xs text-slate-600 truncate">{report.top3[0].cluster}</div>
+            </div>
+            <div className="bg-[#FAF8F2] border border-[#E7E0D2] border-t-4 border-t-indigo-500 rounded-xl p-4 text-center">
+              <div className="font-serif text-2xl font-bold text-indigo-600">{report.overallIndexPct}%</div>
+              <div className="text-[11px] font-bold uppercase text-slate-500 mt-1">Overall Index</div>
+              <div className="text-xs text-slate-600">{report.totalRawScore} / 380 Pts</div>
+            </div>
+            <div className="bg-[#FAF8F2] border border-[#E7E0D2] border-t-4 border-t-amber-500 rounded-xl p-4 text-center">
+              <div className="font-serif text-2xl font-bold text-amber-600">{report.highCount} / 19</div>
+              <div className="text-[11px] font-bold uppercase text-slate-500 mt-1">High-Tier Clusters</div>
+              <div className="text-xs text-slate-600">Primary Matches</div>
+            </div>
+          </div>
+        </section>
+
+        {/* Section 2: Financial vs Non-Financial Split */}
+        <section className="bg-white rounded-2xl border border-[#E7E0D2] p-6 md:p-8 shadow-sm space-y-5">
+          <h2 className="font-serif text-xl font-bold text-slate-900 border-l-4 border-blue-600 pl-3">
+            Your Preferred Domain — Financial vs. Non-Financial
+          </h2>
+          <div className="w-full h-10 rounded-xl overflow-hidden flex font-bold text-xs md:text-sm text-white shadow-inner">
+            <div
+              className="bg-blue-600 flex items-center justify-center transition-all"
+              style={{ width: `${report.financialPct}%` }}
+            >
+              Financial {report.financialPct}%
+            </div>
+            <div
+              className="bg-emerald-500 flex items-center justify-center transition-all"
+              style={{ width: `${report.nonFinancialPct}%` }}
+            >
+              Non-Financial {report.nonFinancialPct}%
+            </div>
+          </div>
+          <p className="text-sm text-slate-600">
+            <strong>{report.student.name}</strong>, your responses indicate primary alignment with the{' '}
+            <strong className="text-blue-700">{report.preferredDomain}</strong>.
+          </p>
+        </section>
+
+        {/* Section 3: Complete 19-Cluster Spectrum */}
+        <section className="bg-white rounded-2xl border border-[#E7E0D2] p-6 md:p-8 shadow-sm space-y-4">
+          <h2 className="font-serif text-xl font-bold text-slate-900 border-l-4 border-blue-600 pl-3">
+            Interest Level Spectrum — All 19 Clusters
+          </h2>
+          <div className="bg-[#FAF8F2] border border-[#EDE7DA] rounded-xl p-5 space-y-3">
+            {report.sortedClusters.map((c, idx) => (
+              <div key={c.cluster}>
+                <div className="flex justify-between items-center text-xs md:text-sm font-semibold mb-1">
+                  <span className="text-slate-800">
+                    #{c.rank} {c.cluster}{' '}
+                    <span className="text-slate-400 font-normal">({c.domain})</span>
+                  </span>
+                  <span className="flex items-center gap-2">
+                    <span>{c.percentage}%</span>
+                    <span className={`text-[10px] uppercase px-2 py-0.5 rounded-full border font-bold ${BADGE_STYLES[c.level]}`}>
+                      {c.level}
+                    </span>
+                  </span>
+                </div>
+                <div className="w-full h-2.5 bg-[#EDE7DA] rounded-full overflow-hidden">
+                  <div
+                    className={`h-full rounded-full bg-gradient-to-r ${BAR_GRADIENTS[idx % 4]}`}
+                    style={{ width: `${c.percentage}%` }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Section 4: Interest Level Descriptors */}
+        <section className="bg-white rounded-2xl border border-[#E7E0D2] p-6 md:p-8 shadow-sm space-y-4">
+          <h2 className="font-serif text-xl font-bold text-slate-900 border-l-4 border-blue-600 pl-3">
+            Interest Level Descriptors
+          </h2>
+          <div className="space-y-3">
+            {LEVEL_DESCRIPTORS.map((d) => (
+              <div key={d.level} className="flex flex-col sm:flex-row gap-3 p-4 rounded-xl border border-[#E7E0D2] bg-[#FAF8F2]">
+                <div className="sm:w-32 shrink-0">
+                  <span className={`inline-block text-xs uppercase px-3 py-1 rounded-full border font-bold ${BADGE_STYLES[d.level]}`}>
+                    {d.label}
+                  </span>
+                </div>
+                <p className="text-sm text-slate-700 leading-relaxed">{d.description}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Section 5: Complete Career Clusters & Action Plan */}
+        <section className="bg-white rounded-2xl border border-[#E7E0D2] p-6 md:p-8 shadow-sm space-y-6">
+          <h2 className="font-serif text-xl font-bold text-slate-900 border-l-4 border-blue-600 pl-3">
+            Career Clusters &amp; Options
+          </h2>
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse text-sm">
+              <thead>
+                <tr className="bg-slate-900 text-white text-xs uppercase">
+                  <th className="p-3 text-left">Career Cluster</th>
+                  <th className="p-3 text-left">Score</th>
+                  <th className="p-3 text-center">Level</th>
+                  <th className="p-3 text-left">Career Options</th>
+                </tr>
+              </thead>
+              <tbody>
+                {report.allClustersInOrder.map((c, idx) => (
+                  <tr key={c.cluster} className={idx % 2 === 1 ? 'bg-[#FAF8F2]' : 'bg-white'}>
+                    <td className="p-3 border border-[#E7E0D2] font-semibold text-slate-900">
+                      {c.cluster}
+                      <div className="text-[11px] text-slate-500 font-normal">
+                        Rank #{c.rank} · {c.domain}
+                      </div>
+                    </td>
+                    <td className="p-3 border border-[#E7E0D2] font-bold text-slate-800 whitespace-nowrap">
+                      {c.percentage}% ({c.rawScore}/20)
+                    </td>
+                    <td className="p-3 border border-[#E7E0D2] text-center">
+                      <span className={`text-[10px] uppercase px-2.5 py-0.5 rounded-full border font-bold ${BADGE_STYLES[c.level]}`}>
+                        {c.level}
+                      </span>
+                    </td>
+                    <td className="p-3 border border-[#E7E0D2] text-slate-700">{c.roles.join(', ')}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="bg-blue-50 border border-blue-200 border-l-4 border-l-blue-600 rounded-xl p-5 flex gap-3 items-start">
+            <CheckCircle2 className="w-6 h-6 text-blue-600 shrink-0 mt-0.5" />
+            <div>
+              <h3 className="font-bold text-blue-800 text-sm mb-1">Actions &amp; Next Steps for {report.student.name}</h3>
+              <p className="text-sm text-slate-700">
+                Prioritize your High-level clusters — <strong>{report.top3.map((c) => c.cluster).join(', ')}</strong>.
+                Download the 10-page A4 PDF above to review your full radar geometry, domain breakdown, and 3-step counselor roadmap.
+              </p>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  );
+}
+Key Architectural Advantages
+Single Source of Truth: calculateCommerceResults() in scoring.ts powers both the React UI and the pdf-lib backend, guaranteeing identical scores, rankings, and High/Medium/Low tiers.
+
+Zero Browser Print Issues: Because pdf-lib builds the 10-page A4 PDF directly on the backend with vector charts and exact point coordinates, there is zero risk of browser print-dialog clipping, blank spillover pages, or missing Canvas graphics.
+
+Lightweight on AWS EC2: Unlike Puppeteer/Playwright, pdf-lib requires no headless Chrome binary and uses minimal RAM, keeping your server costs at zero.

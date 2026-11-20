@@ -65,7 +65,7 @@ export interface ReportPdfData {
   platform: string
   reportId: string
   student: { name: string; email: string; phone?: string | null }
-  assessment: { title: string; purpose?: string; category?: string; description?: string }
+  assessment: { title: string; slug?: string; purpose?: string; category?: string; description?: string }
   attempt: { startedAt?: string; completedAt?: string }
   score: {
     dimensions: any[]
@@ -75,9 +75,29 @@ export interface ReportPdfData {
     domainBreakdown?: any[]
   }
   interpretation?: string
+  // Raw answers (question orderIndex -> selected option label) for assessments
+  // whose bespoke PDF renderer recomputes from source (e.g. commerce-branch).
+  answers?: Record<number, string>
 }
 
 export async function generateReportPdf(data: ReportPdfData, id: string): Promise<Buffer> {
+  // Commerce Career Selector: delegate to the bespoke 10-page pdf-lib renderer.
+  // It recomputes the full CommerceReportResult (clusters, domain split, tiers)
+  // from the raw answers + student info, which the generic renderer cannot
+  // express. Auth/payment gating stays in the download route that calls this.
+  const slug = data.assessment.slug || ''
+  if (slug === 'commerce-branch' && data.answers) {
+    const { calculateCommerceResults, answersMapToLikertArray } = await import('@/lib/tests/commerce/scoring')
+    const { generateCommercePdf } = await import('@/lib/tests/commerce/pdfGenerator')
+    const arr = answersMapToLikertArray(data.answers)
+    const result = calculateCommerceResults(
+      { name: data.student.name || 'Candidate', email: data.student.email || '', phone: data.student.phone || '' },
+      arr,
+    )
+    const bytes = await generateCommercePdf(result, { clientName: data.platform || 'Commerce Career Selector' })
+    return Buffer.from(bytes)
+  }
+
   const doc = await PDFDocument.create()
   const font = await doc.embedFont(StandardFonts.Helvetica)
   const fontBold = await doc.embedFont(StandardFonts.HelveticaBold)
@@ -250,7 +270,8 @@ export async function generateReportPdf(data: ReportPdfData, id: string): Promis
   }
 
   // --- Assessment-specific rich content (matches original reference reports) ---
-  const slug = (data.assessment as any).slug || ''
+  // `slug` is resolved at the top of this function (used for the commerce-branch
+  // short-circuit). Reuse it here for the per-assessment rich-content dispatch.
   const hasSpecificContent = ['personality', 'multiple-intelligence', 'stream-selector', 'learning-style'].includes(slug)
 
   // Inner helpers for assessment-specific sections

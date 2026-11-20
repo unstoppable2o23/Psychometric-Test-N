@@ -69,6 +69,9 @@ export const GET = apiHandler(async (req: NextRequest, { params }: { params: Pro
         }
       }),
     },
+    // Raw answers so bespoke PDF renderers (e.g. commerce-branch) can recompute
+    // their full report shape from source. Generic renderer ignores this field.
+    answers: answerMap,
     // Smart Interpreter narrative (counsellor-grade, zero-cost, no LLM)
     interpretation: generateUniversalSmartInterpretation(
       getTestType(report.assessment.slug),
