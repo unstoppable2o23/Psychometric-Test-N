@@ -1,14 +1,10 @@
 // ============================================================================
 // Psychometric Testing Platform — Prisma Schema
 // ----------------------------------------------------------------------------
-// NOTE ON DATABASE: The architecture specification proposed PostgreSQL. This
-// standalone deployment uses SQLite (the configured Prisma provider in this
-// environment) so the application is independently functional without a
-// separate database server. The schema is provider-agnostic: switching to
-// PostgreSQL later only requires changing the `datasource` provider + url and
-// running `prisma migrate`. All enum-like fields use String (SQLite has no
-// native enum) and all "list" fields are stored as JSON strings — both map
-// cleanly to PostgreSQL types when migrated.
+// DATABASE: PostgreSQL (Neon). The schema is provider-agnostic: all enum-like
+// fields use String and all "list" fields are stored as JSON strings, so it
+// maps cleanly to PostgreSQL. The DATABASE_URL is read from the environment
+// (.env locally, Vercel env var in production) — never committed to git.
 // ============================================================================
 
 generator client {
@@ -16,7 +12,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
