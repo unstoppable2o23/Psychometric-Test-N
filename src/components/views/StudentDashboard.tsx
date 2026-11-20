@@ -25,40 +25,13 @@ export function StudentDashboard() {
   }
   useEffect(() => { load() }, [])
 
-  // Map assessment slug to original HTML test file
-  const slugToHtml: Record<string, string> = {
-    'commerce-branch': '/tests/commerce-branch-selector.html',
-    'engineering-branch': '/tests/engineering-branch-selector.html',
-    'humanities-branch': '/tests/humanities-branch-selector.html',
-    'ideal-career': '/tests/ideal-career.html',
-    'learning-style': '/tests/learning-styles.html',
-    'multi-dimensional': '/tests/multi-dimensional.html',
-    'multiple-intelligence': '/tests/multiple-intelligence.html',
-    'personality': '/tests/personality-test.html',
-    'stream-selector': '/tests/stream-selector.html',
-  }
-
   async function handleStart(assignmentId: string, title: string, slug?: string) {
     setStarting(assignmentId)
     try {
-      // Open the original HTML test file directly (preserves original format)
-      const htmlUrl = slug ? slugToHtml[slug] : undefined
-      if (htmlUrl) {
-        // Pass student's name, email, phone as URL params for auto-fill
-        const params = new URLSearchParams({
-          name: user.name,
-          email: user.email,
-          phone: user.phone || '',
-          slug: slug,
-        })
-        setTestLink({ assignmentId, url: `${htmlUrl}?${params.toString()}`, title })
-        toast.success(`${title} is ready — click "Open Test" to begin`)
-      } else {
-        // Fallback to platform test runner
-        const { token } = await api.startTest(assignmentId)
-        setTestLink({ assignmentId, url: `/?test=${token}`, title })
-        toast.success(`${title} is ready — click "Open Test" to begin`)
-      }
+      // Use the platform TestRunner for all tests (supports resume, progress bar, badges)
+      const { token } = await api.startTest(assignmentId)
+      setTestLink({ assignmentId, url: `/?test=${token}`, title })
+      toast.success(`${title} is ready — click "Open Test" to begin`)
     } catch (e: any) {
       toast.error(e.message)
     } finally { setStarting(null) }

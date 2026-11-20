@@ -365,12 +365,12 @@ function CompletionScreen({ recommendation, reportId, onViewDashboard, isAnon }:
             )}
 
             <div className="mt-4 px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-left">
-              <p className="text-xs text-slate-500">Your detailed graphical report has been generated on the server. Your administrator can unlock it for you to view and download as a professional A4 PDF.</p>
+              <p className="text-xs text-slate-500">{isAnon ? 'Click below to view your detailed report.' : 'Your detailed graphical report has been generated on the server. Your administrator can unlock it for you to view and download as a professional A4 PDF.'}</p>
             </div>
 
             <div className="mt-6 flex gap-3">
               <Button onClick={onViewDashboard} className="flex-1 bg-teal-600 hover:bg-teal-700 text-white h-12 text-base">
-                Back to Dashboard
+                {isAnon ? 'View My Report' : 'Back to Dashboard'}
               </Button>
             </div>
           </CardContent>
