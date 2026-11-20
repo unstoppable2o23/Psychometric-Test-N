@@ -17,13 +17,14 @@ export const GET = apiHandler(async (_req: NextRequest, { params }: { params: Pr
 
   const report = await db.report.findUnique({
     where: { id: link.reportId },
-    include: { scoreResult: true, attempt: { select: { id: true, completedAt: true } } },
+    include: { attempt: { select: { id: true, completedAt: true, scoreResult: true } } },
   })
   if (!report) return error('Report not found', 404)
 
   // Enrich with assessment definition data
   const normAssessment = getAssessment(link.assessment.slug)
-  const dims = report.scoreResult ? JSON.parse(report.scoreResult.dimensions) : []
+  const scoreResult = report.attempt.scoreResult
+  const dims = scoreResult ? JSON.parse(scoreResult.dimensions) : []
   const enrichedDims = normAssessment ? dims.map((d: any) => {
     const dimDef = normAssessment.dimensions.find((dd) => dd.code === d.code || dd.name === d.name)
     return { ...d, strengths: dimDef?.strengths || [], developmentAreas: dimDef?.developmentAreas || [], dimensionDescription: dimDef?.description || '' }
@@ -38,9 +39,9 @@ export const GET = apiHandler(async (_req: NextRequest, { params }: { params: Pr
       attempt: report.attempt,
       score: {
         dimensions: enrichedDims,
-        totalScore: report.scoreResult?.totalScore ?? null,
-        recommendation: report.scoreResult?.recommendation ?? null,
-        topDimensions: report.scoreResult?.topDimensions ? JSON.parse(report.scoreResult.topDimensions) : [],
+        totalScore: scoreResult?.totalScore ?? null,
+        recommendation: scoreResult?.recommendation ?? null,
+        topDimensions: scoreResult?.topDimensions ? JSON.parse(scoreResult.topDimensions) : [],
       },
     },
   })

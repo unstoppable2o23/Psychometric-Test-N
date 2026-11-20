@@ -56,7 +56,11 @@ export const GET = apiHandler(async (req: NextRequest, { params }: { params: Pro
       description: normAssessment.description,
       instructions: normAssessment.instructions,
     },
-    attempt: report.attempt,
+    attempt: {
+      id: report.attempt.id,
+      startedAt: report.attempt.startedAt.toISOString(),
+      completedAt: report.attempt.completedAt?.toISOString(),
+    },
     score: {
       ...result,
       dimensions: result.dimensions.map((d) => {

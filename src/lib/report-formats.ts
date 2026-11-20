@@ -292,12 +292,12 @@ function ensureSpace(ctx: PdfCtx, needed: number): void {
 function drawText(
   ctx: PdfCtx,
   text: string,
-  opts: { x?: number; size?: number; font?: PDFFont; color?: any; maxW?: number; lineHeight?: number } = {},
+  opts: { x?: number; size?: number; font?: PDFFont; color?: any; maxWidth?: number; lineHeight?: number } = {},
 ): void {
   const sz = opts.size ?? 10
   const f = opts.font ?? ctx.font
   const col = opts.color ?? C.SLATE
-  const maxW = opts.maxW ?? ctx.contentW
+  const maxW = opts.maxWidth ?? ctx.contentW
   const lh = opts.lineHeight ?? sz + 2
   const x = opts.x ?? ctx.margin
   for (const line of wrapText(text, f, sz, maxW)) {
@@ -555,7 +555,7 @@ export async function generateStreamSelectorReport(data: ReportData, outPath: st
     // Advantages
     if (advantages.length) {
       heading(ctx, 'Advantages', 12, C.TEAL)
-      advantages.forEach(a => drawText(ctx, `* ${a}`, { size: 9.5, maxW: ctx.contentW - 12 }))
+      advantages.forEach(a => drawText(ctx, `* ${a}`, { size: 9.5, maxWidth: ctx.contentW - 12 }))
       spacer(ctx, 6)
     }
 
@@ -598,7 +598,7 @@ export async function generateStreamSelectorReport(data: ReportData, outPath: st
     } else {
       commentary = `Both your aptitude (${apt}) and interest (${int}) in ${title} are moderate or lower. This may not be your strongest fit, but it remains worth exploring if you have a clear vocational goal aligned with this stream.`
     }
-    drawText(ctx, commentary, { size: 9.5, maxW: ctx.contentW - 4 })
+    drawText(ctx, commentary, { size: 9.5, maxWidth: ctx.contentW - 4 })
     spacer(ctx, 6)
   })
 
@@ -669,7 +669,7 @@ export async function generatePersonalityReport(data: ReportData, outPath: strin
     x: ctx.margin + 180, y: ctx.y - 34, size: 14, font: ctx.fontBold, color: C.WHITE,
   })
   ctx.page.drawText(sanitize(profile.profile), {
-    x: ctx.margin + 180, y: ctx.y - 54, size: 8.5, font: ctx.font, color: C.WHITE, maxW: ctx.contentW - 200,
+    x: ctx.margin + 180, y: ctx.y - 54, size: 8.5, font: ctx.font, color: C.WHITE, maxWidth: ctx.contentW - 200,
   })
   ctx.y -= 86
   spacer(ctx, 10)
@@ -746,8 +746,8 @@ export async function generatePersonalityReport(data: ReportData, outPath: strin
       ctx.page.drawRectangle({ x: ctx.margin + colW + 10, y: ry - 18, width: colW, height: rowH, color: i % 2 === 0 ? C.LIGHT : C.WHITE, borderColor: C.BORDER, borderWidth: 0.25 })
       const lText = d.left.traits[i] || ''
       const rText = d.right.traits[i] || ''
-      ctx.page.drawText(sanitize(lText), { x: ctx.margin + 8, y: ry - 12, size: 9, font: ctx.font, color: C.SLATE, maxW: colW - 16 })
-      ctx.page.drawText(sanitize(rText), { x: ctx.margin + colW + 18, y: ry - 12, size: 9, font: ctx.font, color: C.SLATE, maxW: colW - 16 })
+      ctx.page.drawText(sanitize(lText), { x: ctx.margin + 8, y: ry - 12, size: 9, font: ctx.font, color: C.SLATE, maxWidth: colW - 16 })
+      ctx.page.drawText(sanitize(rText), { x: ctx.margin + colW + 18, y: ry - 12, size: 9, font: ctx.font, color: C.SLATE, maxWidth: colW - 16 })
       ctx.y -= rowH
     }
     spacer(ctx, 8)
@@ -778,15 +778,15 @@ export async function generatePersonalityReport(data: ReportData, outPath: strin
   // ---- PAGE 7+: strengths, challenges, careers ---------------------------
   addPage(ctx)
   heading(ctx, 'Your Strengths', 14, C.GREEN)
-  profile.strengths.forEach(s => drawText(ctx, `* ${s}`, { size: 10, maxW: ctx.contentW - 12, color: C.SLATE }))
+  profile.strengths.forEach(s => drawText(ctx, `* ${s}`, { size: 10, maxWidth: ctx.contentW - 12, color: C.SLATE }))
   spacer(ctx, 10)
   heading(ctx, 'Areas To Develop', 14, C.AMBER)
-  profile.challenges.forEach(s => drawText(ctx, `* ${s}`, { size: 10, maxW: ctx.contentW - 12, color: C.SLATE }))
+  profile.challenges.forEach(s => drawText(ctx, `* ${s}`, { size: 10, maxWidth: ctx.contentW - 12, color: C.SLATE }))
   spacer(ctx, 10)
   heading(ctx, 'Career Recommendations', 14, C.TEAL)
   drawText(ctx, 'Based on your personality profile, the following career directions tend to align well with your natural preferences. Treat this as a starting point for exploration rather than a definitive prescription.', { size: 9.5 })
   spacer(ctx, 4)
-  profile.careers.forEach(c => drawText(ctx, `- ${c}`, { size: 10, maxW: ctx.contentW - 12, color: C.SLATE }))
+  profile.careers.forEach(c => drawText(ctx, `- ${c}`, { size: 10, maxWidth: ctx.contentW - 12, color: C.SLATE }))
 
   return await finishDoc(ctx, outPath, `Personality Type Report - ${data.student?.name}`)
 }
@@ -883,28 +883,28 @@ export async function generateMultipleIntelligenceReport(data: ReportData, outPa
     // Strengths
     if (intel.strengths?.length) {
       heading(ctx, 'Strengths', 12, C.GREEN)
-      intel.strengths.forEach((s: string) => drawText(ctx, `* ${s}`, { size: 9.5, maxW: ctx.contentW - 12, color: C.SLATE }))
+      intel.strengths.forEach((s: string) => drawText(ctx, `* ${s}`, { size: 9.5, maxWidth: ctx.contentW - 12, color: C.SLATE }))
       spacer(ctx, 6)
     }
 
     // Challenges
     if (intel.challenges?.length) {
       heading(ctx, 'Challenges', 12, C.AMBER)
-      intel.challenges.forEach((s: string) => drawText(ctx, `* ${s}`, { size: 9.5, maxW: ctx.contentW - 12, color: C.SLATE }))
+      intel.challenges.forEach((s: string) => drawText(ctx, `* ${s}`, { size: 9.5, maxWidth: ctx.contentW - 12, color: C.SLATE }))
       spacer(ctx, 6)
     }
 
     // Famous people
     if (intel.famous?.length) {
       heading(ctx, 'Famous People With This Intelligence', 12, C.TEAL)
-      intel.famous.forEach((s: string) => drawText(ctx, `- ${s}`, { size: 9.5, maxW: ctx.contentW - 12, color: C.SLATE }))
+      intel.famous.forEach((s: string) => drawText(ctx, `- ${s}`, { size: 9.5, maxWidth: ctx.contentW - 12, color: C.SLATE }))
       spacer(ctx, 6)
     }
 
     // Top careers
     if (intel.careers?.length) {
       heading(ctx, 'Top Careers', 12, C.NAVY)
-      intel.careers.forEach((s: string) => drawText(ctx, `- ${s}`, { size: 9.5, maxW: ctx.contentW - 12, color: C.SLATE }))
+      intel.careers.forEach((s: string) => drawText(ctx, `- ${s}`, { size: 9.5, maxWidth: ctx.contentW - 12, color: C.SLATE }))
       spacer(ctx, 6)
     }
 
@@ -1130,7 +1130,7 @@ export async function generateIdealCareerReport(data: ReportData, outPath: strin
       x: cx + 14, y: cy + cardH - 30, size: 16, font: ctx.fontBold, color: C.WHITE,
     })
     ctx.page.drawText(sanitize(info.name), {
-      x: cx + 14, y: cy + cardH - 55, size: 13, font: ctx.fontBold, color: C.WHITE, maxW: cardW - 28,
+      x: cx + 14, y: cy + cardH - 55, size: 13, font: ctx.fontBold, color: C.WHITE, maxWidth: cardW - 28,
     })
     ctx.page.drawText(`Score: ${cluster.score}`, {
       x: cx + 14, y: cy + 20, size: 10, font: ctx.font, color: C.WHITE,
@@ -1213,7 +1213,7 @@ export async function generateIdealCareerReport(data: ReportData, outPath: strin
       // Card per career
       ctx.page.drawRectangle({ x: cx, y: cy - 20, width: colW, height: 22, color: i % 2 === 0 ? C.BG_LIGHT : C.LIGHT, borderColor: C.BORDER, borderWidth: 0.25 })
       ctx.page.drawText(`- ${sanitize(career)}`, {
-        x: cx + 8, y: cy - 14, size: 10, font: ctx.font, color: C.SLATE, maxW: colW - 16,
+        x: cx + 8, y: cy - 14, size: 10, font: ctx.font, color: C.SLATE, maxWidth: colW - 16,
       })
     })
     const careerRows = Math.ceil(info.careers.length / 2)

@@ -299,16 +299,17 @@ export interface ParsedInterpretation {
 export function parseInterpretation(html: string): ParsedInterpretation {
   const stripTags = (s: string) => s.replace(/<[^>]+>/g, '').trim()
   
-  // Extract Executive Synthesis
-  const execMatch = html.match(/Executive Synthesis:<\/strong>\s*(.*?)<\/p>/s)
+  // Extract Executive Synthesis (note: [\s\S] used instead of the 's' regex
+  // flag so the pattern stays compatible with the ES2017 build target)
+  const execMatch = html.match(/Executive Synthesis:<\/strong>\s*([\s\S]*?)<\/p>/)
   const executiveSynthesis = execMatch ? stripTags(execMatch[1]) : ''
   
   // Extract Career Synergies
-  const careerMatch = html.match(/Career Synergies:<\/strong>\s*(.*?)<\/p>/s)
+  const careerMatch = html.match(/Career Synergies:<\/strong>\s*([\s\S]*?)<\/p>/)
   const careerSynergies = careerMatch ? stripTags(careerMatch[1]) : ''
   
   // Extract Action Plan items
-  const liMatches = html.matchAll(/<li>(.*?)<\/li>/gs)
+  const liMatches = html.matchAll(/<li>([\s\S]*?)<\/li>/g)
   const actionPlan: string[] = []
   for (const m of liMatches) {
     actionPlan.push(stripTags(m[1]))

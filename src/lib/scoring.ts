@@ -171,6 +171,7 @@ function scoreDomainStream(assessment: NormAssessment, answers: Record<number, s
     const rec = recs.find((r) => r.code === code)
     return {
       code, title: rec?.title || code,
+      subtitle: rec?.subtitle || '',
       aptitude: Math.min(Math.max(aptAvg, 20), 98),
       interest: Math.min(Math.max(intAvg, 20), 98),
       composite,

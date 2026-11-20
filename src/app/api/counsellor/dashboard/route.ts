@@ -35,7 +35,7 @@ export const GET = apiHandler(async () => {
   return json({
     counsellor: { id: me.id, name: me.name, email: me.email },
     students: students.map((s) => s.student),
-    reports: reports.map((r) => ({ id: r.report.id, grantedAt: r.createdAt, ...r.report, scoreResult: scoreByAttempt[r.report.attemptId] ?? null })),
+    reports: reports.map((r) => ({ grantedAt: r.createdAt, ...r.report, scoreResult: scoreByAttempt[r.report.attemptId] ?? null })),
     manuals: manuals.map((m) => ({ id: m.id, assessmentId: m.assessment.id, title: m.title, assessment: m.assessment })),
   })
 })

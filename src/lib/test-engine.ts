@@ -1,5 +1,6 @@
 import { db } from '@/lib/db'
-import { getAssessment, NormAssessment, NormQuestion } from '@/lib/assessments/loader'
+import { getAssessment } from '@/lib/assessments/loader'
+import type { NormAssessment, NormQuestion } from '@/lib/assessments/types'
 import { AuthError } from '@/lib/auth'
 
 export interface ValidTokenContext {

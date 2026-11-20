@@ -1,10 +1,11 @@
 import { db } from '@/lib/db'
-import { AuthUser } from '@/lib/auth'
 
 export async function audit(
   action: string,
   opts: {
-    actor?: AuthUser | null
+    // Minimal actor shape — call sites pass either a full AuthUser or a
+    // lightweight { id, role } pair (e.g. when acting on behalf of a student).
+    actor?: { id: string; role?: string | null } | null
     targetType?: string
     targetId?: string
     metadata?: Record<string, unknown>

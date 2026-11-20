@@ -85,6 +85,7 @@ export interface ScoreResult {
   domainBreakdown?: {
     code: string
     title: string
+    subtitle?: string
     aptitude: number
     interest: number
     composite: number

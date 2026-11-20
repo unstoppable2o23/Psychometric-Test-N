@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
@@ -22,35 +22,40 @@ export default function AnonTestPage() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
 
-  const loadLink = useCallback(async () => {
-    try {
-      const res = await fetch(`/api/anon/${token}`)
-      const data = await res.json()
-      if (!res.ok) { setErrorMsg(data.error || 'Invalid link'); setPhase('error'); return }
-      setLinkData(data)
+  useEffect(() => {
+    let cancelled = false
+    // All state updates happen inside promise callbacks (never synchronously
+    // within the effect body) and are skipped if the effect was cleaned up.
+    fetch(`/api/anon/${token}`)
+      .then(async (res) => {
+        const data = await res.json()
+        if (cancelled) return
+        if (!res.ok) { setErrorMsg(data.error || 'Invalid link'); setPhase('error'); return }
+        setLinkData(data)
 
-      if (data.isCompleted) {
-        // Test is completed — load the report
-        const repRes = await fetch(`/api/anon/${token}/report`)
-        const repData = await repRes.json()
-        if (repRes.ok) { setReport(repData.report); setPhase('report') }
-        else { setErrorMsg('Failed to load report'); setPhase('error') }
-      } else if (data.isRegistered && data.testToken) {
-        // Registered but not completed — resume via platform TestRunner
-        // Redirect to /?test=TOKEN&anon=ANON_TOKEN
-        window.location.href = `/?test=${data.testToken}&anon=${token}`
-      } else if (data.isRegistered && !data.testToken) {
-        // Registered but no active token — shouldn't happen, but handle it
-        setErrorMsg('Your test session has expired. Please contact the administrator.')
-        setPhase('error')
-      } else {
-        // Not registered — show registration form
-        setPhase('register')
-      }
-    } catch { setErrorMsg('Failed to load'); setPhase('error') }
+        if (data.isCompleted) {
+          // Test is completed — load the report
+          const repRes = await fetch(`/api/anon/${token}/report`)
+          const repData = await repRes.json()
+          if (cancelled) return
+          if (repRes.ok) { setReport(repData.report); setPhase('report') }
+          else { setErrorMsg('Failed to load report'); setPhase('error') }
+        } else if (data.isRegistered && data.testToken) {
+          // Registered but not completed — resume via platform TestRunner
+          // Redirect to /?test=TOKEN&anon=ANON_TOKEN
+          window.location.href = `/?test=${data.testToken}&anon=${token}`
+        } else if (data.isRegistered && !data.testToken) {
+          // Registered but no active token — shouldn't happen, but handle it
+          setErrorMsg('Your test session has expired. Please contact the administrator.')
+          setPhase('error')
+        } else {
+          // Not registered — show registration form
+          setPhase('register')
+        }
+      })
+      .catch(() => { if (!cancelled) { setErrorMsg('Failed to load'); setPhase('error') } })
+    return () => { cancelled = true }
   }, [token])
-
-  useEffect(() => { loadLink() }, [loadLink]) // eslint-disable-line react-hooks/exhaustive-deps
 
   async function register(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
