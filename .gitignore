@@ -40,3 +40,7 @@ Thumbs.db
 # Upload (source HTML files — keep in Git if you want version control of tests)
 # Uncomment the line below if you don't want test source files in Git
 # upload/
+
+# Temporary git fallback artifacts (bundle/patches) — never track these
+pending-changes.bundle
+pending-patches/
